@@ -1557,6 +1557,7 @@
           <div class="level-desc" id="level-desc">Descrição do nível.</div>
           <div class="tag-row">
             <span class="tag" id="tag-optimal">🏁 Ótimo: —</span>
+            <span class="tag hidden" id="tag-blocks">🧩 Blocos: —</span>
             <span class="tag" id="moves">Movimentos: 0</span>
           </div>
         </div>
@@ -1700,12 +1701,12 @@
     <div class="certificate-body">
       <p class="certificate-text">Este certificado é atribuído a</p>
       <p class="certificate-name" id="certPlayerName">Ciber-Herói</p>
-      <p class="certificate-text" id="certAchText">que, com coragem, atenção e sabedoria, completou o</p>
+      <p class="certificate-text" id="certAchText">que, com coragem, atenção e sabedoria, completou o tema</p>
       <p class="certificate-highlight" id="certHighlight">1.º Ciclo de Cibersegurança</p>
       <p class="certificate-text">tornando-se oficialmente Guardião da Cibersegurança.</p>
     </div>
     <div class="certificate-stats">
-      <div class="cert-stat"><span class="cert-stat-icon">📚</span><strong id="certThemes">0/3</strong><span>temas</span></div>
+      <div class="cert-stat"><span class="cert-stat-icon">📚</span><strong id="certThemes">0/3</strong><span>níveis</span></div>
       <div class="cert-stat"><span class="cert-stat-icon">⭐</span><strong id="certStars">0/27</strong><span>estrelas</span></div>
       <div class="cert-stat"><span class="cert-stat-icon">🏆</span><strong id="certMedal">—</strong><span>medalha</span></div>
     </div>
@@ -1900,8 +1901,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentItemEms=["🎈","⭐","🤝"];
   let allDeposited=false, doorPos=null, doorQuizOpen=false;
   let moveHistory=[];
-  let runningQueue=false, queuedCommands=[], queueGroupMode=null;
-  let currentMinMoves=null, shouldDanceOnRender=false;
+  let runningQueue=false, queuedCommands=[], groupStack=[];
+  let currentMinMoves=null, currentMinBlocks=null, lastBlocksUsed=null, shouldDanceOnRender=false;
   let stuckMoves=0, lastItemCount=0, lastRobotPos=null, stuckHintIdx=0;
   const STUCK_THRESHOLD=8;
   const STUCK_HINTS=[
@@ -2048,15 +2049,47 @@ document.addEventListener("DOMContentLoaded", () => {
     return {themesDone, themesTotal:themeKeys.length, starsEarned, starsTotal};
   }
 
-  function showCertificate(ck){
+  // Estatísticas de UM ÚNICO tema (não do ciclo inteiro) — usadas pelo
+  // certificado, que agora se emite por tema em vez de exigir o ciclo
+  // completo. Mesma lógica de estrelas que cycleCertStats, mas só para
+  // os níveis do tema pedido.
+  function themeCertStats(ck,tk){
+    const cycle=GAME_DATA[ck]; const theme=cycle&&cycle.themes[tk];
+    if(!theme) return {levelsDone:0,levelsTotal:0,starsEarned:0,starsTotal:0};
+    const lvls=levelsFor(ck,theme);
+    const prog=loadProgress(ck,tk);
+    let levelsDone=0, starsEarned=0, starsTotal=0;
+    lvls.forEach((lv,idx)=>{
+      starsTotal+=3;
+      const ld=prog.levels&&prog.levels[idx];
+      if(ld&&ld.completed){
+        levelsDone++;
+        const base={robot:lv.robot,items:lv.items,deposit:lv.deposit,obstacles:lv.obstacles||[],size:lv.size};
+        const minMoves=bfsOptimal(base);
+        const bm=ld.bestMoves||99999;
+        const stars=minMoves!==null?(bm<=minMoves?3:bm<=minMoves*1.5?2:1):1;
+        starsEarned+=stars;
+      }
+    });
+    return {levelsDone, levelsTotal:lvls.length, starsEarned, starsTotal};
+  }
+
+  function showCertificate(ck,tk){
     const overlay=$("certificateOverlay"); if(!overlay) return;
     const cycle=GAME_DATA[ck]; if(!cycle) return;
+    const theme=cycle.themes[tk];
     const pName=(localStorage.getItem('mundocrianca_player')||'').trim();
     const cn=$("certPlayerName"); if(cn) cn.textContent=pName||"Ciber-Herói";
     const sub=$("certSubtitle"); if(sub) sub.textContent="de Guardião da Cibersegurança";
-    const hl=$("certHighlight"); if(hl){ const label=ck==="sec"?"Ensino Secundário":cycle.name; hl.textContent=`${label} de Cibersegurança`; }
-    const {themesDone,themesTotal,starsEarned,starsTotal}=cycleCertStats(ck);
-    const ct=$("certThemes"); if(ct) ct.textContent=`${themesDone}/${themesTotal}`;
+    const hl=$("certHighlight");
+    if(hl){
+      const cycleLabel=ck==="sec"?"Ensino Secundário":cycle.name;
+      hl.textContent=theme ? `${theme.name} (${cycleLabel})` : `${cycleLabel} de Cibersegurança`;
+    }
+    const {levelsDone,levelsTotal,starsEarned,starsTotal}=theme
+      ? themeCertStats(ck,tk)
+      : {levelsDone:0,levelsTotal:0,starsEarned:0,starsTotal:0};
+    const ct=$("certThemes"); if(ct) ct.textContent=`${levelsDone}/${levelsTotal}`;
     const cs=$("certStars"); if(cs) cs.textContent=`${starsEarned}/${starsTotal}`;
     const pct=starsTotal>0?Math.round(starsEarned/starsTotal*100):0;
     const cm=$("certMedal"); if(cm) cm.textContent=pct===100?"🥇 Perfeito":pct>=80?"🥈 Excelente":pct>=60?"🥉 Bom":"📚 A Melhorar";
@@ -2126,7 +2159,7 @@ document.addEventListener("DOMContentLoaded", () => {
     while(queue.length){
       const cur=queue.shift();
       if(best!==null&&cur.moves>=best) continue;
-      if(cur.moves>120) continue;
+      if(cur.moves>180) continue;
       const remaining=cur.items.filter(i=>!i.collected);
       const [rr,rc]=cur.rob;
       if(remaining.length===0&&!cur.carry&&rr===door[0]&&rc===door[1]){ best=cur.moves; continue; }
@@ -2191,7 +2224,7 @@ document.addEventListener("DOMContentLoaded", () => {
         processed++;
         const cur=queue.shift();
         if(best!==null&&cur.moves>=best) continue;
-        if(cur.moves>120) continue;
+        if(cur.moves>180) continue;
         const remaining=cur.items.filter(i=>!i.collected);
         const [rr,rc]=cur.rob;
         if(remaining.length===0&&!cur.carry&&rr===door[0]&&rc===door[1]){ best=cur.moves; continue; }
@@ -2411,7 +2444,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cr=$("crumb-level"); if(cr) cr.textContent="Nível "+(idx+1)+" de "+lvls.length;
     const ct=$("crumb-theme"); if(ct) ct.textContent=currentTheme.name+" "+currentTheme.emoji;
     dir=0; carriedItem=null; moveCount=0; allDeposited=false; doorQuizOpen=false;
-    moveHistory=[]; runningQueue=false; queuedCommands=[]; queueGroupMode=null;
+    moveHistory=[]; runningQueue=false; queuedCommands=[]; groupStack=[];
     levelState={
       robot:[...base.robot],
       items:base.items.map(([r,c])=>({r,c,collected:false})),
@@ -2434,6 +2467,26 @@ document.addEventListener("DOMContentLoaded", () => {
         if(to) to.textContent="🏁 Ótimo: "+(result!==null?result+" mov.":"—");
       }
     });
+    // "🧩 Blocos" — só no Secundário: mostra quantos blocos (comandos +
+    // ciclos, contados no nível de topo da sequência) uma solução bem
+    // estruturada precisaria, como referência de eficiência do PROGRAMA,
+    // não só dos movimentos. Não afeta as estrelas — é só feedback extra.
+    currentMinBlocks=null; lastBlocksUsed=0;
+    const tb=$("tag-blocks");
+    if(tb){
+      if(currentCycleKey==="sec"){
+        tb.classList.remove("hidden");
+        tb.textContent="🧩 Blocos: a calcular…";
+        bfsPathAsync(base, doorPos, (path)=>{
+          if(levelState&&currentLevelIndex===idx&&currentThemeKey===capturedThemeKey&&path){
+            currentMinBlocks=compactPathToQueue(path).length;
+            tb.textContent="🧩 Blocos (com ciclos): "+currentMinBlocks;
+          }
+        });
+      } else {
+        tb.classList.add("hidden");
+      }
+    }
     updateMoves();
     stuckMoves=0; lastItemCount=levelState.items.length; lastRobotPos=null; stuckHintIdx=0;
     const qb=$("queue-box");
@@ -3219,7 +3272,16 @@ document.addEventListener("DOMContentLoaded", () => {
       1:[`Conseguiste em ${moveCount} movimentos${currentMinMoves!==null?` (mínimo: ${currentMinMoves})`:``}. Continua a praticar! 🌱`,`Missão completa em ${moveCount} movimentos. Podes fazer melhor! 🎯`]
     };
     const msgs=starMsgs[stars]||starMsgs[1];
-    if(ptxt) ptxt.textContent=msgs[Math.floor(Math.random()*msgs.length)];
+    let msgText=msgs[Math.floor(Math.random()*msgs.length)];
+    // No Secundário, acrescenta feedback sobre eficiência do PROGRAMA em si
+    // (quantos blocos foram usados vs. uma referência com ciclos) — só
+    // informativo, não altera as estrelas (essas continuam a medir só
+    // movimentos, como sempre fizeram).
+    if(currentCycleKey==="sec"&&lastBlocksUsed>0&&currentMinBlocks!==null){
+      if(lastBlocksUsed<=currentMinBlocks) msgText+=" 🧩 E usaste só "+lastBlocksUsed+" blocos — tão eficiente como a referência ("+currentMinBlocks+")!";
+      else msgText+=" 🧩 Usaste "+lastBlocksUsed+" blocos (referência com ciclos: "+currentMinBlocks+") — tenta agrupar mais passos em \"Repetir\" para reduzir.";
+    }
+    if(ptxt) ptxt.textContent=msgText;
     [1,2,3].forEach(i=>{
       const s=$("popup-star"+i); if(s){ s.classList.remove("lit"); if(i<=stars) setTimeout(()=>s.classList.add("lit"),i*220); }
     });
@@ -3271,16 +3333,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // Personalizar mensagem com nome do jogador
     const pName = (localStorage.getItem('mundocrianca_player')||'').trim();
     const ptxt=$("popup-text");
+    // O certificado passou a ser emitido por TEMA (não exige o ciclo
+    // inteiro) — por isso a mensagem já não depende de isCycleFullyComplete;
+    // só muda ligeiramente se for também o último tema do ciclo, como bónus.
     const cycleDone=isCycleFullyComplete(currentCycleKey);
+    const themeName=currentTheme?.name||"este tema";
     if(ptxt) ptxt.textContent=cycleDone
-      ? (pName ? `Parabéns, ${pName}! Completaste o ${GAME_DATA[currentCycleKey]?.name} inteiro! Já podes tirar o teu certificado! 🎓` : `Completaste o ${GAME_DATA[currentCycleKey]?.name} inteiro! Já podes tirar o teu certificado! 🎓`)
-      : (pName ? `Parabéns, ${pName}! Completaste todos os níveis! És um verdadeiro campeão! 🎉` : "Incrível! Completaste todos os níveis! És um verdadeiro campeão! 🎉");
+      ? (pName ? `Parabéns, ${pName}! Completaste "${themeName}" — e com ele, o ${GAME_DATA[currentCycleKey]?.name} inteiro! Tira o teu certificado! 🎓` : `Completaste "${themeName}" — e com ele, o ${GAME_DATA[currentCycleKey]?.name} inteiro! Tira o teu certificado! 🎓`)
+      : (pName ? `Parabéns, ${pName}! Completaste "${themeName}"! Já podes tirar o teu certificado deste tema! 🎓` : `Completaste "${themeName}"! Já podes tirar o teu certificado deste tema! 🎓`);
     [1,2,3].forEach(i=>{ const s=$("popup-star"+i); if(s){ s.classList.remove("lit"); setTimeout(()=>s.classList.add("lit"),i*200); } });
     const pf=$("popup-fact"); if(pf) pf.style.display="none";
     const certBtn=$("popup-cert-btn");
     if(certBtn){
-      if(cycleDone){ certBtn.style.display="inline-flex"; certBtn.dataset.cycle=currentCycleKey; }
-      else certBtn.style.display="none";
+      certBtn.style.display="inline-flex";
+      certBtn.dataset.cycle=currentCycleKey;
+      certBtn.dataset.theme=currentThemeKey;
     }
     pop.classList.remove("hidden");
     // 🎵 Fanfarra final de vitória
@@ -3330,6 +3397,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* QUEUE MODE */
+  // Texto de um passo dentro de um bloco "repetir" — recursivo, porque um
+  // ciclo pode conter outro ciclo lá dentro (ciclo aninhado).
+  function entryInnerText(e){
+    if(e.type==="repeat"){
+      const inner=e.children.map(entryInnerText).join(" ");
+      return "🔁×"+e.times+" [ "+inner+" ]";
+    }
+    return CMD_ICONS[e.cmd]||e.cmd;
+  }
+
   function renderQueue(){
     const qc=$("queue-commands"); if(!qc) return;
     qc.innerHTML="";
@@ -3337,7 +3414,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const span=document.createElement("span");
       if(entry.type==="repeat"){
         span.className="queue-cmd queue-block queue-repeat";
-        const inner=entry.children.map(c=>CMD_ICONS[c.cmd]||c.cmd).join(" ");
+        const inner=entry.children.map(entryInnerText).join(" ");
         span.textContent="🔁×"+entry.times+" [ "+inner+" ]";
       } else {
         span.className="queue-cmd";
@@ -3353,14 +3430,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function updateQueueUI(){ renderQueue(); }
 
-  // Mostra/esconde a barra "a construir um ciclo…" consoante queueGroupMode.
+  // Mostra/esconde a barra "a construir um ciclo…" consoante groupStack.
+  // groupStack pode ter mais de 1 nível — um ciclo aberto dentro de outro
+  // ciclo aberto (ciclo aninhado). Mostra sempre o mais interno (o que
+  // está mesmo a receber os próximos passos), com uma "trilha" (breadcrumb)
+  // dos ciclos ainda por fechar por cima dele.
   function renderQueueGroupBar(){
     const active=$("queue-group-active"), hint=$("queue-group-hint"), row=$("queue-blocks-row");
     if(!active) return;
-    if(queueGroupMode && queueGroupMode.type==="repeat"){
+    if(groupStack.length){
       active.classList.remove("hidden");
-      if(row) row.classList.add("hidden");
-      if(hint) hint.textContent="🔁×"+queueGroupMode.times+" — "+queueGroupMode.children.length+" passo(s) escolhido(s)";
+      if(row) row.classList.remove("hidden"); // permite abrir MAIS um "Repetir" lá dentro (aninhar)
+      const inner=groupStack[groupStack.length-1];
+      const trail=groupStack.map(g=>"🔁×"+g.times).join(" › ");
+      const suffix=groupStack.length>1?" no nível mais interno":"";
+      if(hint) hint.textContent=trail+" — "+inner.children.length+" passo(s) escolhido(s)"+suffix;
     } else {
       active.classList.add("hidden");
       if(row) row.classList.remove("hidden");
@@ -3369,14 +3453,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Ponto único de entrada para adicionar UM comando à sequência — usado
   // pelo clique nos botões, pelo teclado (WASD) e pelo swipe. Se houver um
-  // bloco "repetir" em construção (queueGroupMode), o comando entra
-  // nesse bloco em vez de ir direto para a sequência principal.
+  // ou mais blocos "repetir" em construção (groupStack), o comando entra
+  // sempre no bloco mais interno (o topo da pilha) em vez de ir direto
+  // para a sequência principal.
   function queuePushCmd(cmd){
     const label=CMD_LABELS[cmd]||cmd;
-    if(queueGroupMode){
-      queueGroupMode.children.push({cmd,label});
+    if(groupStack.length){
+      const inner=groupStack[groupStack.length-1];
+      inner.children.push({cmd,label});
       renderQueueGroupBar();
-      setFeedback("✅ Passo adicionado ao ciclo ("+queueGroupMode.children.length+").","info");
+      setFeedback("✅ Passo adicionado ao ciclo ("+inner.children.length+").","info");
       return;
     }
     queuedCommands.push({cmd,label});
@@ -3397,15 +3483,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Corre UMA entrada da sequência — um comando simples, ou um bloco
-  // "repetir" (expandido aqui, em tempo real).
+  // "repetir" (que pode conter outro bloco "repetir" lá dentro — ciclo
+  // aninhado — por isso chama-se a si mesma para cada passo interno).
   async function runQueueEntry(entry){
     if(!runningQueue||doorQuizOpen) return;
     if(entry.type==="repeat"){
       for(let i=0;i<entry.times;i++){
         for(const child of entry.children){
           if(!runningQueue||doorQuizOpen) return;
-          _execCmd(child.cmd);
-          await new Promise(r=>setTimeout(r,340));
+          await runQueueEntry(child);
         }
       }
     } else {
@@ -3418,6 +3504,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(runningQueue||queuedCommands.length===0) return;
     runningQueue=true;
     const cmds=[...queuedCommands]; queuedCommands=[];
+    lastBlocksUsed=(lastBlocksUsed||0)+cmds.length;
     renderQueue();
     try{
       for(const entry of cmds){
@@ -3561,36 +3648,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const runQ=$("btn-run-queue"); if(runQ) runQ.addEventListener("click",executeQueue);
   const undQ=$("btn-undo-queue"); if(undQ) undQ.addEventListener("click",()=>{ if(queuedCommands.length>0){ queuedCommands.pop(); renderQueue(); setFeedback("↩ Último comando removido.","info"); } });
-  const clrQ=$("btn-clear-queue"); if(clrQ) clrQ.addEventListener("click",()=>{ queuedCommands=[]; queueGroupMode=null; renderQueueGroupBar(); renderQueue(); setFeedback("🧹 Sequência limpa.","info"); });
+  const clrQ=$("btn-clear-queue"); if(clrQ) clrQ.addEventListener("click",()=>{ queuedCommands=[]; groupStack=[]; renderQueueGroupBar(); renderQueue(); setFeedback("🧹 Sequência limpa.","info"); });
 
-  // Bloco "Repetir" (só aparece no Secundário — ver loadLevel)
+  // Bloco "Repetir" (só aparece no Secundário — ver loadLevel). Pode
+  // aninhar-se a si mesmo — abrir "Repetir" outra vez enquanto já há um
+  // ciclo em construção começa um ciclo NOVO lá dentro (ciclo aninhado),
+  // até um máximo de 2 níveis para não ficar confuso.
+  const MAX_NEST=2;
   const btnBlockRepeat=$("btn-block-repeat");
   if(btnBlockRepeat) btnBlockRepeat.addEventListener("click",()=>{
-    if(queueGroupMode||runningQueue) return;
+    if(runningQueue) return;
+    if(groupStack.length>=MAX_NEST){
+      setFeedback("🔁 Só podes aninhar ciclos até "+MAX_NEST+" níveis — fecha o mais interno primeiro.","warn");
+      return;
+    }
     $("queue-repeat-picker")?.classList.remove("hidden");
   });
   document.querySelectorAll(".times-btn").forEach(b=>{
     b.addEventListener("click",()=>{
       const times=parseInt(b.getAttribute("data-times"),10)||2;
-      queueGroupMode={type:"repeat",times,children:[]};
+      const group={type:"repeat",times,children:[]};
+      groupStack.push(group);
       $("queue-repeat-picker")?.classList.add("hidden");
       renderQueueGroupBar();
-      setFeedback("🔁 A construir um ciclo de "+times+"×. Escolhe os passos a repetir.","info");
+      setFeedback(groupStack.length>1
+        ? "🔁 A construir um ciclo ANINHADO de "+times+"× dentro do ciclo anterior."
+        : "🔁 A construir um ciclo de "+times+"×. Escolhe os passos a repetir.","info");
     });
   });
   $("btn-repeat-cancel")?.addEventListener("click",()=>{ $("queue-repeat-picker")?.classList.add("hidden"); });
   $("btn-group-close")?.addEventListener("click",()=>{
-    if(!queueGroupMode) return;
-    if(queueGroupMode.type==="repeat"&&queueGroupMode.children.length===0){
+    if(!groupStack.length) return;
+    const inner=groupStack[groupStack.length-1];
+    if(inner.children.length===0){
       setFeedback("Adiciona pelo menos um passo ao ciclo antes de fechar.","warn"); return;
     }
-    queuedCommands.push(queueGroupMode);
-    queueGroupMode=null;
+    groupStack.pop();
+    if(groupStack.length){
+      // Fecha o ciclo mais interno para dentro do ciclo que o envolve.
+      groupStack[groupStack.length-1].children.push(inner);
+      setFeedback("✅ Ciclo aninhado fechado — continua o ciclo de fora.","info");
+    } else {
+      queuedCommands.push(inner);
+      setFeedback("✅ Ciclo adicionado à sequência.","info");
+    }
     renderQueueGroupBar(); renderQueue();
-    setFeedback("✅ Ciclo adicionado à sequência.","info");
   });
   $("btn-group-cancel")?.addEventListener("click",()=>{
-    queueGroupMode=null;
+    if(groupStack.length) groupStack.pop();
     renderQueueGroupBar();
     setFeedback("❌ Bloco cancelado.","info");
   });
@@ -3610,8 +3715,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   $("popup-cert-btn")?.addEventListener("click",()=>{
     const ck=$("popup-cert-btn").dataset.cycle||currentCycleKey;
+    const tk=$("popup-cert-btn").dataset.theme||currentThemeKey;
     $("popup-complete")?.classList.add("hidden");
-    showCertificate(ck);
+    showCertificate(ck,tk);
   });
   $("btnCertBack")?.addEventListener("click",()=>{
     $("certificateOverlay")?.classList.add("hidden");
@@ -4800,6 +4906,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="tutorial-bubble">
           No Secundário tens um bloco extra por baixo da fila de comandos:
           <strong>🔁 Repetir</strong> junta vários passos e corre-os várias vezes seguidas.
+          Podes até abrir um <strong>🔁 Repetir</strong> dentro de outro <strong>🔁 Repetir</strong> — um ciclo aninhado — para resolver caminhos com padrões dentro de padrões.
         </div>
       </div>
       <div class="tutorial-demo" id="tutorial-demo">
