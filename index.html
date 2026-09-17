@@ -710,13 +710,12 @@
     }
     .queue-actions{display:flex;gap:5px;flex-wrap:wrap;}
 
-    /* Blocos "Repetir"/"Se bloqueado" — só disponíveis no Secundário */
+    /* Bloco "Repetir" — só disponível no Secundário */
     .queue-block{
       border-style:dashed!important;
       font-weight:700;
     }
     .queue-repeat{background:rgba(56,189,248,0.14)!important;border-color:#38bdf8!important;color:#7dd3fc!important;}
-    .queue-if{background:rgba(255,68,68,0.14)!important;border-color:#ff4444!important;color:#ff9d9d!important;}
     .queue-blocks-toolbar{margin-top:8px;padding-top:8px;border-top:1px dashed var(--queue-border);}
     .queue-blocks-row{display:flex;gap:6px;flex-wrap:wrap;}
     .queue-repeat-picker,.queue-group-active{
@@ -728,6 +727,26 @@
       background:rgba(56,189,248,0.10);border:1px dashed #38bdf8;border-radius:var(--radius-sm);
       padding:6px 8px;
     }
+
+    /* ── Modo de demonstração ──
+       Ao contrário da execução normal (que esvazia a fila à medida que
+       corre), aqui a sequência inteira fica sempre visível, maior, com o
+       passo atual em destaque — o objetivo é ver a programação, não só o
+       robô a mexer-se. */
+    #queue-box.demo-playing{
+      border-color:#ffd23f; box-shadow:0 0 0 2px rgba(255,210,63,0.35);
+    }
+    #queue-box.demo-playing .queue-label{color:#ffd23f;}
+    #queue-box.demo-playing .queue-cmd{
+      font-size:.86rem; padding:6px 14px; border-width:2px;
+    }
+    .queue-cmd.demo-active{
+      animation:demoPulse .6s ease-in-out infinite alternate;
+      box-shadow:0 0 0 2px #ffd23f,0 0 16px rgba(255,210,63,0.75);
+    }
+    @keyframes demoPulse{from{transform:scale(1);}to{transform:scale(1.08);}}
+    .queue-cmd.demo-done{opacity:.4;}
+    .demo-progress{font-weight:400;opacity:.9;}
 
     .feedback-box{
       border-radius:var(--radius-md);padding:8px 14px;font-size:.8rem;
@@ -1214,6 +1233,26 @@
     }
     .tutorial-dot.active{background:#ffa733;}
     .tutorial-dot-sec-only{display:none;}
+    /* Demonstração animada do bloco "Repetir" — passo 5 do tutorial, só Secundário */
+    .tutorial-demo{width:100%;display:flex;flex-direction:column;align-items:center;gap:7px;margin:2px 0 8px;}
+    .demo-chip{
+      font-family:'Fredoka One',cursive;font-size:.76rem;
+      background:rgba(56,189,248,0.14);border:1.5px dashed #38bdf8;color:#7dd3fc;
+      border-radius:999px;padding:4px 12px;transition:transform .15s;
+    }
+    .demo-chip.pulse{transform:scale(1.1);}
+    .demo-track{position:relative;display:flex;gap:6px;}
+    .demo-cell{
+      width:32px;height:32px;border-radius:8px;
+      background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,167,51,0.3);
+      display:flex;align-items:center;justify-content:center;font-size:1rem;
+    }
+    .demo-robot{
+      position:absolute;top:0;left:0;width:32px;height:32px;
+      display:flex;align-items:center;justify-content:center;font-size:1.15rem;
+      transition:left .5s cubic-bezier(.34,1.56,.64,1);
+    }
+    .demo-status{font-size:.7rem;color:var(--surface-text2);font-family:'Fredoka One',cursive;min-height:1.2em;}
     .tutorial-footer{
       display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;
     }
@@ -1586,7 +1625,6 @@
           <div class="queue-blocks-toolbar hidden" id="queue-blocks-toolbar">
             <div class="queue-blocks-row" id="queue-blocks-row">
               <button class="btn secondary small" id="btn-block-repeat" title="Repete os passos que escolheres N vezes">🔁 Repetir</button>
-              <button class="btn secondary small" id="btn-block-if" title="Só executa um passo se uma condição for verdadeira">❓ Se…</button>
             </div>
             <div class="queue-repeat-picker hidden" id="queue-repeat-picker">
               <span class="queue-blocks-hint">Quantas vezes?</span>
@@ -1595,12 +1633,6 @@
               <button class="btn small times-btn" data-times="4">4×</button>
               <button class="btn small times-btn" data-times="5">5×</button>
               <button class="btn secondary small" id="btn-repeat-cancel">❌</button>
-            </div>
-            <div class="queue-cond-picker hidden" id="queue-cond-picker">
-              <span class="queue-blocks-hint">Se…</span>
-              <button class="btn small cond-btn" data-cond="blocked">🚧 Bloqueado à frente</button>
-              <button class="btn small cond-btn" data-cond="carrying">🎒 A carregar item</button>
-              <button class="btn secondary small" id="btn-cond-cancel">❌</button>
             </div>
             <div class="queue-group-active hidden" id="queue-group-active">
               <span class="queue-blocks-hint" id="queue-group-hint"></span>
@@ -1617,6 +1649,7 @@
           <button class="btn secondary small" id="btn-reset-level">↺ Reiniciar nível</button>
           <button class="btn secondary small" id="btn-undo-direct" style="display:none;">↩ Desfazer (Z)</button>
           <button class="btn secondary small" id="btn-hint">💡 Dica</button>
+          <button class="btn secondary small hidden" id="btn-demo" title="Mostra uma forma de resolver este nível usando os blocos">🎬 Demonstração</button>
         </div>
       </div>
     </div>
@@ -1834,7 +1867,7 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:7,robot:[6,1],items:[[5,4],[3,2],[2,5]],deposit:[[0,6]],obstacles:[[4,3],[4,4],[3,3],[2,2]],difficulty:"Médio",desc:"A tua identidade digital é o rasto que deixas online! Recolhe os documentos de identidade 🪪 e protege-os no cofre digital 🔐."},
             {size:8,robot:[7,2],items:[[6,5],[4,1],[3,6],[2,3]],deposit:[[0,5]],obstacles:[[6,3],[5,3],[4,4],[3,4],[2,5]],difficulty:"Difícil",desc:"Alguém a usar um perfil falso 🎭 tenta enganar-te! Reúne todas as provas da tua identidade real e protege-a no cofre."},
-            {size:8,robot:[7,0],items:[[6,3],[6,6],[4,2],[2,5],[1,7]],deposit:[[0,6]],obstacles:[[6,4],[5,4],[4,4],[3,3],[2,3],[1,4]],difficulty:"Desafio",desc:"Missão final: SIM swapping, perfis falsos e roubo de identidade rondam a rede! Reúne todos os teus dados e protege a tua identidade digital para sempre."}
+            {size:8,robot:[7,0],items:[[1,3],[2,4],[3,5],[4,6],[5,3]],deposit:[[7,7]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[1,4],[1,5],[1,6],[1,7],[2,5],[2,6],[2,7],[3,6],[3,7],[4,7],[5,4],[5,5],[5,6],[5,7],[6,1],[6,2],[6,3],[6,4],[6,5],[6,6],[6,7],[7,1],[7,2],[7,3],[7,4],[7,5],[7,6],[7,7]],difficulty:"Desafio",desc:"Missão final: SIM swapping, perfis falsos e roubo de identidade rondam a rede! O caminho é longo e repetitivo — usa o bloco 🔁 Repetir para avançares mais depressa. Reúne todos os teus dados e protege a tua identidade digital para sempre."}
           ]
         },
         golpes:{
@@ -1844,7 +1877,7 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:7,robot:[6,0],items:[[5,3],[3,4],[2,1]],deposit:[[0,5]],obstacles:[[4,2],[4,3],[3,2],[2,3]],difficulty:"Médio",desc:"Uma oferta boa demais para ser verdade é quase sempre uma burla! Recolhe as lupas de verificação 🔍 e protege o pagamento 🛡️."},
             {size:8,robot:[7,1],items:[[6,5],[4,6],[3,2],[1,4]],deposit:[[0,6]],obstacles:[[6,3],[5,4],[4,3],[3,4],[2,5]],difficulty:"Difícil",desc:"Uma armadilha de subscrição 🕸️ tenta prender-te! Reúne os sinais de alerta e as provas de pagamento seguro antes que seja tarde."},
-            {size:8,robot:[7,3],items:[[6,1],[6,6],[4,4],[2,2],[1,6]],deposit:[[0,7]],obstacles:[[6,4],[5,3],[4,5],[3,3],[2,4],[1,3]],difficulty:"Desafio",desc:"Desafio final contra os golpes online! Dark patterns, sites falsos e ofertas enganosas testam a tua atenção. Protege todos os pagamentos no escudo final!"}
+            {size:8,robot:[7,0],items:[[1,4],[2,3],[4,6],[5,4],[6,5]],deposit:[[7,7]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[1,5],[1,6],[1,7],[2,4],[2,5],[2,6],[2,7],[3,1],[3,2],[3,3],[3,4],[3,5],[3,6],[3,7],[4,7],[5,5],[5,6],[5,7],[6,6],[6,7],[7,1],[7,2],[7,3],[7,4],[7,5],[7,6],[7,7]],difficulty:"Desafio",desc:"Desafio final contra os golpes online! Dark patterns, sites falsos e ofertas enganosas testam a tua atenção. O caminho é longo e repetitivo — usa o bloco 🔁 Repetir para avançares mais depressa. Protege todos os pagamentos no escudo final!"}
           ]
         },
         ciberbullying:{
@@ -1854,7 +1887,7 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:7,robot:[6,2],items:[[5,5],[3,1],[2,4]],deposit:[[0,3]],obstacles:[[4,3],[4,4],[3,3],[2,2]],difficulty:"Médio",desc:"Ninguém merece ser maltratado online! Recolhe os botões de denúncia 🚨 e leva-os a quem pode ajudar 🧑‍⚖️."},
             {size:8,robot:[7,2],items:[[6,6],[4,1],[3,6],[2,3]],deposit:[[0,4]],obstacles:[[6,4],[5,4],[4,4],[3,4],[2,5]],difficulty:"Difícil",desc:"Uma situação triste 😢 pede ajuda! Bloquear, denunciar e contar a um adulto de confiança são sempre os passos certos."},
-            {size:8,robot:[7,0],items:[[6,3],[6,7],[4,5],[2,2],[1,6]],deposit:[[0,4]],obstacles:[[6,5],[5,4],[4,4],[3,3],[2,4],[1,3]],difficulty:"Desafio",desc:"Desafio final: catfishing, sextorsão e ciberbullying não têm lugar online! Reúne todas as denúncias e entrega-as a quem pode proteger-te."}
+            {size:8,robot:[7,0],items:[[1,5],[3,3],[4,6],[5,4],[6,4]],deposit:[[7,7]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[1,6],[1,7],[2,1],[2,2],[2,3],[2,4],[2,5],[2,6],[2,7],[3,4],[3,5],[3,6],[3,7],[4,7],[5,5],[5,6],[5,7],[6,5],[6,6],[6,7],[7,1],[7,2],[7,3],[7,4],[7,5],[7,6],[7,7]],difficulty:"Desafio",desc:"Desafio final: catfishing, sextorsão e ciberbullying não têm lugar online! O caminho é longo e repetitivo — usa o bloco 🔁 Repetir para avançares mais depressa. Reúne todas as denúncias e entrega-as a quem pode proteger-te."}
           ]
         }
       }
@@ -2196,6 +2229,159 @@ document.addEventListener("DOMContentLoaded", () => {
     schedule(runChunk);
   }
 
+  // Variante de bfsOptimalAsync que também guarda o caminho de ações
+  // (não só a contagem) — só usada pelo botão "🎬 Demonstração"; o cálculo
+  // normal do Ótimo/estrelas continua a usar bfsOptimalAsync, sem caminho,
+  // por ser mais leve. Sem cache própria (chamada só quando alguém clica
+  // no botão, não em cada renderização).
+  function bfsPathAsync(base, door, callback){
+    door=door||computeDoorPos(base);
+    const schedule = typeof requestIdleCallback==="function"
+      ? (fn)=>requestIdleCallback(fn,{timeout:2000})
+      : (fn)=>setTimeout(fn,0);
+    const s=base.size;
+    const isObs=(r,c)=>(base.obstacles||[]).some(o=>o[0]===r&&o[1]===c);
+    const dep=door;
+    function stKey(rob,d,items,carry){
+      return rob[0]+","+rob[1]+","+d+","+(carry?1:0)+"|"+items.filter(i=>!i.collected).map(i=>i.r+","+i.c).sort().join(";");
+    }
+    const items0=base.items.map(([r,c])=>({r,c,collected:false}));
+    const start={rob:[...base.robot],d:0,items:items0,carry:false,moves:0,path:[]};
+    const visited=new Set(); visited.add(stKey(start.rob,start.d,start.items,start.carry));
+    const queue=[start];
+    let best=null, bestPath=null;
+    const DR=[[-1,0],[0,1],[1,0],[0,-1]];
+    const CHUNK=300;
+    function runChunk(deadline){
+      let processed=0;
+      while(queue.length && processed<CHUNK){
+        if(deadline && typeof deadline.timeRemaining==="function" && deadline.timeRemaining()<1 && processed>0) break;
+        processed++;
+        const cur=queue.shift();
+        if(best!==null&&cur.moves>=best) continue;
+        if(cur.moves>200) continue;
+        const remaining=cur.items.filter(i=>!i.collected);
+        const [rr,rc]=cur.rob;
+        if(remaining.length===0&&!cur.carry&&rr===door[0]&&rc===door[1]){ best=cur.moves; bestPath=cur.path; continue; }
+        const [fdr,fdc]=DR[cur.d];
+        const [fr,fc]=[rr+fdr,rc+fdc];
+        if(fr>=0&&fr<s&&fc>=0&&fc<s&&!isObs(fr,fc)){
+          const sk=stKey([fr,fc],cur.d,cur.items,cur.carry);
+          if(!visited.has(sk)){ visited.add(sk); queue.push({rob:[fr,fc],d:cur.d,items:cur.items.map(i=>({...i})),carry:cur.carry,moves:cur.moves+1,path:[...cur.path,"MOVE"]}); }
+        }
+        const dl=(cur.d+3)%4;
+        const skl=stKey(cur.rob,dl,cur.items,cur.carry);
+        if(!visited.has(skl)){ visited.add(skl); queue.push({rob:[...cur.rob],d:dl,items:cur.items.map(i=>({...i})),carry:cur.carry,moves:cur.moves+1,path:[...cur.path,"LEFT"]}); }
+        const dr2=(cur.d+1)%4;
+        const skr=stKey(cur.rob,dr2,cur.items,cur.carry);
+        if(!visited.has(skr)){ visited.add(skr); queue.push({rob:[...cur.rob],d:dr2,items:cur.items.map(i=>({...i})),carry:cur.carry,moves:cur.moves+1,path:[...cur.path,"RIGHT"]}); }
+        if(!cur.carry){
+          const idx=cur.items.findIndex(i=>!i.collected&&i.r===rr&&i.c===rc);
+          if(idx>=0){
+            const ni=cur.items.map(i=>({...i})); ni[idx].collected=true;
+            const sk=stKey(cur.rob,cur.d,ni,true);
+            if(!visited.has(sk)){ visited.add(sk); queue.push({rob:[...cur.rob],d:cur.d,items:ni,carry:true,moves:cur.moves+1,path:[...cur.path,"COLLECT"]}); }
+          }
+        }
+        if(cur.carry&&rr===dep[0]&&rc===dep[1]){
+          const sk=stKey(cur.rob,cur.d,cur.items,false);
+          if(!visited.has(sk)){ visited.add(sk); queue.push({rob:[...cur.rob],d:cur.d,items:cur.items.map(i=>({...i})),carry:false,moves:cur.moves+1,path:[...cur.path,"DROP"]}); }
+        }
+      }
+      if(queue.length){ schedule(runChunk); }
+      else{ callback(bestPath); }
+    }
+    schedule(runChunk);
+  }
+
+  // Comprime um caminho plano (["MOVE","MOVE","MOVE","LEFT",...]) em blocos
+  // de fila — corridas de 2+ ações iguais viram "repetir", tal como um
+  // aluno faria à mão. O máximo por bloco é 5×, para bater certo com os
+  // botões 2×/3×/4×/5× que existem na interface.
+  function compactPathToQueue(path){
+    const out=[];
+    let i=0;
+    while(i<path.length){
+      let j=i;
+      while(j<path.length && path[j]===path[i]) j++;
+      let runLen=j-i;
+      const cmd=path[i];
+      const label=CMD_LABELS[cmd]||cmd;
+      while(runLen>=2){
+        const chunk=Math.min(runLen,5);
+        out.push({type:"repeat",times:chunk,children:[{cmd,label}]});
+        runLen-=chunk;
+      }
+      if(runLen===1) out.push({cmd,label});
+      i=j;
+    }
+    return out;
+  }
+
+  // Desenha a sequência de demonstração INTEIRA de uma vez (ao contrário de
+  // renderQueue, que só mostra o que ainda falta correr) — o objetivo aqui
+  // é ver o programa completo, com o passo atual em destaque.
+  function renderDemoQueue(entries){
+    const qc=$("queue-commands"); if(!qc) return;
+    qc.innerHTML="";
+    entries.forEach((entry)=>{
+      const span=document.createElement("span");
+      if(entry.type==="repeat"){
+        span.className="queue-cmd queue-block queue-repeat";
+        const inner=entry.children.map(c=>CMD_ICONS[c.cmd]||c.cmd).join(" ");
+        span.innerHTML="🔁×"+entry.times+" [ "+inner+" ]<span class=\"demo-progress\"></span>";
+      } else {
+        span.className="queue-cmd";
+        span.textContent=entry.label;
+      }
+      qc.appendChild(span);
+    });
+  }
+
+  // Corre a sequência de demonstração passo a passo, mantendo-a sempre
+  // visível: o chip atual pulsa em destaque, os já feitos ficam esbatidos
+  // mas continuam lá — nunca desaparecem, ao contrário da fila normal.
+  async function runDemoEntries(entries){
+    runningQueue=true;
+    const qb=$("queue-box"); if(qb) qb.classList.add("demo-playing");
+    const lbl=qb ? qb.querySelector(".queue-label") : null;
+    const lblOriginal=lbl ? lbl.textContent : null;
+    if(lbl) lbl.textContent="🎬 A demonstrar…";
+    renderDemoQueue(entries);
+    const qc=$("queue-commands");
+    if(qc) qc.scrollIntoView({behavior:"smooth",block:"nearest"});
+    try{
+      for(let idx=0; idx<entries.length; idx++){
+        if(!runningQueue||doorQuizOpen) break;
+        const entry=entries[idx];
+        const chip=qc ? qc.children[idx] : null;
+        if(chip) chip.classList.add("demo-active");
+        if(entry.type==="repeat"){
+          const progEl=chip ? chip.querySelector(".demo-progress") : null;
+          for(let k=0;k<entry.times;k++){
+            if(!runningQueue||doorQuizOpen) break;
+            if(progEl) progEl.textContent=" ("+(k+1)+"/"+entry.times+")";
+            for(const child of entry.children){
+              if(!runningQueue||doorQuizOpen) break;
+              _execCmd(child.cmd);
+              await new Promise(r=>setTimeout(r,420));
+            }
+          }
+        } else {
+          _execCmd(entry.cmd);
+          await new Promise(r=>setTimeout(r,420));
+        }
+        if(chip){ chip.classList.remove("demo-active"); chip.classList.add("demo-done"); }
+      }
+    } catch(e){
+      console.error("Erro na demonstração:",e);
+    } finally{
+      runningQueue=false;
+      if(qb) qb.classList.remove("demo-playing");
+      if(lbl&&lblOriginal!==null) lbl.textContent=lblOriginal;
+    }
+  }
+
   function isQueueMode(){ return currentCycle?.mode==="queue"; }
 
   function computeDoorPos(base){
@@ -2253,11 +2439,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const qb=$("queue-box");
     if(isQueueMode()){ if(qb) qb.classList.remove("hidden"); updateQueueUI(); }
     else{ if(qb) qb.classList.add("hidden"); }
-    // "Repetir"/"Se bloqueado" só existem no Secundário — os outros ciclos
+    // "Repetir" só existe no Secundário — os outros ciclos
     // em modo sequência ficam só com os comandos simples.
     const qbt=$("queue-blocks-toolbar");
     if(qbt) qbt.classList.toggle("hidden", currentCycleKey!=="sec");
     renderQueueGroupBar();
+    // A demonstração só aparece no 1.º nível de cada tema do Secundário —
+    // é onde quem nunca viu os blocos mais precisa de um exemplo ao vivo.
+    const db=$("btn-demo");
+    if(db) db.classList.toggle("hidden", !(currentCycleKey==="sec" && currentLevelIndex===0));
     const ub=$("btn-undo-direct"); if(ub) ub.style.display=isQueueMode()?"none":"inline-flex";
     const bb=$("btn-cmd-back"); if(bb) bb.style.display="flex";
     renderGrid(); setFeedback("📍 Nível "+(idx+1)+" de "+lvls.length+" — "+currentTheme.name,"info");
@@ -3149,11 +3339,6 @@ document.addEventListener("DOMContentLoaded", () => {
         span.className="queue-cmd queue-block queue-repeat";
         const inner=entry.children.map(c=>CMD_ICONS[c.cmd]||c.cmd).join(" ");
         span.textContent="🔁×"+entry.times+" [ "+inner+" ]";
-      } else if(entry.type==="if"){
-        span.className="queue-cmd queue-block queue-if";
-        const inner=entry.children.map(c=>CMD_ICONS[c.cmd]||c.cmd).join(" ");
-        const condIcon=entry.cond==="carrying"?"🎒":"🚧";
-        span.textContent="❓"+condIcon+"→"+inner;
       } else {
         span.className="queue-cmd";
         span.textContent=entry.label;
@@ -3169,8 +3354,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateQueueUI(){ renderQueue(); }
 
   // Mostra/esconde a barra "a construir um ciclo…" consoante queueGroupMode.
-  // Só o bloco "repeat" fica visivelmente "aberto" (o "if" fecha-se sozinho
-  // assim que se escolhe o único passo que o compõe).
   function renderQueueGroupBar(){
     const active=$("queue-group-active"), hint=$("queue-group-hint"), row=$("queue-blocks-row");
     if(!active) return;
@@ -3186,41 +3369,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Ponto único de entrada para adicionar UM comando à sequência — usado
   // pelo clique nos botões, pelo teclado (WASD) e pelo swipe. Se houver um
-  // bloco "repetir"/"se" em construção (queueGroupMode), o comando entra
+  // bloco "repetir" em construção (queueGroupMode), o comando entra
   // nesse bloco em vez de ir direto para a sequência principal.
   function queuePushCmd(cmd){
     const label=CMD_LABELS[cmd]||cmd;
     if(queueGroupMode){
       queueGroupMode.children.push({cmd,label});
-      if(queueGroupMode.type==="if"){
-        // "Se" só embrulha um único passo — fecha-se logo.
-        queuedCommands.push(queueGroupMode);
-        queueGroupMode=null;
-        renderQueueGroupBar(); renderQueue();
-        setFeedback("✅ Bloco \"Se\" adicionado à sequência.","info");
-      } else {
-        renderQueueGroupBar();
-        setFeedback("✅ Passo adicionado ao ciclo ("+queueGroupMode.children.length+").","info");
-      }
+      renderQueueGroupBar();
+      setFeedback("✅ Passo adicionado ao ciclo ("+queueGroupMode.children.length+").","info");
       return;
     }
     queuedCommands.push({cmd,label});
     renderQueue();
     setFeedback("✅ Comando adicionado.","info");
-  }
-
-  // Condição do bloco "Se bloqueado": true se a célula imediatamente à
-  // frente do robô (na direção atual) for um obstáculo ou estiver fora
-  // da grelha. Avaliada em tempo real durante a execução, nunca antes.
-  function frontIsBlocked(){
-    if(!levelState) return true;
-    const s=levelState.size;
-    const [r,c]=levelState.robot;
-    const DR=[[-1,0],[0,1],[1,0],[0,-1]];
-    const [ddr,ddc]=DR[dir];
-    const nr=r+ddr, nc=c+ddc;
-    if(nr<0||nr>=s||nc<0||nc>=s) return true;
-    return (levelState.obstacles||[]).some(o=>o[0]===nr&&o[1]===nc);
   }
 
   // Executa um único comando sem verificar runningQueue
@@ -3236,7 +3397,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Corre UMA entrada da sequência — um comando simples, ou um bloco
-  // "repetir"/"se" (expandido/avaliado aqui, em tempo real).
+  // "repetir" (expandido aqui, em tempo real).
   async function runQueueEntry(entry){
     if(!runningQueue||doorQuizOpen) return;
     if(entry.type==="repeat"){
@@ -3247,17 +3408,6 @@ document.addEventListener("DOMContentLoaded", () => {
           await new Promise(r=>setTimeout(r,340));
         }
       }
-    } else if(entry.type==="if"){
-      const child=entry.children[0];
-      const condTrue = entry.cond==="carrying" ? !!carriedItem : frontIsBlocked();
-      if(condTrue){
-        if(child) _execCmd(child.cmd);
-      } else {
-        setFeedback(entry.cond==="carrying"
-          ? "🔍 Não estás a carregar nada — passo do \"Se\" foi saltado."
-          : "🔍 Não está bloqueado — passo do \"Se\" foi saltado.","info");
-      }
-      await new Promise(r=>setTimeout(r,340));
     } else {
       _execCmd(entry.cmd);
       await new Promise(r=>setTimeout(r,340));
@@ -3413,7 +3563,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const undQ=$("btn-undo-queue"); if(undQ) undQ.addEventListener("click",()=>{ if(queuedCommands.length>0){ queuedCommands.pop(); renderQueue(); setFeedback("↩ Último comando removido.","info"); } });
   const clrQ=$("btn-clear-queue"); if(clrQ) clrQ.addEventListener("click",()=>{ queuedCommands=[]; queueGroupMode=null; renderQueueGroupBar(); renderQueue(); setFeedback("🧹 Sequência limpa.","info"); });
 
-  // Blocos "Repetir"/"Se bloqueado" (só aparecem no Secundário — ver loadLevel)
+  // Bloco "Repetir" (só aparece no Secundário — ver loadLevel)
   const btnBlockRepeat=$("btn-block-repeat");
   if(btnBlockRepeat) btnBlockRepeat.addEventListener("click",()=>{
     if(queueGroupMode||runningQueue) return;
@@ -3429,22 +3579,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
   $("btn-repeat-cancel")?.addEventListener("click",()=>{ $("queue-repeat-picker")?.classList.add("hidden"); });
-  const btnBlockIf=$("btn-block-if");
-  if(btnBlockIf) btnBlockIf.addEventListener("click",()=>{
-    if(queueGroupMode||runningQueue) return;
-    $("queue-cond-picker")?.classList.remove("hidden");
-  });
-  const COND_LABELS={blocked:"estiver bloqueado à frente",carrying:"estiveres a carregar um item"};
-  document.querySelectorAll(".cond-btn").forEach(b=>{
-    b.addEventListener("click",()=>{
-      const cond=b.getAttribute("data-cond")||"blocked";
-      queueGroupMode={type:"if",cond,children:[]};
-      $("queue-cond-picker")?.classList.add("hidden");
-      renderQueueGroupBar();
-      setFeedback("❓ Escolhe UM passo para \"Se "+(COND_LABELS[cond]||cond)+"\".","info");
-    });
-  });
-  $("btn-cond-cancel")?.addEventListener("click",()=>{ $("queue-cond-picker")?.classList.add("hidden"); });
   $("btn-group-close")?.addEventListener("click",()=>{
     if(!queueGroupMode) return;
     if(queueGroupMode.type==="repeat"&&queueGroupMode.children.length===0){
@@ -3626,6 +3760,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const hintBtn=$("btn-hint");
   if(hintBtn) hintBtn.addEventListener("click",showHint);
+
+  // "🎬 Demonstração" — só existe no 1.º nível de cada tema do Secundário
+  // (ver toggle em loadLevel). Reinicia o nível, calcula uma solução real
+  // com bfsPathAsync, monta-a como uma sequência de blocos (com "Repetir"
+  // sempre que houver 2+ ações iguais seguidas) e executa-a no ecrã, para
+  // quem nunca usou os blocos ver o resultado antes de tentar sozinho.
+  const demoBtn=$("btn-demo");
+  if(demoBtn) demoBtn.addEventListener("click",()=>{
+    if(!currentTheme||runningQueue) return;
+    doConfirm("🎬 Vou reiniciar este nível e mostrar uma forma de o resolver usando os blocos. Continuar?",()=>{
+      runningQueue=false; resetQueue(); loadLevel(currentLevelIndex);
+      demoBtn.disabled=true;
+      setFeedback("🎬 A calcular a demonstração…","info");
+      const lvls=levelsFor(currentCycleKey,currentTheme);
+      const base=lvls[currentLevelIndex];
+      const door=computeDoorPos(base);
+      bfsPathAsync(base,door,(path)=>{
+        if(!path||!currentTheme||currentLevelIndex>=lvls.length){
+          setFeedback("😕 Não consegui calcular uma demonstração para este nível.","warn");
+          demoBtn.disabled=false;
+          return;
+        }
+        const entries=compactPathToQueue(path);
+        setFeedback("🎬 Repara na sequência completa — o passo atual fica em destaque!","info");
+        setTimeout(async ()=>{
+          await runDemoEntries(entries);
+          demoBtn.disabled=false;
+        },1200);
+      });
+    });
+  });
 
   document.addEventListener("keydown",e=>{
     if(!gameScreen||gameScreen.classList.contains("hidden")) return;
@@ -4082,6 +4247,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const TOTAL = 5;
 
     function tutDone(){
+      stopDemo();
       try{ localStorage.setItem(TUT_KEY,'1'); }catch(e){}
       const overlay = document.getElementById('tutorial-overlay');
       if(overlay){
@@ -4091,10 +4257,50 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // Demonstração animada e autónoma do bloco "Repetir" no passo 5 — mostra
+    // o robô a avançar 3 vezes seguidas, em ciclo, para quem nunca viu o
+    // bloco perceber o que ele faz antes de o experimentar a sério.
+    let demoTimer=null, demoStep=0;
+    function demoTick(){
+      const robot=document.getElementById('demo-robot');
+      const chip=document.getElementById('demo-chip');
+      const status=document.getElementById('demo-status');
+      if(!robot||!chip||!status) return;
+      demoStep++;
+      if(demoStep>3){
+        status.textContent='✅ Ciclo terminado! A repetir…';
+        demoTimer=setTimeout(()=>{
+          demoStep=0;
+          robot.style.left='0px';
+          status.textContent='A construir: 🔁×3 [ ⬆️ Avançar ]';
+          demoTimer=setTimeout(demoTick,900);
+        },1000);
+        return;
+      }
+      robot.style.left=(demoStep*38)+'px';
+      status.textContent='Passo '+demoStep+' de 3 — ⬆️ Avançar';
+      chip.classList.add('pulse');
+      setTimeout(()=>chip.classList.remove('pulse'),200);
+      demoTimer=setTimeout(demoTick,750);
+    }
+    function startDemo(){
+      stopDemo();
+      demoStep=0;
+      const robot=document.getElementById('demo-robot');
+      const status=document.getElementById('demo-status');
+      if(robot) robot.style.left='0px';
+      if(status) status.textContent='A construir: 🔁×3 [ ⬆️ Avançar ]';
+      demoTimer=setTimeout(demoTick,900);
+    }
+    function stopDemo(){
+      if(demoTimer){ clearTimeout(demoTimer); demoTimer=null; }
+    }
+
     function goToStep(n){
       document.querySelectorAll('.tutorial-step').forEach(s=>s.classList.remove('active'));
       const el = document.getElementById('tut-step-'+n);
       if(el) el.classList.add('active');
+      if(n===5) startDemo(); else stopDemo();
     }
 
     for(let i=1;i<=TOTAL;i++){
@@ -4585,22 +4791,27 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     </div>
 
-    <!-- PASSO 5: Blocos "Repetir" e "Se" — só aparece no Secundário; ver
+    <!-- PASSO 5: Bloco "Repetir" — só aparece no Secundário; ver
          configureTutorialForCycle() para a lógica que o mostra/esconde. -->
     <div class="tutorial-step" id="tut-step-5">
-      <div class="tutorial-title">Ciclos e condições 🔁</div>
+      <div class="tutorial-title">Ciclos 🔁</div>
       <div class="tutorial-robot-row">
         <div class="tutorial-robot"><canvas id="tut-vb-robot-6" class="tut-vb-robot" width="96" height="96" style="width:58px;height:58px;" aria-hidden="true"></canvas></div>
         <div class="tutorial-bubble">
-          No Secundário tens dois blocos extra por baixo da fila de comandos:
+          No Secundário tens um bloco extra por baixo da fila de comandos:
           <strong>🔁 Repetir</strong> junta vários passos e corre-os várias vezes seguidas.
-          <strong>❓ Se</strong> só executa um passo quando uma condição é verdadeira nesse momento do jogo.
         </div>
       </div>
-      <div class="tutorial-visual" style="gap:10px;font-family:'Nunito',sans-serif;flex-direction:column;align-items:flex-start;max-width:230px;">
-        <div style="font-size:.76rem;color:#7dd3fc;">🔁×3 [ ⬆️ ↪️ ] → avança e vira, três vezes seguidas</div>
-        <div style="font-size:.76rem;color:#ff9d9d;">🚧 Se bloqueado à frente → corre o passo só se houver ali um obstáculo</div>
-        <div style="font-size:.76rem;color:#ffd27d;">🎒 Se a carregar item → corre o passo só se tiveres um item nas mãos</div>
+      <div class="tutorial-demo" id="tutorial-demo">
+        <div class="demo-chip" id="demo-chip">🔁×3 [ ⬆️ Avançar ]</div>
+        <div class="demo-track">
+          <div class="demo-cell"></div>
+          <div class="demo-cell"></div>
+          <div class="demo-cell"></div>
+          <div class="demo-cell">🚪</div>
+          <div class="demo-robot" id="demo-robot">🤖</div>
+        </div>
+        <div class="demo-status" id="demo-status">A construir: 🔁×3 [ ⬆️ Avançar ]</div>
       </div>
       <div class="tutorial-footer">
         <button class="tut-skip" id="tut-skip-5">Saltar</button>
