@@ -545,6 +545,31 @@
       /* Feedback e hint mais compactos */
       .feedback-box{font-size:.72rem;padding:6px 10px;margin-bottom:4px;}
       .kbd-hint{display:none;}
+
+      /* D-pad ainda mais compacto no 2.º/3.º Ciclo e Secundário (ver
+         "queue-mode-dpad" em loadLevel) — mais UI a competir por espaço
+         (fila de comandos, blocos) e um público mais velho, que não
+         precisa de alvos de toque tão grandes como o 1.º Ciclo. Ainda
+         acima do mínimo de 44px recomendado para toque em ecrãs táteis. */
+      body.queue-mode-dpad .dpad-wrap{ padding:6px 5px 5px; gap:2px; margin-bottom:6px; }
+      body.queue-mode-dpad .dpad-wrap::before{ font-size:.52rem; }
+      body.queue-mode-dpad .dpad-row{ gap:2px; }
+      body.queue-mode-dpad .dpad-btn,
+      body.queue-mode-dpad .dpad-center,
+      body.queue-mode-dpad .dpad-cell-empty,
+      body.queue-mode-dpad .dpad-action-btn{
+        width:clamp(44px,11vw,52px) !important;
+        height:clamp(44px,11vw,52px) !important;
+        border-radius:10px;
+      }
+      body.queue-mode-dpad .dpad-arrow{ font-size:clamp(.95rem,3vw,1.2rem); }
+      body.queue-mode-dpad .dpad-label{ font-size:.4rem; }
+      body.queue-mode-dpad .dpad-action-btn .dpad-arrow{ font-size:clamp(.85rem,2.6vw,1.1rem); }
+      body.queue-mode-dpad .dpad-compass{
+        width:clamp(38px,9.5vw,46px) !important;
+        height:clamp(38px,9.5vw,46px) !important;
+      }
+      body.queue-mode-dpad .dpad-actions{ gap:4px; margin-top:3px; }
     }
 
     /* cmd-btn: base herdada por dpad-btn e action-btn */
@@ -710,7 +735,7 @@
     }
     .queue-actions{display:flex;gap:5px;flex-wrap:wrap;}
 
-    /* Bloco "Repetir" — só disponível no Secundário */
+    /* Bloco "Repetir" — disponível no 3.º Ciclo e no Secundário */
     .queue-block{
       border-style:dashed!important;
       font-weight:700;
@@ -1233,7 +1258,7 @@
     }
     .tutorial-dot.active{background:#ffa733;}
     .tutorial-dot-sec-only{display:none;}
-    /* Demonstração animada do bloco "Repetir" — passo 5 do tutorial, só Secundário */
+    /* Demonstração animada do bloco "Repetir" — passo 5 do tutorial, 3.º Ciclo e Secundário */
     .tutorial-demo{width:100%;display:flex;flex-direction:column;align-items:center;gap:7px;margin:2px 0 8px;}
     .demo-chip{
       font-family:'Fredoka One',cursive;font-size:.76rem;
@@ -2193,6 +2218,44 @@ document.addEventListener("DOMContentLoaded", () => {
     return best;
   }
 
+  // ── Auto-verificação de níveis (só para desenvolvimento) ──────────────
+  // Corre o mesmo BFS usado no jogo contra TODOS os níveis de GAME_DATA
+  // (incluindo superEasyLevels) e avisa na consola (F12) se algum precisar
+  // de mais ações do que o limite de 180 usado acima (cur.moves>180) — o
+  // sintoma seria "🏁 Ótimo: —" a nunca calcular e a 3ª estrela impossível
+  // de ganhar nesse nível. Só corre se abrires o jogo com "?selfcheck" no
+  // fim do URL (ex: ficheiro.html?selfcheck) — não corre para jogadores
+  // normais, para não gastar tempo de arranque à toa.
+  function runLevelSelfCheck(){
+    console.log("%c🔎 A verificar todos os níveis…","color:#38bdf8;font-weight:bold;");
+    let checked=0, problems=0;
+    Object.keys(GAME_DATA).forEach(ck=>{
+      const cycle=GAME_DATA[ck];
+      Object.keys(cycle.themes).forEach(tk=>{
+        const theme=cycle.themes[tk];
+        ["levels","superEasyLevels"].forEach(listName=>{
+          (theme[listName]||[]).forEach((lv,idx)=>{
+            checked++;
+            const label=`${ck}/${tk}/${listName}[${idx}]`;
+            const door=computeDoorPos(lv);
+            const best=bfsOptimal(lv,door);
+            if(best===null){
+              console.warn(`⚠️ NÍVEL IMPOSSÍVEL: ${label} — nenhuma sequência de ações resolve este nível.`);
+              problems++;
+            } else if(best>180){
+              console.warn(`⚠️ ${label} precisa de ${best} ações — passa o limite atual (180) e vai mostrar "Ótimo: —" para sempre. Considera simplificar o nível ou subir o limite em bfsOptimal()/bfsOptimalAsync().`);
+              problems++;
+            }
+          });
+        });
+      });
+    });
+    console.log(`%c✅ Verificação terminada: ${checked} níveis, ${problems} problema(s) encontrado(s).`, problems?"color:#ff9d9d;font-weight:bold;":"color:#4ecb71;font-weight:bold;");
+  }
+  if(typeof location!=="undefined" && /[?&]selfcheck\b/.test(location.search)){
+    setTimeout(runLevelSelfCheck,0);
+  }
+
   /* Versão assíncrona do BFS — corre durante tempo de inatividade do browser
      para não bloquear o UI. Chama callback(result) quando terminar. */
   function bfsOptimalAsync(base, door, callback){
@@ -2417,6 +2480,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function isQueueMode(){ return currentCycle?.mode==="queue"; }
 
+  // IMPORTANTE para quem editar níveis: "base.deposit" NUNCA é o sítio
+  // físico onde o robô entrega os itens — é só um ponto de REFERÊNCIA
+  // usado aqui para calcular qual dos 4 cantos da grelha fica mais LONGE
+  // dele. Esse canto escolhido ("doorPos") é que é o portal real: onde
+  // os itens são largados (ver dropItem()) e onde o nível termina.
+  // Por isso "deposit" pode perfeitamente cair em cima de um obstáculo
+  // nos dados de um nível (acontece nos 3 níveis "Desafio" do Secundário,
+  // de propósito) — nunca precisa de ser uma célula acessível, só serve
+  // de "direção" para o cálculo abaixo.
   function computeDoorPos(base){
     const s=base.size, dep=base.deposit[0]||[0,0], rob=base.robot;
     const corners=[[0,0],[0,s-1],[s-1,0],[s-1,s-1]];
@@ -2467,14 +2539,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if(to) to.textContent="🏁 Ótimo: "+(result!==null?result+" mov.":"—");
       }
     });
-    // "🧩 Blocos" — só no Secundário: mostra quantos blocos (comandos +
-    // ciclos, contados no nível de topo da sequência) uma solução bem
-    // estruturada precisaria, como referência de eficiência do PROGRAMA,
-    // não só dos movimentos. Não afeta as estrelas — é só feedback extra.
+    // "🧩 Blocos" — no 3.º Ciclo e no Secundário (os dois ciclos com
+    // "Repetir"): mostra quantos blocos (comandos + ciclos, contados no
+    // nível de topo da sequência) uma solução bem estruturada precisaria,
+    // como referência de eficiência do PROGRAMA, não só dos movimentos.
+    // Não afeta as estrelas — é só feedback extra.
     currentMinBlocks=null; lastBlocksUsed=0;
     const tb=$("tag-blocks");
     if(tb){
-      if(currentCycleKey==="sec"){
+      if(currentCycleKey==="sec"||currentCycleKey==="3c"){
         tb.classList.remove("hidden");
         tb.textContent="🧩 Blocos: a calcular…";
         bfsPathAsync(base, doorPos, (path)=>{
@@ -2492,15 +2565,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const qb=$("queue-box");
     if(isQueueMode()){ if(qb) qb.classList.remove("hidden"); updateQueueUI(); }
     else{ if(qb) qb.classList.add("hidden"); }
-    // "Repetir" só existe no Secundário — os outros ciclos
-    // em modo sequência ficam só com os comandos simples.
+    // D-pad mais compacto nos ciclos "fila" (2.º/3.º Ciclo e Secundário) —
+    // têm mais UI a competir por espaço (fila de comandos, blocos) e são
+    // crianças mais velhas, que não precisam de alvos de toque tão grandes
+    // como o 1.º Ciclo. O 1.º Ciclo mantém-se sempre no tamanho grande.
+    document.body.classList.toggle("queue-mode-dpad", isQueueMode());
+    // "Repetir" existe no 3.º Ciclo e no Secundário — só o ANINHAMENTO
+    // (Repetir dentro de Repetir) fica exclusivo do Secundário, decidido
+    // no MAX_NEST junto ao botão "🔁 Repetir".
     const qbt=$("queue-blocks-toolbar");
-    if(qbt) qbt.classList.toggle("hidden", currentCycleKey!=="sec");
+    if(qbt) qbt.classList.toggle("hidden", currentCycleKey!=="sec"&&currentCycleKey!=="3c");
     renderQueueGroupBar();
-    // A demonstração só aparece no 1.º nível de cada tema do Secundário —
-    // é onde quem nunca viu os blocos mais precisa de um exemplo ao vivo.
+    // A demonstração só aparece no 1.º nível de cada tema do 3.º Ciclo e
+    // do Secundário — é onde quem nunca viu os blocos mais precisa de um
+    // exemplo ao vivo.
     const db=$("btn-demo");
-    if(db) db.classList.toggle("hidden", !(currentCycleKey==="sec" && currentLevelIndex===0));
+    if(db) db.classList.toggle("hidden", !((currentCycleKey==="sec"||currentCycleKey==="3c") && currentLevelIndex===0));
     const ub=$("btn-undo-direct"); if(ub) ub.style.display=isQueueMode()?"none":"inline-flex";
     const bb=$("btn-cmd-back"); if(bb) bb.style.display="flex";
     renderGrid(); setFeedback("📍 Nível "+(idx+1)+" de "+lvls.length+" — "+currentTheme.name,"info");
@@ -2595,9 +2675,11 @@ document.addEventListener("DOMContentLoaded", () => {
               ? `<text x="30" y="34" text-anchor="middle" font-size="12" filter="url(#pstar${svgUid})" style="transform-origin:30px 30px;animation:portalCore 1.6s ease-in-out infinite;">🔒</text>`
               : `<text x="30" y="35" text-anchor="middle" font-size="14" filter="url(#pstar${svgUid})" style="transform-origin:30px 30px;animation:portalStarSpin 3s linear infinite;">⭐</text>`
             }
-            <!-- label PORTAL -->
+            <!-- label PORTAL — usa o depositEmoji do tema (currentTheme?.depositEmoji),
+                 tal como os itens/obstáculos já usam itemEmojis/obstacleEmoji, em vez
+                 do 🌀 genérico fixo que estava aqui antes -->
             <text x="30" y="57" text-anchor="middle" font-size="6" font-family="Fredoka One, cursive" font-weight="700"
-              fill="${c1}" opacity="0.9" letter-spacing="0.5">${isComplete?"✅ PORTAL!":"🌀 PORTAL"}</text>
+              fill="${c1}" opacity="0.9" letter-spacing="0.5">${isComplete?"✅ PORTAL!":(currentTheme?.depositEmoji||"🌀")+" PORTAL"}</text>
           </svg>`;
           cell.style.cssText+="position:relative;border-color:"+c2+"!important;box-shadow:0 0 18px "+glowCol+",inset 0 0 10px rgba(0,0,0,0.3)!important;";
           if(isRobot){
@@ -3277,7 +3359,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // (quantos blocos foram usados vs. uma referência com ciclos) — só
     // informativo, não altera as estrelas (essas continuam a medir só
     // movimentos, como sempre fizeram).
-    if(currentCycleKey==="sec"&&lastBlocksUsed>0&&currentMinBlocks!==null){
+    if((currentCycleKey==="sec"||currentCycleKey==="3c")&&lastBlocksUsed>0&&currentMinBlocks!==null){
       if(lastBlocksUsed<=currentMinBlocks) msgText+=" 🧩 E usaste só "+lastBlocksUsed+" blocos — tão eficiente como a referência ("+currentMinBlocks+")!";
       else msgText+=" 🧩 Usaste "+lastBlocksUsed+" blocos (referência com ciclos: "+currentMinBlocks+") — tenta agrupar mais passos em \"Repetir\" para reduzir.";
     }
@@ -3523,6 +3605,78 @@ document.addEventListener("DOMContentLoaded", () => {
   (function addExtraLevels(){
     function rand(n){ return Math.floor(Math.random()*n); }
 
+    // Frases temáticas para os níveis EXTRA (gerados automaticamente).
+    // Sem isto, todos mostravam sempre a mesma frase genérica — e como
+    // há muito mais níveis extra do que feitos à mão (5 a 10 por tema,
+    // contra só 3), era a frase que a maioria dos alunos via. Uma por
+    // "ck/tk", escolhida ao calhas em cada nível gerado.
+    const EXTRA_LEVEL_DESCS = {
+      "1c/senhas": [
+        "Mais uma senha para proteger! Apanha a chave 🔑 e tranca-a bem no cofre 🔐.",
+        "Reforça a tua conta: recolhe o cadeado 🔒 e guarda-o em segurança no cofre 🔐.",
+        "Um escudo de proteção à espera! Leva-o ao cofre 🔐 antes que alguém tente adivinhar a tua senha."
+      ],
+      "1c/dispositivos": [
+        "O teu telemóvel também precisa de cuidados! Leva-o à oficina 🛡️ para o manter seguro.",
+        "Uma atualização em atraso! Apanha-a 🔄 e leva-a à oficina 🛡️ antes que apareça um vírus 🦠.",
+        "Protege mais um aparelho: recolhe o computador 💻 e entrega-o na oficina 🛡️."
+      ],
+      "1c/ajuda": [
+        "Chegou outra mensagem esquisita! Leva o telemóvel 📞 a um adulto de confiança 🧑‍🏫.",
+        "Sentes-te inseguro com algo online? Leva o pedido de ajuda 🆘 a um adulto de confiança 🧑‍🏫.",
+        "Nunca enfrentes isto sozinho: recolhe a mensagem 💬 e mostra-a a um adulto de confiança 🧑‍🏫."
+      ],
+      "2c/dados": [
+        "Mais dados pessoais para proteger! Leva o cartão 🪪 ao arquivo seguro 🗄️, longe de olhos curiosos 🕵️.",
+        "Os teus documentos não são para partilhar! Recolhe-os 📋 e tranca-os no arquivo seguro 🗄️.",
+        "Guarda bem esta informação: leva a ficha 📇 ao arquivo seguro 🗄️ antes que alguém a veja."
+      ],
+      "2c/privacidade": [
+        "Um segredo de um amigo! Leva-o para casa 🏡 e não o partilhes sem autorização.",
+        "Essa mensagem 💌 é privada — leva-a para casa 🏡, longe de olhares indiscretos 👀.",
+        "Mais uma foto que só deve ficar entre amigos: recolhe o cadeado 🔒 e guarda-o em casa 🏡."
+      ],
+      "2c/links": [
+        "Antes de clicares, verifica sempre! Leva o link seguro ✅ ao mundo digital 🌐.",
+        "Cuidado com o phishing 🎣! Recolhe o escudo 🛡️ e protege a tua navegação no mundo digital 🌐.",
+        "Esse link parece seguro? Confirma primeiro — depois leva-o 🔗 ao mundo digital 🌐."
+      ],
+      "3c/backup": [
+        "Mais um ficheiro importante! Guarda-o na nuvem ☁️ antes que algo corra mal.",
+        "Uma pasta cheia de memórias 🗂️ — não corras o risco, leva-a à nuvem ☁️.",
+        "Se o computador falhar ⚡, as cópias de segurança salvam-te: leva a disquete 💾 à nuvem ☁️."
+      ],
+      "3c/publicar": [
+        "Antes de publicares, pensa bem! Leva a ideia 💭 à publicação segura 📤.",
+        "Confirma que está tudo certo ✅ antes de partilhar — depois entrega na publicação segura 📤.",
+        "Um \"gosto\" impulsivo pode esperar: leva-o 👍 à publicação segura 📤 só depois de pensares bem."
+      ],
+      "3c/mundo": [
+        "Mais um escudo para a missão final! Leva-o ao troféu 🏆 e ajuda a proteger o mundo digital.",
+        "Uma ameaça 👾 apareceu — recolhe o cadeado 🔐 e entrega-o para vencer esta fase.",
+        "Estás quase lá: apanha o símbolo da rede 🌐 e leva-o ao troféu final 🏆."
+      ],
+      "sec/identidade": [
+        "Mais um documento digital para proteger da tua identidade! Leva-o ao cofre digital 🔐.",
+        "Cuidado com perfis falsos 🎭 — recolhe o teu avatar 👤 e guarda-o em segurança.",
+        "A tua pegada digital cresce a cada clique: protege este dado 🔏 no cofre digital 🔐."
+      ],
+      "sec/golpes": [
+        "Verifica sempre antes de pagar! Leva o cartão 💳 para um sítio protegido 🛡️.",
+        "Uma burla pode estar escondida como numa teia 🕸️ — usa a lupa 🔍 para investigar antes de avançar.",
+        "Confirma que é mesmo seguro ✅ e protege o pagamento 🛡️ antes que seja tarde."
+      ],
+      "sec/ciberbullying": [
+        "Alguém precisa de ajuda! Leva o botão de denúncia 🚨 a quem pode intervir 🧑‍⚖️.",
+        "Ninguém deve sofrer 😢 online — recolhe a mensagem 💬 e entrega-a a quem pode ajudar 🧑‍⚖️.",
+        "Diz basta 🛑! Leva esta prova a quem pode agir 🧑‍⚖️ e ajudar a parar o ciberbullying."
+      ]
+    };
+    function pickExtraDesc(ck,tk){
+      const pool=EXTRA_LEVEL_DESCS[ck+"/"+tk];
+      return pool ? pool[rand(pool.length)] : "Missão extra: apanha todos os itens e leva ao portal 🌀!";
+    }
+
     /* Calcula o doorPos da mesma forma que computeDoorPos() */
     function getDoorPos(size, robotPos, depositPos, obstacles){
       const corners=[[0,0],[0,size-1],[size-1,0],[size-1,size-1]];
@@ -3574,12 +3728,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return true;
     }
 
-    function makeLevel(size,diff){
+    function makeLevel(size,diff,ck,tk){
       // Limitar obstáculos para garantir jogabilidade:
       // diff 0=Médio: máx 4, diff 1=Difícil: máx 6, diff 2+=Desafio: máx 8
       const ic=diff>=3?4:diff===2?3:2;
       const maxObs=diff>=2?8:diff===1?6:4;
       const ds=["Médio","Difícil","Desafio"];
+      const desc=pickExtraDesc(ck,tk);
       const MAX_ATTEMPTS=50;
       for(let attempt=0;attempt<MAX_ATTEMPTS;attempt++){
         const used=new Set();
@@ -3597,7 +3752,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if(!used.has(k)&&!corners.has(k)){ used.add(k); obstacles.push([r,c]); }
         }
         if(isLevelSolvable(size, robot, items, depositPos, obstacles)){
-          return{size,robot,items,deposit:[depositPos],obstacles,difficulty:ds[Math.min(diff,2)],desc:"Missão extra: apanha todos os itens e leva ao portal 🌀!",_generated:true};
+          return{size,robot,items,deposit:[depositPos],obstacles,difficulty:ds[Math.min(diff,2)],desc,_generated:true};
         }
       }
       // Fallback: nível simples sem obstáculos (sempre possível)
@@ -3605,17 +3760,18 @@ document.addEventListener("DOMContentLoaded", () => {
       function safePos(){ let r,c,k; do{r=rand(size);c=rand(size);k=r+"-"+c;}while(used2.has(k)); used2.add(k);return[r,c]; }
       const robot=safePos(), depositPos=safePos();
       const items=Array.from({length:ic},()=>safePos());
-      return{size,robot,items,deposit:[depositPos],obstacles:[],difficulty:ds[Math.min(diff,2)],desc:"Missão extra: apanha todos os itens e leva ao portal 🌀!",_generated:true};
+      return{size,robot,items,deposit:[depositPos],obstacles:[],difficulty:ds[Math.min(diff,2)],desc,_generated:true};
     }
 
     Object.keys(GAME_DATA).forEach(ck=>{
       const cycle=GAME_DATA[ck], extra=ck==="1c"?10:5;
-      Object.values(cycle.themes).forEach(theme=>{
+      Object.keys(cycle.themes).forEach(tk=>{
+        const theme=cycle.themes[tk];
         theme._designedCount=theme.levels.length;
         for(let i=0;i<extra;i++){
           const size=ck==="1c"?6+rand(2):7+rand(2);
           const diff=Math.min(3,Math.floor(i/2));
-          theme.levels.push(makeLevel(size,diff));
+          theme.levels.push(makeLevel(size,diff,ck,tk));
         }
       });
     });
@@ -3650,16 +3806,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const undQ=$("btn-undo-queue"); if(undQ) undQ.addEventListener("click",()=>{ if(queuedCommands.length>0){ queuedCommands.pop(); renderQueue(); setFeedback("↩ Último comando removido.","info"); } });
   const clrQ=$("btn-clear-queue"); if(clrQ) clrQ.addEventListener("click",()=>{ queuedCommands=[]; groupStack=[]; renderQueueGroupBar(); renderQueue(); setFeedback("🧹 Sequência limpa.","info"); });
 
-  // Bloco "Repetir" (só aparece no Secundário — ver loadLevel). Pode
-  // aninhar-se a si mesmo — abrir "Repetir" outra vez enquanto já há um
-  // ciclo em construção começa um ciclo NOVO lá dentro (ciclo aninhado),
-  // até um máximo de 2 níveis para não ficar confuso.
+  // Bloco "Repetir" (3.º Ciclo e Secundário — ver loadLevel). Só no
+  // Secundário se pode aninhar (abrir "Repetir" outra vez enquanto já há
+  // um ciclo em construção começa um ciclo NOVO lá dentro); no 3.º Ciclo
+  // fica só a versão simples, um nível de cada vez.
   const MAX_NEST=2;
   const btnBlockRepeat=$("btn-block-repeat");
   if(btnBlockRepeat) btnBlockRepeat.addEventListener("click",()=>{
     if(runningQueue) return;
-    if(groupStack.length>=MAX_NEST){
-      setFeedback("🔁 Só podes aninhar ciclos até "+MAX_NEST+" níveis — fecha o mais interno primeiro.","warn");
+    const maxNest = currentCycleKey==="sec" ? MAX_NEST : 1;
+    if(groupStack.length>=maxNest){
+      setFeedback(currentCycleKey==="sec"
+        ? "🔁 Só podes aninhar ciclos até "+MAX_NEST+" níveis — fecha o mais interno primeiro."
+        : "🔁 Fecha este ciclo antes de abrires outro (aninhar só existe no Secundário).","warn");
       return;
     }
     $("queue-repeat-picker")?.classList.remove("hidden");
@@ -3867,7 +4026,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const hintBtn=$("btn-hint");
   if(hintBtn) hintBtn.addEventListener("click",showHint);
 
-  // "🎬 Demonstração" — só existe no 1.º nível de cada tema do Secundário
+  // "🎬 Demonstração" — só existe no 1.º nível de cada tema do 3.º Ciclo
+  // e do Secundário
   // (ver toggle em loadLevel). Reinicia o nível, calcula uma solução real
   // com bfsPathAsync, monta-a como uma sequência de blocos (com "Repetir"
   // sempre que houver 2+ ações iguais seguidas) e executa-a no ecrã, para
@@ -4347,8 +4507,8 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── TUTORIAL ── */
   (function(){
     const TUT_KEY = 'mundocrianca_tutorial_done_v1';
-    // Passo 5 (blocos "Repetir"/"Se") só existe para o Secundário; para os
-    // outros ciclos o fluxo continua a acabar no passo 4, exatamente como
+    // Passo 5 (bloco "Repetir") existe no 3.º Ciclo e no Secundário; para
+    // 1.º/2.º Ciclo o fluxo continua a acabar no passo 4, exatamente como
     // antes desta alteração.
     const TOTAL = 5;
 
@@ -4413,9 +4573,10 @@ document.addEventListener("DOMContentLoaded", () => {
       (function(step){
         const next = document.getElementById('tut-next-'+step);
         if(next) next.addEventListener('click',()=>{
-          // No 4.º passo, quem não está no Secundário termina aqui
-          // (mesmo comportamento que existia antes do passo 5 ser criado).
-          if(step===4 && currentCycleKey!=="sec"){ tutDone(); return; }
+          // No 4.º passo, quem não está no 3.º Ciclo nem no Secundário
+          // termina aqui (mesmo comportamento que existia antes do passo
+          // 5 ser criado — agora o passo 5 também serve o 3.º Ciclo).
+          if(step===4 && currentCycleKey!=="sec" && currentCycleKey!=="3c"){ tutDone(); return; }
           if(step<TOTAL) goToStep(step+1);
           else tutDone();
         });
@@ -4424,16 +4585,25 @@ document.addEventListener("DOMContentLoaded", () => {
       })(i);
     }
 
-    // Ajusta o botão do passo 4 (final para quase todos, "Seguinte" só
-    // para o Secundário) e revela o 5º ponto dos indicadores.
+    // Ajusta o botão do passo 4 (final para 1.º/2.º Ciclo, "Seguinte" para
+    // 3.º Ciclo e Secundário) e revela o 5º ponto dos indicadores.
     function configureTutorialForCycle(){
-      const isSec = currentCycleKey === "sec";
+      // O passo dos ciclos (tut-step-5) agora aparece no 3.º Ciclo E no
+      // Secundário — só o TEXTO muda: no 3.º Ciclo só existe o "Repetir"
+      // simples (sem aninhar); no Secundário pode aninhar-se a si mesmo.
+      const hasCycleStep = currentCycleKey === "sec" || currentCycleKey === "3c";
       document.querySelectorAll('.tutorial-dot-sec-only').forEach(d=>{
-        d.style.display = isSec ? '' : 'none';
+        d.style.display = hasCycleStep ? '' : 'none';
       });
+      const bubble = document.getElementById('tut-cycle-bubble');
+      if(bubble){
+        bubble.innerHTML = currentCycleKey === "sec"
+          ? 'No Secundário tens um bloco extra por baixo da fila de comandos: <strong>🔁 Repetir</strong> junta vários passos e corre-os várias vezes seguidas. Podes até abrir um <strong>🔁 Repetir</strong> dentro de outro <strong>🔁 Repetir</strong> — um ciclo aninhado — para resolver caminhos com padrões dentro de padrões.'
+          : 'Neste ciclo tens um bloco extra por baixo da fila de comandos: <strong>🔁 Repetir</strong> junta vários passos e corre-os várias vezes seguidas, para não teres de os escrever um a um.';
+      }
       const nb4 = document.getElementById('tut-next-4');
       if(nb4){
-        if(isSec){
+        if(hasCycleStep){
           nb4.textContent = 'Seguinte →';
           nb4.style.background=''; nb4.style.borderColor=''; nb4.style.boxShadow='';
         } else {
@@ -4897,16 +5067,16 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     </div>
 
-    <!-- PASSO 5: Bloco "Repetir" — só aparece no Secundário; ver
-         configureTutorialForCycle() para a lógica que o mostra/esconde. -->
+    <!-- PASSO 5: Bloco "Repetir" — aparece no 3.º Ciclo e no Secundário; ver
+         configureTutorialForCycle() para a lógica que o mostra/esconde e
+         que troca o texto da bolha consoante o ciclo. -->
     <div class="tutorial-step" id="tut-step-5">
       <div class="tutorial-title">Ciclos 🔁</div>
       <div class="tutorial-robot-row">
         <div class="tutorial-robot"><canvas id="tut-vb-robot-6" class="tut-vb-robot" width="96" height="96" style="width:58px;height:58px;" aria-hidden="true"></canvas></div>
-        <div class="tutorial-bubble">
-          No Secundário tens um bloco extra por baixo da fila de comandos:
+        <div class="tutorial-bubble" id="tut-cycle-bubble">
+          Tens um bloco extra por baixo da fila de comandos:
           <strong>🔁 Repetir</strong> junta vários passos e corre-os várias vezes seguidas.
-          Podes até abrir um <strong>🔁 Repetir</strong> dentro de outro <strong>🔁 Repetir</strong> — um ciclo aninhado — para resolver caminhos com padrões dentro de padrões.
         </div>
       </div>
       <div class="tutorial-demo" id="tutorial-demo">
