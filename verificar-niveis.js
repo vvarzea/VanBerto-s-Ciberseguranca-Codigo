@@ -91,9 +91,25 @@ function loadDataObject(html, marker, label) {
   }
 }
 
+// Variante que NÃO termina o programa se o bloco não existir — usada para
+// dados opcionais (como o CODE_SNIFF_DATA), que podem não existir em
+// versões mais antigas do ficheiro do jogo.
+function loadOptionalDataObject(html, marker, label) {
+  const objText = extractBlock(html, marker);
+  if (!objText) return null;
+  try {
+    // eslint-disable-next-line no-new-func
+    return Function(`"use strict"; return (${objText});`)();
+  } catch (e) {
+    console.error(`❌ Erro a interpretar ${label}:`, e.message);
+    process.exit(1);
+  }
+}
+
 const GAME_DATA = loadDataObject(html, "const GAME_DATA = {", "GAME_DATA");
 const QUIZ_DATA = loadDataObject(html, "const QUIZ_DATA={", "QUIZ_DATA")
   || loadDataObject(html, "const QUIZ_DATA = {", "QUIZ_DATA");
+let CODE_SNIFF_DATA = loadOptionalDataObject(html, "const CODE_SNIFF_DATA={", "CODE_SNIFF_DATA");
 
 /* ===== Mesmo algoritmo de busca (BFS) do jogo ===== */
 function computeDoorPos(base) {
@@ -255,12 +271,41 @@ if (QUIZ_DATA) {
   console.log("AVISO: não encontrei QUIZ_DATA — perguntas do quiz não verificadas.");
 }
 
+// Desafios de código (CODE_SNIFF_DATA) — mesmo formato de validação do
+// quiz (q/ops/a), mais o campo "code" que tem de existir e não estar vazio.
+let totalCS = 0, csErrors = 0;
+if (CODE_SNIFF_DATA) {
+  Object.keys(CODE_SNIFF_DATA).forEach(key => {
+    const arr = CODE_SNIFF_DATA[key];
+    if (!Array.isArray(arr)) return;
+    arr.forEach((item, idx) => {
+      totalCS++;
+      const label = `codesniff/${key}[${idx}]`;
+      if (typeof item.code !== "string" || !item.code.trim()) {
+        console.log(`ERRO  ${label}: campo "code" vazio/inválido`); csErrors++;
+      }
+      if (typeof item.q !== "string" || !item.q.trim()) {
+        console.log(`ERRO  ${label}: pergunta vazia/inválida`); csErrors++;
+      }
+      if (!Array.isArray(item.ops) || item.ops.length < 2) {
+        console.log(`ERRO  ${label}: precisa de pelo menos 2 opções`); csErrors++;
+      }
+      if (typeof item.a !== "number" || item.a < 0 || (item.ops && item.a >= item.ops.length)) {
+        console.log(`ERRO  ${label}: índice da resposta certa (a=${item.a}) fora do intervalo de opções`); csErrors++;
+      }
+    });
+  });
+} else {
+  console.log("AVISO: não encontrei CODE_SNIFF_DATA — desafios de código não verificados (pode ser normal se esta versão do jogo ainda não os tiver).");
+}
+
 console.log("\n=== RESUMO ===");
 console.log(`Níveis verificados: ${totalLevels}  |  Erros: ${errors}  |  Avisos: ${warnings}`);
 if (QUIZ_DATA) console.log(`Perguntas verificadas: ${totalQ}  |  Erros: ${quizErrors}`);
-if (errors === 0 && quizErrors === 0) {
+if (CODE_SNIFF_DATA) console.log(`Desafios de código verificados: ${totalCS}  |  Erros: ${csErrors}`);
+if (errors === 0 && quizErrors === 0 && csErrors === 0) {
   console.log("\n✅ Tudo em ordem — todos os níveis são possíveis e o quiz está bem formado.");
 } else {
   console.log("\n⚠️  Há problemas por corrigir — ver detalhes acima.");
 }
-process.exit(errors > 0 || quizErrors > 0 ? 1 : 0);
+process.exit(errors > 0 || quizErrors > 0 || csErrors > 0 ? 1 : 0);

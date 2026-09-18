@@ -1540,18 +1540,21 @@
         <div class="theme-title">Identidade Digital</div>
         <div class="theme-sub">Protege quem és online!</div>
         <div class="theme-progress"><div class="theme-progress-bar" style="width:0%"></div></div>
+        <button type="button" class="btn secondary small codesniff-btn" data-theme="identidade">🔍 Desafio de Código</button>
       </div>
       <div class="theme-card theme-card--4c" data-cycle="sec" data-theme="golpes">
         <div class="theme-emoji">💸🛡️</div>
         <div class="theme-title">Golpes e Fraudes Online</div>
         <div class="theme-sub">Não caias em burlas online!</div>
         <div class="theme-progress"><div class="theme-progress-bar" style="width:0%"></div></div>
+        <button type="button" class="btn secondary small codesniff-btn" data-theme="golpes">🔍 Desafio de Código</button>
       </div>
       <div class="theme-card theme-card--4c" data-cycle="sec" data-theme="ciberbullying">
         <div class="theme-emoji">💬🧑‍⚖️</div>
         <div class="theme-title">Ciberbullying / Comportamento Online</div>
         <div class="theme-sub">Respeito e ajuda vêm sempre primeiro!</div>
         <div class="theme-progress"><div class="theme-progress-bar" style="width:0%"></div></div>
+        <button type="button" class="btn secondary small codesniff-btn" data-theme="ciberbullying">🔍 Desafio de Código</button>
       </div>
     </div>
   </div>
@@ -3096,6 +3099,47 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* ===== DESAFIO DE CÓDIGO (só Secundário) =====
+     Mini-desafio extra: mostra um trecho de código HTML real (uma página
+     de login, um formulário de compra, um link, etc.) com um problema de
+     cibersegurança escondido no próprio código-fonte, e pede para
+     identificar qual das opções descreve corretamente o que há de
+     suspeito. Mesmo formato simples de perguntas/opções do QUIZ_DATA
+     (q/ops/a), só que aqui "q" é a pergunta sobre o código e "code" é o
+     trecho a mostrar. */
+  const CODE_SNIFF_DATA={
+    identidade:[
+      {code:'<form action="https://minhas-contas-seguro.net/login" method="post">\n  <h2>Portal de Autenticação — Chave Móvel Digital</h2>\n  <input type="text" name="numero_cc" placeholder="Cartão de Cidadão">\n  <input type="password" name="pin" placeholder="PIN">\n  <button type="submit">Confirmar Identidade</button>\n</form>',
+       q:"O que há de suspeito neste código de um alegado portal da Chave Móvel Digital?",
+       ops:["O formulário pede o PIN da Chave Móvel Digital, mas envia os dados (\"action\") para um domínio \".net\" que não é o site oficial do governo","O formulário usa o método \"post\", o que é sempre inseguro","O botão devia chamar-se \"Enviar\" em vez de \"Confirmar Identidade\""],
+       a:0},
+      {code:'<p>O teu Cartão de Cidadão está a expirar!\n  <a href="http://id-recover-pt.info/renovar">\n    Clica aqui para renovar no site oficial do governo\n  </a>\n</p>',
+       q:"Porque é que este link é suspeito, mesmo dizendo \"site oficial do governo\" no texto?",
+       ops:["O texto do link diz \"site oficial do governo\", mas o endereço real (\"href\") é \"id-recover-pt.info\", um domínio que nada tem a ver com o Estado português","Porque usa a tag <a> em vez de <button>","Porque o texto do link é demasiado longo"],
+       a:0}
+    ],
+    golpes:[
+      {code:'<form>\n  <p>Total: 0,99€ (envio grátis!)</p>\n  <label>\n    <input type="checkbox" name="subscrever" checked style="display:none">\n    Aceito a subscrição mensal de 39,99€/mês\n  </label>\n  <button>Finalizar compra — 0,99€</button>\n</form>',
+       q:"Qual é o \"dark pattern\" (padrão obscuro) escondido neste formulário de compra?",
+       ops:["Há uma checkbox já marcada (\"checked\") para uma subscrição de 39,99€/mês, mas está escondida com \"display:none\" para o cliente não a ver nem a poder desmarcar","O botão devia estar a vermelho em vez de sem cor definida","O formulário não tem \"method\" definido, o que é sempre um erro grave"],
+       a:0},
+      {code:'<a href="https://paypal.com.confirma-reembolso-seguro.info/dados">\n  Recebeste um reembolso! Confirma os teus dados bancários em paypal.com\n</a>',
+       q:"Porque é que este link não é mesmo do PayPal, apesar de mostrar \"paypal.com\"?",
+       ops:["O domínio verdadeiro é \"confirma-reembolso-seguro.info\" — \"paypal.com\" foi colocado antes de propósito, só para parecer oficial; o domínio real lê-se a partir da parte final, antes da primeira barra","Porque a palavra \"reembolso\" nunca é usada em sites legítimos","Porque o link começa por \"https\", que é sempre um sinal de perigo"],
+       a:0}
+    ],
+    ciberbullying:[
+      {code:'<form action="/publicar_confissao">\n  <input type="hidden" name="autor" value="Nome_Real_Do_Aluno">\n  <textarea name="mensagem" placeholder="Escreve algo, é 100% anónimo!"></textarea>\n  <button>Publicar anonimamente</button>\n</form>',
+       q:"Porque é que esta \"caixa de confissões anónimas\" pode não ser assim tão anónima?",
+       ops:["Existe um campo escondido (\"hidden\") que já envia o nome real de quem escreve junto com a mensagem — o site sabe exatamente quem publicou, apesar de dizer que é anónimo","Porque usa \"textarea\" em vez de \"input\"","Porque o botão diz \"Publicar\" em vez de \"Enviar\""],
+       a:0},
+      {code:'<a href="http://ve-quem-te-bloqueou.xyz/verificar?utilizador=tu">\n  😱 Descobre quem te bloqueou e quem anda a falar mal de ti!\n</a>',
+       q:"Que sinais neste link sugerem que é uma armadilha, e não uma funcionalidade real de uma rede social?",
+       ops:["Nenhuma rede social oferece mesmo esta funcionalidade; o domínio \".xyz\" pouco conhecido e a linguagem alarmista (\"descobre quem...\") são táticas clássicas para levar a clicar sem pensar","Porque o link começa por \"http\" em vez de \"ftp\"","Porque tem um emoji no texto, o que nunca acontece em sites reais"],
+       a:0}
+    ]
+  };
+
   /* ===== QUIZ ===== */
   const QUIZ_DATA={
     senhas:[
@@ -3359,6 +3403,98 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+  }
+
+  /* ===== DESAFIO DE CÓDIGO (Secundário) =====
+     Mesmo "esqueleto" técnico do openKidQuiz acima (overlay criado uma
+     única vez e reutilizado), mas percorrendo os desafios de
+     CODE_SNIFF_DATA de um tema em sequência, sem interferir em nada do
+     jogo do robô (níveis, moveCount, progresso) — é um extra
+     independente, acedido pelo botão "🔍 Desafio de Código" nos cartões
+     do Secundário. */
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  }
+  function openCodeSniff(themeKey, idx){
+    idx=idx||0;
+    const list=CODE_SNIFF_DATA[themeKey]||[];
+    let popup=document.getElementById("popup-codesniff");
+    let inner=document.getElementById("popup-codesniff-inner");
+    if(!popup){
+      popup=document.createElement("div");
+      popup.id="popup-codesniff";
+      popup.setAttribute("role","dialog");
+      popup.setAttribute("aria-modal","true");
+      popup.setAttribute("aria-label","Desafio de Código");
+      popup.style.cssText="position:fixed;inset:0;background:rgba(8,3,20,0.85);display:flex;align-items:center;justify-content:center;z-index:9500;backdrop-filter:blur(4px);";
+      inner=document.createElement("div");
+      inner.id="popup-codesniff-inner";
+      inner.style.cssText="background:linear-gradient(155deg,#2d0e52,#1a0835);border:3px solid #38bdf8;outline:2px solid #ffa733;outline-offset:-5px;border-radius:20px;padding:22px 24px;max-width:520px;width:92%;max-height:88vh;overflow-y:auto;text-align:left;box-shadow:0 0 0 2px rgba(56,189,248,0.3),8px 8px 0 #0a0520,0 0 60px rgba(56,189,248,.3);font-family:'Fredoka One',cursive;color:#ffa733;position:relative;";
+      popup.appendChild(inner);
+      document.body.appendChild(popup);
+      if (typeof _overlayObserver !== 'undefined') {
+        _overlayObserver.observe(popup, { attributes: true, attributeFilter: ['class', 'style'] });
+      }
+      popup.addEventListener("click",(e)=>{ if(e.target===popup) closeCodeSniff(); });
+    }
+    popup.style.display="flex"; popup.style.opacity="1"; popup.style.pointerEvents="auto"; updateOverlayOpenClass();
+    if(!list.length){
+      inner.innerHTML=`<div style="text-align:center;">
+        <div style="font-size:.92rem;color:#ffa733;line-height:1.6;margin-bottom:16px;">Ainda não há desafios de código para este tema.</div>
+        <button id="cs-close-empty" class="btn secondary small">← Voltar</button>
+      </div>`;
+      inner.querySelector("#cs-close-empty").addEventListener("click",closeCodeSniff);
+      return;
+    }
+    if(idx>=list.length){
+      inner.innerHTML=`<div style="text-align:center;">
+        <div style="font-size:2.2rem;margin-bottom:8px;">🕵️‍♀️✅</div>
+        <div style="font-size:.95rem;color:#ffa733;font-weight:400;line-height:1.6;margin-bottom:16px;">Completaste todos os desafios de código deste tema! Já sabes olhar para o código de uma página web à procura de sinais de perigo.</div>
+        <button id="cs-close-done" class="btn small">← Voltar</button>
+      </div>`;
+      inner.querySelector("#cs-close-done").addEventListener("click",closeCodeSniff);
+      return;
+    }
+    const ch=list[idx];
+    const opts=ch.ops.map((text,i)=>({text,correct:i===ch.a}));
+    for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}
+    inner.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:.75rem;color:#38bdf8;text-transform:uppercase;letter-spacing:.07em;font-weight:400;">🔍 Desafio de Código</div>
+        <div style="font-size:.72rem;padding:3px 12px;border-radius:999px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.5);color:#ffb890;">${idx+1} / ${list.length}</div>
+      </div>
+      <pre style="background:#0a0520;border:1px solid rgba(56,189,248,0.35);border-radius:10px;padding:12px 14px;overflow-x:auto;font-family:'Consolas','Courier New',monospace;font-size:.72rem;line-height:1.5;color:#7dd3fc;white-space:pre;margin:0 0 14px;"><code>${escapeHtml(ch.code)}</code></pre>
+      <div style="font-size:.88rem;color:#ffa733;font-weight:400;line-height:1.6;margin-bottom:14px;">${ch.q}</div>
+      <div id="cs-opts" style="display:flex;flex-direction:column;gap:8px;">
+        ${opts.map(opt=>`<button data-correct="${opt.correct}" style="padding:10px 12px;border-radius:12px;border:2px solid rgba(56,189,248,0.4);background:rgba(56,189,248,0.08);color:#ffa733;font-size:.78rem;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;text-align:left;line-height:1.4;transition:all .12s;-webkit-tap-highlight-color:transparent;">${escapeHtml(opt.text)}</button>`).join("")}
+      </div>
+      <div id="cs-feedback" style="font-size:.82rem;font-weight:700;min-height:22px;margin-top:12px;color:#ffa733;text-align:center;"></div>
+      <div style="text-align:center;margin-top:8px;"><button id="cs-close" class="btn secondary small">← Voltar</button></div>`;
+    inner.querySelector("#cs-close").addEventListener("click",closeCodeSniff);
+    inner.querySelectorAll("#cs-opts button").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const ok=btn.getAttribute("data-correct")==="true";
+        const fb=inner.querySelector("#cs-feedback");
+        inner.querySelectorAll("#cs-opts button").forEach(b=>{ b.disabled=true; b.style.pointerEvents="none"; });
+        if(ok){
+          btn.style.background="rgba(67,160,71,0.25)"; btn.style.borderColor="#66BB6A"; btn.style.color="#A5D6A7"; btn.style.fontWeight="900";
+          if(fb){fb.style.color="#81C784";fb.textContent="✅ Certo! Boa deteção.";}
+          playTone("quizOk");
+        } else {
+          inner.querySelectorAll("#cs-opts button").forEach(b=>{
+            if(b.getAttribute("data-correct")==="true"){ b.style.background="rgba(67,160,71,0.25)"; b.style.borderColor="#66BB6A"; b.style.color="#A5D6A7"; b.style.fontWeight="900"; }
+          });
+          btn.style.background="rgba(229,57,53,0.25)"; btn.style.borderColor="#EF5350"; btn.style.color="#EF9A9A";
+          if(fb){fb.style.color="#EF9A9A";fb.textContent="❌ Não era essa — repara na parte marcada a verde.";}
+          playTone("quizErr");
+        }
+        setTimeout(()=>openCodeSniff(themeKey, idx+1), 1900);
+      });
+    });
+  }
+  function closeCodeSniff(){
+    const popup=document.getElementById("popup-codesniff");
+    if(popup){ popup.style.display="none"; updateOverlayOpenClass(); }
   }
 
   function completeLevel(){
@@ -3940,6 +4076,17 @@ document.addEventListener("DOMContentLoaded", () => {
       currentLevelIndex=Math.min(progress.currentLevelIndex||0,Math.max(0,lvls.length-1));
       const ct=$("crumb-theme"); if(ct) ct.textContent=currentTheme.name+" "+currentTheme.emoji;
       showScreen(gameScreen); loadLevel(currentLevelIndex);
+    });
+  });
+
+  // Botão "🔍 Desafio de Código" dentro dos cartões do Secundário: abre o
+  // mini-desafio extra sem navegar para o jogo do robô (por isso
+  // stopPropagation, para não disparar também o clique do cartão-pai).
+  document.querySelectorAll(".codesniff-btn").forEach(btn=>{
+    btn.addEventListener("click",(e)=>{
+      e.stopPropagation();
+      const tk=btn.getAttribute("data-theme");
+      openCodeSniff(tk, 0);
     });
   });
 
@@ -4756,7 +4903,7 @@ document.addEventListener("DOMContentLoaded", () => {
      quando um overlay está visível.
   ══════════════════════════════════════════════════ */
   function updateOverlayOpenClass() {
-    const overlayIds = ['popup-complete', 'popup-door-quiz', 'tutorial-overlay', 'teacher-pause-overlay', 'certificateOverlay'];
+    const overlayIds = ['popup-complete', 'popup-door-quiz', 'popup-codesniff', 'tutorial-overlay', 'teacher-pause-overlay', 'certificateOverlay'];
     const anyOpen = overlayIds.some(id => {
       const el = document.getElementById(id);
       if (!el) return false;
@@ -4768,7 +4915,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const _overlayObserver = new MutationObserver(updateOverlayOpenClass);
-  ['popup-complete', 'popup-door-quiz', 'tutorial-overlay', 'teacher-pause-overlay', 'certificateOverlay'].forEach(id => {
+  ['popup-complete', 'popup-door-quiz', 'popup-codesniff', 'tutorial-overlay', 'teacher-pause-overlay', 'certificateOverlay'].forEach(id => {
     const el = document.getElementById(id);
     if (el) _overlayObserver.observe(el, { attributes: true, attributeFilter: ['class'] });
   });
