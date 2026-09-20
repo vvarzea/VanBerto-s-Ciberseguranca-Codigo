@@ -748,6 +748,46 @@
     }
     .queue-blocks-hint{font-size:.72rem;color:var(--surface-text2);font-family:'Fredoka One',cursive;}
     .times-btn{min-width:40px;}
+
+    /* Vista "Pseudocódigo" da fila (só Secundário) e realce de palavras-chave
+       (partilhado com o Desafio de Pseudocódigo) */
+    #queue-pseudo{
+      margin:8px 0 6px;padding:10px 12px;background:#0a0520;
+      border:1px solid rgba(56,189,248,0.35);border-radius:10px;
+      font-family:'Consolas','Courier New',monospace;font-size:.74rem;line-height:1.55;
+      color:#e0f2fe;white-space:pre;overflow-x:auto;max-height:220px;overflow-y:auto;
+    }
+    .ps-kw{color:#ffd23f;font-weight:700;}
+    .ps-cm{color:#9a86b8;font-style:italic;}
+
+    /* Modo "✍️ Escrever" (só Secundário): programar o robô em pseudocódigo */
+    .queue-mode-tabs{display:flex;gap:6px;margin-bottom:8px;}
+    .write-panel{margin-top:2px;}
+    .write-tools{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}
+    #write-code{
+      width:100%;box-sizing:border-box;min-height:150px;resize:vertical;
+      background:#0a0520;color:#e0f2fe;border:1px solid rgba(56,189,248,0.45);border-radius:10px;
+      padding:10px 12px;font-family:'Consolas','Courier New',monospace;font-size:.85rem;line-height:1.55;
+      tab-size:4;white-space:pre;overflow:auto;
+    }
+    #write-code:focus{outline:2px solid #38bdf8;outline-offset:1px;}
+    #write-code::placeholder{color:#7a6b9a;}
+    @media(max-width:600px){#write-code{font-size:16px;}}
+    #write-demo{
+      margin:0;box-sizing:border-box;min-height:150px;background:#0a0520;color:#e0f2fe;
+      border:1px solid rgba(255,210,63,0.6);border-radius:10px;padding:10px 12px;max-height:260px;
+      font-family:'Consolas','Courier New',monospace;font-size:.85rem;line-height:1.55;overflow:auto;white-space:pre;
+    }
+    @media(max-width:600px){#write-demo{font-size:16px;}}
+    .ps-line{display:block;padding-left:4px;border-radius:4px;}
+    .ps-line.ps-active{background:rgba(255,210,63,0.22);box-shadow:-3px 0 0 #ffd23f;}
+    .ps-line.ps-done{opacity:.55;}
+    .write-msg{font-size:.76rem;line-height:1.5;min-height:18px;margin:6px 0;white-space:pre-wrap;font-family:'Nunito',sans-serif;font-weight:700;}
+    .write-msg.err{color:#ff9e9e;}
+    .write-msg.ok{color:#81C784;}
+    .write-help{margin-top:8px;font-size:.74rem;line-height:1.55;}
+    .write-help summary{cursor:pointer;font-weight:800;}
+    .write-help code{background:rgba(56,189,248,0.14);border-radius:5px;padding:0 4px;font-family:'Consolas','Courier New',monospace;}
     .queue-group-active{
       background:rgba(56,189,248,0.10);border:1px dashed #38bdf8;border-radius:var(--radius-sm);
       padding:6px 8px;
@@ -1277,7 +1317,14 @@
       display:flex;align-items:center;justify-content:center;font-size:1.15rem;
       transition:left .5s cubic-bezier(.34,1.56,.64,1);
     }
-    .demo-status{font-size:.7rem;color:var(--surface-text2);font-family:'Fredoka One',cursive;min-height:1.2em;}
+    .demo-status{font-size:.7rem;color:var(--surface-text2);font-family:'Fredoka One',cursive;min-height:1.2em;text-align:center;}
+    /* Demonstração animada dos passos "Fila+Executar" e "✍️ Escrever" do tutorial */
+    .write-demo-pre{
+      font-family:'Fredoka One',cursive;font-size:.68rem;line-height:1.5;
+      background:rgba(26,8,53,0.7);border:1.5px dashed #38bdf8;border-radius:10px;
+      padding:8px 10px;color:#7dd3fc;min-height:64px;width:100%;max-width:220px;
+      white-space:pre-wrap;margin:0;
+    }
     .tutorial-footer{
       display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;
     }
@@ -1541,6 +1588,7 @@
         <div class="theme-sub">Protege quem és online!</div>
         <div class="theme-progress"><div class="theme-progress-bar" style="width:0%"></div></div>
         <button type="button" class="btn secondary small codesniff-btn" data-theme="identidade">🔍 Desafio de Código</button>
+        <button type="button" class="btn secondary small pseudo-btn" data-theme="identidade">🧠 Desafio de Pseudocódigo</button>
       </div>
       <div class="theme-card theme-card--4c" data-cycle="sec" data-theme="golpes">
         <div class="theme-emoji">💸🛡️</div>
@@ -1548,6 +1596,7 @@
         <div class="theme-sub">Não caias em burlas online!</div>
         <div class="theme-progress"><div class="theme-progress-bar" style="width:0%"></div></div>
         <button type="button" class="btn secondary small codesniff-btn" data-theme="golpes">🔍 Desafio de Código</button>
+        <button type="button" class="btn secondary small pseudo-btn" data-theme="golpes">🧠 Desafio de Pseudocódigo</button>
       </div>
       <div class="theme-card theme-card--4c" data-cycle="sec" data-theme="ciberbullying">
         <div class="theme-emoji">💬🧑‍⚖️</div>
@@ -1555,6 +1604,7 @@
         <div class="theme-sub">Respeito e ajuda vêm sempre primeiro!</div>
         <div class="theme-progress"><div class="theme-progress-bar" style="width:0%"></div></div>
         <button type="button" class="btn secondary small codesniff-btn" data-theme="ciberbullying">🔍 Desafio de Código</button>
+        <button type="button" class="btn secondary small pseudo-btn" data-theme="ciberbullying">🧠 Desafio de Pseudocódigo</button>
       </div>
     </div>
   </div>
@@ -1645,10 +1695,16 @@
 
         <div class="queue-box hidden" id="queue-box">
           <div class="queue-label">📋 Sequência de comandos</div>
+          <div class="queue-mode-tabs hidden" id="queue-mode-tabs" role="group" aria-label="Como queres programar o robô?">
+            <button type="button" class="btn small" id="tab-blocks" aria-pressed="true">🧩 Blocos</button>
+            <button type="button" class="btn secondary small" id="tab-write" aria-pressed="false">✍️ Escrever</button>
+          </div>
           <div class="queue-commands" id="queue-commands"></div>
-          <div class="queue-actions">
+          <pre id="queue-pseudo" class="hidden" aria-label="O teu programa em pseudocódigo"></pre>
+          <div class="queue-actions" id="queue-actions-blocks">
             <button class="btn small" id="btn-run-queue" style="display:none;">▶️ Executar</button>
             <button class="btn secondary small" id="btn-undo-queue" style="display:none;">↩ Desfazer</button>
+            <button class="btn secondary small" id="btn-pseudo-toggle" style="display:none;" aria-pressed="false" title="Mostra a tua sequência escrita em pseudocódigo">👁️ Pseudocódigo</button>
             <button class="btn secondary small" id="btn-clear-queue" style="display:none;">🧹 Limpar</button>
           </div>
           <div class="queue-blocks-toolbar hidden" id="queue-blocks-toolbar">
@@ -1668,6 +1724,40 @@
               <button class="btn small" id="btn-group-close">✅ Fechar</button>
               <button class="btn secondary small" id="btn-group-cancel">❌ Cancelar</button>
             </div>
+          </div>
+          <div class="write-panel hidden" id="write-panel">
+            <div class="write-tools">
+              <button type="button" class="btn secondary small" id="wr-repeat" title="Escreve uma linha REPETIR — escolhes quantas vezes e os passos a repetir vão por baixo, mais para dentro">🔁 REPETIR</button>
+              <button type="button" class="btn secondary small" id="wr-indent" title="Põe a linha onde está o cursor mais para dentro (Tab)">⇥ Indentar</button>
+              <button type="button" class="btn secondary small" id="wr-outdent" title="Põe a linha onde está o cursor mais para fora (Shift+Tab)">⇤ Desindentar</button>
+            </div>
+            <div class="queue-repeat-picker hidden" id="wr-repeat-picker">
+              <span class="queue-blocks-hint">Quantas vezes?</span>
+              <button type="button" class="btn small wr-times-btn" data-times="2">2×</button>
+              <button type="button" class="btn small wr-times-btn" data-times="3">3×</button>
+              <button type="button" class="btn small wr-times-btn" data-times="4">4×</button>
+              <button type="button" class="btn small wr-times-btn" data-times="5">5×</button>
+              <button type="button" class="btn secondary small" id="wr-repeat-cancel">❌</button>
+            </div>
+            <pre id="write-demo" class="hidden" aria-label="Demonstração: o programa a ser escrito e executado"></pre>
+            <textarea id="write-code" rows="8" wrap="off" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+              aria-label="Escreve o teu programa em pseudocódigo, um comando por linha"
+              placeholder="// Um comando por linha. Por exemplo:&#10;AVANÇAR&#10;REPETIR 2 VEZES&#10;    VIRAR À DIREITA&#10;    AVANÇAR"></textarea>
+            <div class="write-msg" id="write-msg" role="status" aria-live="polite"></div>
+            <div class="queue-actions">
+              <button type="button" class="btn small" id="wr-run">▶️ Executar</button>
+              <button type="button" class="btn secondary small" id="wr-clear">🧹 Limpar</button>
+              <button type="button" class="btn secondary small" id="wr-to-blocks" title="Converte o que escreveste em blocos (substitui os blocos que lá estiverem)">🧩 Ver em blocos</button>
+            </div>
+            <details class="write-help">
+              <summary>📖 Que palavras posso usar?</summary>
+              <div>
+                Um comando por linha: <code>AVANÇAR</code> · <code>RECUAR</code> · <code>VIRAR À ESQUERDA</code> · <code>VIRAR À DIREITA</code> · <code>APANHAR</code> · <code>DEPOSITAR</code><br>
+                Para repetir: <code>REPETIR 3 VEZES</code> e, nas linhas de baixo, os passos a repetir <b>mais para dentro</b> (tecla Tab ou 4 espaços). Podes pôr um REPETIR dentro de outro (até 2 níveis).<br>
+                Comentários começam por <code>//</code>. Maiúsculas, minúsculas e acentos não importam.<br>
+                Ao carregar em ▶️ Executar, o nível recomeça sempre do início. Os botões de direção e as teclas W A S D E F também escrevem a linha por ti. (Esc e depois Tab sai da caixa de texto.)
+              </div>
+            </details>
           </div>
         </div>
 
@@ -1776,12 +1866,14 @@ document.addEventListener("DOMContentLoaded", () => {
           superEasyLevels:[
             {size:4,robot:[3,3],items:[[1,1]],deposit:[[0,0]],obstacles:[],difficulty:"Super Fácil",desc:"Uma palavra-passe forte protege as tuas contas! Apanha a chave 🔑 e leva ao cofre."},
             {size:5,robot:[4,4],items:[[2,1]],deposit:[[0,0]],obstacles:[],difficulty:"Super Fácil",desc:"Uma boa senha tem letras, números e símbolos! Recolhe o cadeado e protege o cofre."},
-            {size:5,robot:[4,3],items:[[1,3]],deposit:[[0,0]],obstacles:[],difficulty:"Super Fácil",desc:"Nunca partilhes a tua palavra-passe com ninguém! Apanha o escudo protetor."}
+            {size:5,robot:[4,3],items:[[1,1]],deposit:[[0,0]],obstacles:[],difficulty:"Super Fácil",desc:"Nunca partilhes a tua palavra-passe com ninguém! Apanha o escudo protetor."}
           ],
           levels:[
             {size:5,robot:[4,2],items:[[2,2]],deposit:[[0,0]],obstacles:[],difficulty:"Fácil",desc:"Cria uma palavra-passe segura! Apanha a chave 🔑 e leva ao cofre 🔐. Uma senha forte protege-te online!"},
             {size:5,robot:[4,4],items:[[3,1],[1,3]],deposit:[[0,0]],obstacles:[[2,2]],difficulty:"Médio",desc:"Uma senha fraca ❓ bloqueia o caminho! Contorna-a e apanha o cadeado e o escudo para o cofre."},
-            {size:6,robot:[5,5],items:[[4,1],[3,4],[2,5]],deposit:[[0,0]],obstacles:[[3,2],[3,5],[1,3]],difficulty:"Difícil",desc:"O cofre das senhas está cheio de obstáculos! Recolhe todas as chaves e cadeados e leva-os ao cofre 🔐."}
+            {size:6,robot:[5,5],items:[[4,1],[3,4],[2,5]],deposit:[[0,0]],obstacles:[[3,2],[3,5],[1,3]],difficulty:"Difícil",desc:"O cofre das senhas está cheio de obstáculos! Recolhe todas as chaves e cadeados e leva-os ao cofre 🔐."},
+            {size:6,robot:[5,3],items:[[2,0],[4,5],[4,2],[3,3]],deposit:[[0,5]],obstacles:[[1,1],[1,2],[2,2],[2,4],[2,3]],difficulty:"Difícil",desc:"Mais uma senha para proteger! Apanha a chave 🔑 e tranca-a bem no cofre 🔐."},
+            {size:7,robot:[6,3],items:[[4,0],[3,5],[2,0],[5,2]],deposit:[[0,4]],obstacles:[[5,6],[5,5],[4,4],[3,4],[2,1],[3,1]],difficulty:"Desafio",desc:"Reforça a tua conta: recolhe o cadeado 🔒 e guarda-o em segurança no cofre 🔐."}
           ]
         },
         dispositivos:{
@@ -1796,7 +1888,9 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:5,robot:[4,0],items:[[2,1]],deposit:[[0,4]],obstacles:[],difficulty:"Fácil",desc:"O teu computador precisa de uma atualização 💻! Apanha e leva à oficina 🛡️ antes que fique vulnerável!"},
             {size:5,robot:[4,0],items:[[3,2],[1,3]],deposit:[[0,4]],obstacles:[[2,2]],difficulty:"Médio",desc:"Um vírus 🦠 bloqueia o caminho! O computador e o telemóvel precisam de proteção. Leva as atualizações à oficina!"},
-            {size:6,robot:[5,1],items:[[4,3],[2,4],[1,2]],deposit:[[0,5]],obstacles:[[3,2],[2,2],[2,3]],difficulty:"Difícil",desc:"Grande revisão de segurança! Reúne todos os dispositivos: computador, telemóvel e as atualizações!"}
+            {size:6,robot:[5,1],items:[[4,3],[2,4],[1,2]],deposit:[[0,5]],obstacles:[[3,2],[2,2],[2,3]],difficulty:"Difícil",desc:"Grande revisão de segurança! Reúne todos os dispositivos: computador, telemóvel e as atualizações!"},
+            {size:6,robot:[5,2],items:[[1,1],[4,5],[4,2],[3,3]],deposit:[[0,4]],obstacles:[[3,2],[1,5],[2,5],[2,4],[3,4]],difficulty:"Difícil",desc:"O teu telemóvel também precisa de cuidados! Leva-o à oficina 🛡️ para o manter seguro."},
+            {size:6,robot:[5,2],items:[[1,2],[4,2],[2,3],[2,0]],deposit:[[0,4]],obstacles:[[1,5],[4,0],[3,4],[3,3],[4,5],[4,3]],difficulty:"Desafio",desc:"Uma atualização em atraso! Apanha-a 🔄 e leva-a à oficina 🛡️ antes que apareça um vírus 🦠."}
           ]
         },
         ajuda:{
@@ -1806,12 +1900,14 @@ document.addEventListener("DOMContentLoaded", () => {
           superEasyLevels:[
             {size:4,robot:[3,1],items:[[1,2]],deposit:[[0,3]],obstacles:[],difficulty:"Super Fácil",desc:"Se algo correr mal online, pede ajuda! Apanha o telefone e leva ao adulto de confiança."},
             {size:5,robot:[4,1],items:[[2,3]],deposit:[[0,3]],obstacles:[],difficulty:"Super Fácil",desc:"Contar a um adulto é sempre a atitude certa! Recolhe a mensagem de ajuda."},
-            {size:5,robot:[4,0],items:[[1,1]],deposit:[[0,3]],obstacles:[],difficulty:"Super Fácil",desc:"Nunca enfrentes sozinho um problema online! Leva o pedido de ajuda ao professor."}
+            {size:5,robot:[4,1],items:[[1,3]],deposit:[[0,3]],obstacles:[],difficulty:"Super Fácil",desc:"Nunca enfrentes sozinho um problema online! Leva o pedido de ajuda ao professor."}
           ],
           levels:[
             {size:5,robot:[4,1],items:[[2,1]],deposit:[[0,3]],obstacles:[],difficulty:"Fácil",desc:"Recebeste uma mensagem estranha! Apanha o telefone 📞 e leva ao adulto de confiança 🧑‍🏫. Pedir ajuda é sempre a decisão certa!"},
             {size:5,robot:[4,1],items:[[3,3],[1,1]],deposit:[[0,3]],obstacles:[[2,2]],difficulty:"Médio",desc:"A preocupação 😟 bloqueia o caminho! Apanha o telefone e a mensagem e leva-os ao adulto de confiança."},
-            {size:6,robot:[5,0],items:[[4,2],[3,4],[1,3]],deposit:[[0,4]],obstacles:[[3,1],[2,2],[2,3]],difficulty:"Difícil",desc:"Grande missão de ajuda! Reúne todos os pedidos de socorro e leva-os à central de ajuda. Nunca enfrentes um problema online sozinho!"}
+            {size:6,robot:[5,0],items:[[4,2],[3,4],[1,3]],deposit:[[0,4]],obstacles:[[3,1],[2,2],[2,3]],difficulty:"Difícil",desc:"Grande missão de ajuda! Reúne todos os pedidos de socorro e leva-os à central de ajuda. Nunca enfrentes um problema online sozinho!"},
+            {size:6,robot:[5,2],items:[[2,3],[4,3],[4,0],[3,1]],deposit:[[0,5]],obstacles:[[1,5],[2,5],[1,3],[1,0]],difficulty:"Difícil",desc:"Chegou outra mensagem esquisita! Leva o telemóvel 📞 a um adulto de confiança 🧑‍🏫."},
+            {size:6,robot:[5,0],items:[[4,2],[4,5],[2,3],[2,1]],deposit:[[0,4]],obstacles:[[3,5],[4,0],[1,4],[1,5],[2,5]],difficulty:"Desafio",desc:"Sentes-te inseguro com algo online? Leva o pedido de ajuda 🆘 a um adulto de confiança 🧑‍🏫."}
           ]
         }
       }
@@ -1826,7 +1922,9 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:6,robot:[5,0],items:[[4,2],[2,1]],deposit:[[0,5]],obstacles:[[3,2],[3,3]],difficulty:"Fácil",desc:"Os teus dados pessoais são valiosos! Nunca os partilhes com desconhecidos. Leva os documentos 📋 ao arquivo seguro 🗄️!"},
             {size:7,robot:[6,0],items:[[5,4],[3,5],[2,2]],deposit:[[0,6]],obstacles:[[4,2],[4,3],[3,3],[2,4]],difficulty:"Médio",desc:"Um desconhecido 🕵️ tenta obter os teus dados! Nunca partilhes a tua morada ou telefone. Protege os teus documentos e cartões!"},
-            {size:7,robot:[6,1],items:[[5,5],[4,1],[3,6],[2,3]],deposit:[[0,6]],obstacles:[[4,2],[3,2],[3,3],[2,5],[1,3]],difficulty:"Difícil",desc:"O RGPD protege os dados de todas as crianças! Reúne todos os documentos pessoais e guarda-os no arquivo seguro."}
+            {size:7,robot:[6,1],items:[[5,5],[4,1],[3,6],[2,3]],deposit:[[0,6]],obstacles:[[4,2],[3,2],[3,3],[2,5],[1,3]],difficulty:"Difícil",desc:"O RGPD protege os dados de todas as crianças! Reúne todos os documentos pessoais e guarda-os no arquivo seguro."},
+            {size:7,robot:[6,2],items:[[3,2],[2,0],[5,0],[1,1],[1,4],[5,2]],deposit:[[0,6]],obstacles:[[5,4],[4,4],[4,5],[1,2],[2,2],[2,3],[1,0]],difficulty:"Difícil",desc:"Mais dados pessoais para proteger! Leva o cartão 🪪 ao arquivo seguro 🗄️, longe de olhos curiosos 🕵️."},
+            {size:7,robot:[6,2],items:[[5,4],[3,6],[5,1],[3,3],[4,0],[1,5]],deposit:[[0,6]],obstacles:[[1,0],[1,2],[1,1],[2,0],[4,2],[4,3],[4,6]],difficulty:"Desafio",desc:"Os teus documentos não são para partilhar! Recolhe-os 📋 e tranca-os no arquivo seguro 🗄️."}
           ]
         },
         privacidade:{
@@ -1836,7 +1934,9 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:6,robot:[5,1],items:[[4,3],[2,4]],deposit:[[0,2]],obstacles:[[3,2],[3,3]],difficulty:"Fácil",desc:"A privacidade dos amigos é sagrada! Reúne os cadeados 🔒 e leva-os para casa 🏡. Nunca partilhes fotos sem autorização!"},
             {size:7,robot:[6,2],items:[[5,4],[4,1],[2,4]],deposit:[[0,5]],obstacles:[[4,3],[3,3],[3,4],[2,2]],difficulty:"Médio",desc:"Olhares curiosos 👀 tentam espreitar! Mas a privacidade supera tudo. Recolhe os símbolos de confiança e leva-os para casa."},
-            {size:7,robot:[6,3],items:[[5,1],[5,5],[3,2],[2,4]],deposit:[[0,5]],obstacles:[[4,2],[4,3],[3,3],[2,2],[1,4]],difficulty:"Difícil",desc:"Cada pessoa decide o que quer partilhar sobre si! Reúne todos os símbolos de privacidade para a grande casa segura."}
+            {size:7,robot:[6,3],items:[[5,1],[5,5],[3,2],[2,4]],deposit:[[0,5]],obstacles:[[4,2],[4,3],[3,3],[2,2],[1,4]],difficulty:"Difícil",desc:"Cada pessoa decide o que quer partilhar sobre si! Reúne todos os símbolos de privacidade para a grande casa segura."},
+            {size:7,robot:[6,0],items:[[3,6],[3,0],[3,2],[5,1],[1,0]],deposit:[[0,6]],obstacles:[[1,2],[1,3],[2,4],[2,6],[1,6],[4,2],[4,4]],difficulty:"Difícil",desc:"Um segredo de um amigo! Leva-o para casa 🏡 e não o partilhes sem autorização."},
+            {size:8,robot:[7,3],items:[[5,3],[6,0],[4,0],[5,1],[4,4],[2,2]],deposit:[[0,7]],obstacles:[[3,4],[3,3],[5,5],[6,5],[1,0],[3,6],[3,5]],difficulty:"Desafio",desc:"Essa mensagem 💌 é privada — leva-a para casa 🏡, longe de olhares indiscretos 👀."}
           ]
         },
         links:{
@@ -1846,7 +1946,9 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:6,robot:[5,0],items:[[4,2],[2,1]],deposit:[[0,5]],obstacles:[[3,2],[3,3]],difficulty:"Fácil",desc:"Verifica sempre o endereço antes de clicares! Leva os links seguros ✅ ao mundo digital 🌐."},
             {size:7,robot:[6,0],items:[[5,4],[3,5],[2,2]],deposit:[[0,6]],obstacles:[[4,2],[4,3],[3,3],[2,4]],difficulty:"Médio",desc:"Um anzol de phishing 🎣 bloqueia o caminho! Desconfia de mensagens estranhas. Leva os links verificados e o escudo."},
-            {size:7,robot:[6,1],items:[[5,5],[4,1],[3,6],[2,3]],deposit:[[0,6]],obstacles:[[4,2],[3,2],[3,3],[2,5],[1,3]],difficulty:"Difícil",desc:"Evitar links suspeitos é fundamental! Reúne todos os símbolos de navegação segura para o mundo digital."}
+            {size:7,robot:[6,1],items:[[5,5],[4,1],[3,6],[2,3]],deposit:[[0,6]],obstacles:[[4,2],[3,2],[3,3],[2,5],[1,3]],difficulty:"Difícil",desc:"Evitar links suspeitos é fundamental! Reúne todos os símbolos de navegação segura para o mundo digital."},
+            {size:7,robot:[6,2],items:[[1,2],[2,3],[5,3],[2,0],[5,6]],deposit:[[0,4]],obstacles:[[1,0],[1,4],[3,5],[3,4],[4,3],[4,2],[1,3]],difficulty:"Difícil",desc:"Antes de clicares, verifica sempre! Leva o link seguro ✅ ao mundo digital 🌐."},
+            {size:7,robot:[6,0],items:[[3,5],[2,0],[5,3],[3,3],[4,0]],deposit:[[0,4]],obstacles:[[4,3],[4,2],[5,2],[3,2],[3,1],[2,1],[4,6]],difficulty:"Desafio",desc:"Cuidado com o phishing 🎣! Recolhe o escudo 🛡️ e protege a tua navegação no mundo digital 🌐."}
           ]
         }
       }
@@ -1861,7 +1963,9 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:7,robot:[6,0],items:[[5,2],[3,1],[2,4]],deposit:[[0,6]],obstacles:[[4,2],[4,3],[3,3],[2,2]],difficulty:"Médio",desc:"Faz sempre cópias de segurança! Recolhe os ficheiros 💾 e leva-os à nuvem ☁️."},
             {size:8,robot:[7,1],items:[[6,4],[4,6],[2,2],[1,5]],deposit:[[0,7]],obstacles:[[5,2],[5,3],[4,3],[3,4],[2,5]],difficulty:"Difícil",desc:"Uma falha de energia ⚡ pode apagar tudo! Guarda os teus ficheiros numa pen ou na nuvem. Recolhe todas as cópias!"},
-            {size:8,robot:[7,0],items:[[6,2],[6,6],[3,1],[2,4],[1,6]],deposit:[[0,7]],obstacles:[[5,2],[5,5],[4,4],[3,3],[2,2],[1,3]],difficulty:"Desafio",desc:"Missão de proteção total! Uma boa cópia de segurança pode salvar todo o teu trabalho. Reúne todos os ficheiros e pastas para a grande nuvem!"}
+            {size:8,robot:[7,0],items:[[6,2],[6,6],[3,1],[2,4],[1,6]],deposit:[[0,7]],obstacles:[[5,2],[5,5],[4,4],[3,3],[2,2],[1,3]],difficulty:"Desafio",desc:"Missão de proteção total! Uma boa cópia de segurança pode salvar todo o teu trabalho. Reúne todos os ficheiros e pastas para a grande nuvem!"},
+            {size:8,robot:[7,2],items:[[4,0],[3,4],[4,5],[2,5],[5,1],[2,1]],deposit:[[0,5]],obstacles:[[1,0],[2,0],[1,7],[1,2],[6,3],[6,2],[3,0],[2,7]],difficulty:"Desafio",desc:"Mais um ficheiro importante! Guarda-o na nuvem ☁️ antes que algo corra mal."},
+            {size:8,robot:[7,2],items:[[1,6],[6,4],[6,1],[2,4],[5,0],[5,2],[4,6]],deposit:[[0,6]],obstacles:[[5,5],[1,2],[1,3],[1,4],[3,0],[4,3],[6,2],[5,7]],difficulty:"Desafio",desc:"Uma pasta cheia de memórias 🗂️ — não corras o risco, leva-a à nuvem ☁️."}
           ]
         },
         publicar:{
@@ -1871,7 +1975,9 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:7,robot:[6,2],items:[[5,4],[3,5],[2,1]],deposit:[[0,4]],obstacles:[[4,3],[4,4],[3,3],[2,4]],difficulty:"Médio",desc:"Antes de publicares, pensa bem! Apanha as ideias 💭 e leva à publicação segura 📤."},
             {size:8,robot:[7,2],items:[[6,6],[4,1],[3,6],[2,2]],deposit:[[0,4]],obstacles:[[5,4],[5,5],[4,4],[3,4],[2,5],[1,3]],difficulty:"Difícil",desc:"Um alerta ⚠️ lembra-te: o que publicas pode ficar online para sempre! Reúne as ideias e as autorizações antes de publicar."},
-            {size:8,robot:[7,3],items:[[6,1],[6,7],[4,6],[2,2],[1,5]],deposit:[[0,4]],obstacles:[[5,4],[4,4],[3,4],[2,5],[2,3],[1,3]],difficulty:"Desafio",desc:"Desafio final da publicação segura! Pensar antes de publicar protege-te a ti e aos outros. Reúne tudo com responsabilidade!"}
+            {size:8,robot:[7,3],items:[[6,1],[6,7],[4,6],[2,2],[1,5]],deposit:[[0,4]],obstacles:[[5,4],[4,4],[3,4],[2,5],[2,3],[1,3]],difficulty:"Desafio",desc:"Desafio final da publicação segura! Pensar antes de publicar protege-te a ti e aos outros. Reúne tudo com responsabilidade!"},
+            {size:8,robot:[7,0],items:[[3,4],[6,5],[1,0],[5,7],[4,6],[1,2]],deposit:[[0,7]],obstacles:[[4,4],[4,3],[1,1],[3,2],[1,4],[1,3],[2,5]],difficulty:"Desafio",desc:"Antes de publicares, pensa bem! Leva a ideia 💭 à publicação segura 📤."},
+            {size:8,robot:[7,3],items:[[5,5],[1,4],[1,6],[4,1],[5,2],[4,3]],deposit:[[0,7]],obstacles:[[5,0],[3,0],[1,5],[1,7],[2,2],[1,2],[1,1],[2,0],[2,6]],difficulty:"Desafio",desc:"Confirma que está tudo certo ✅ antes de partilhar — depois entrega na publicação segura 📤."}
           ]
         },
         mundo:{
@@ -1881,7 +1987,9 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:7,robot:[6,1],items:[[5,5],[4,2],[2,4]],deposit:[[0,6]],obstacles:[[5,3],[4,3],[3,3],[2,2]],difficulty:"Médio",desc:"Todos merecemos navegar em segurança! Apanha os escudos 🛡️ e leva ao troféu final 🏆."},
             {size:8,robot:[7,1],items:[[6,6],[5,2],[4,7],[2,4],[1,6]],deposit:[[0,7]],obstacles:[[6,3],[5,3],[4,3],[3,4],[2,5],[1,5]],difficulty:"Difícil",desc:"As ameaças digitais 👾 testam a nossa força! Mas quem conhece as regras de cibersegurança está sempre protegido! Reúne todos os escudos e cadeados!"},
-            {size:8,robot:[7,2],items:[[6,7],[6,1],[4,6],[3,1],[2,5],[1,7]],deposit:[[0,7]],obstacles:[[6,3],[5,3],[4,4],[3,4],[2,4],[1,5]],difficulty:"Desafio",desc:"Missão final! Palavras-passe fortes, dados protegidos, privacidade respeitada e sempre pedir ajuda — reúne tudo para te tornares um verdadeiro herói da Cibersegurança!"}
+            {size:8,robot:[7,2],items:[[6,7],[6,1],[4,6],[3,1],[2,5],[1,7]],deposit:[[0,7]],obstacles:[[6,3],[5,3],[4,4],[3,4],[2,4],[1,5]],difficulty:"Desafio",desc:"Missão final! Palavras-passe fortes, dados protegidos, privacidade respeitada e sempre pedir ajuda — reúne tudo para te tornares um verdadeiro herói da Cibersegurança!"},
+            {size:8,robot:[7,0],items:[[3,7],[3,2],[4,4],[3,5],[1,2],[4,6],[6,1]],deposit:[[0,5]],obstacles:[[5,0],[5,3],[6,3],[6,7],[5,7],[5,6],[2,0]],difficulty:"Desafio",desc:"Mais um escudo para a missão final! Leva-o ao troféu 🏆 e ajuda a proteger o mundo digital."},
+            {size:8,robot:[7,1],items:[[6,1],[5,7],[3,2],[4,5],[3,4],[1,0],[2,6]],deposit:[[0,7]],obstacles:[[1,4],[6,7],[6,6],[6,5],[4,2],[4,3],[5,3],[5,4]],difficulty:"Desafio",desc:"Uma ameaça 👾 apareceu — recolhe o cadeado 🔐 e entrega-o para vencer esta fase."}
           ]
         }
       }
@@ -1896,7 +2004,9 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:7,robot:[6,1],items:[[5,4],[3,2],[2,5]],deposit:[[0,6]],obstacles:[[4,3],[4,4],[3,3],[2,2]],difficulty:"Médio",desc:"A tua identidade digital é o rasto que deixas online! Recolhe os documentos de identidade 🪪 e protege-os no cofre digital 🔐."},
             {size:8,robot:[7,2],items:[[6,5],[4,1],[3,6],[2,3]],deposit:[[0,5]],obstacles:[[6,3],[5,3],[4,4],[3,4],[2,5]],difficulty:"Difícil",desc:"Alguém a usar um perfil falso 🎭 tenta enganar-te! Reúne todas as provas da tua identidade real e protege-a no cofre."},
-            {size:9,robot:[8,0],items:[[1,4],[2,3],[3,6],[4,5],[5,7],[6,6]],deposit:[[8,8]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[1,5],[1,6],[1,7],[1,8],[2,4],[2,5],[2,6],[2,7],[2,8],[3,7],[3,8],[4,6],[4,7],[4,8],[5,8],[6,7],[6,8],[8,1],[8,2],[8,3],[8,4],[8,5],[8,6],[8,7]],difficulty:"Desafio",desc:"Missão final: SIM swapping, perfis falsos e roubo de identidade rondam a rede! O caminho é ainda mais longo e labiríntico — usa o bloco 🔁 Repetir para avançares mais depressa. Reúne todos os teus dados e protege a tua identidade digital para sempre."}
+            {size:9,robot:[8,0],items:[[1,4],[2,3],[3,6],[4,5],[5,7],[6,6]],deposit:[[8,8]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[1,5],[1,6],[1,7],[1,8],[2,4],[2,5],[2,6],[2,7],[2,8],[3,7],[3,8],[4,6],[4,7],[4,8],[5,8],[6,7],[6,8],[8,1],[8,2],[8,3],[8,4],[8,5],[8,6],[8,7]],difficulty:"Desafio",desc:"Missão final: SIM swapping, perfis falsos e roubo de identidade rondam a rede! O caminho é ainda mais longo e labiríntico — usa o bloco 🔁 Repetir para avançares mais depressa. Reúne todos os teus dados e protege a tua identidade digital para sempre."},
+            {size:9,robot:[8,0],items:[[4,3],[8,5],[2,2],[7,2],[6,5],[8,3],[0,1]],deposit:[[0,0]],obstacles:[[7,8],[6,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8],[3,7],[2,7],[1,7],[0,7],[4,6],[3,6],[2,6],[1,6],[0,6],[1,5],[0,5],[2,4],[1,4],[0,4],[0,3],[1,2],[0,2],[7,0],[6,0],[5,0],[4,0],[3,0],[2,0],[1,0],[7,3],[3,5]],difficulty:"Desafio",desc:"Mais um documento digital para proteger da tua identidade! Leva-o ao cofre digital 🔐."},
+            {size:9,robot:[8,0],items:[[5,6],[4,4],[2,3],[7,5],[6,4],[7,2],[1,1]],deposit:[[8,8]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[1,5],[1,6],[1,7],[1,8],[2,4],[2,5],[2,6],[2,7],[2,8],[3,7],[3,8],[4,6],[4,7],[4,8],[5,8],[6,7],[6,8],[8,1],[8,2],[8,3],[8,4],[8,5],[8,6],[8,7],[6,0],[5,1],[3,5],[5,0],[4,1]],difficulty:"Desafio",desc:"Cuidado com perfis falsos 🎭 — recolhe o teu avatar 👤 e guarda-o em segurança."}
           ]
         },
         golpes:{
@@ -1906,7 +2016,9 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:7,robot:[6,0],items:[[5,3],[3,4],[2,1]],deposit:[[0,5]],obstacles:[[4,2],[4,3],[3,2],[2,3]],difficulty:"Médio",desc:"Uma oferta boa demais para ser verdade é quase sempre uma burla! Recolhe as lupas de verificação 🔍 e protege o pagamento 🛡️."},
             {size:8,robot:[7,1],items:[[6,5],[4,6],[3,2],[1,4]],deposit:[[0,6]],obstacles:[[6,3],[5,4],[4,3],[3,4],[2,5]],difficulty:"Difícil",desc:"Uma armadilha de subscrição 🕸️ tenta prender-te! Reúne os sinais de alerta e as provas de pagamento seguro antes que seja tarde."},
-            {size:9,robot:[8,0],items:[[1,5],[2,3],[3,7],[4,4],[5,6],[6,7]],deposit:[[8,8]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[1,6],[1,7],[1,8],[2,4],[2,5],[2,6],[2,7],[2,8],[3,8],[4,5],[4,6],[4,7],[4,8],[5,7],[5,8],[6,8],[8,1],[8,2],[8,3],[8,4],[8,5],[8,6],[8,7]],difficulty:"Desafio",desc:"Desafio final contra os golpes online! Dark patterns, sites falsos e ofertas enganosas testam a tua atenção num labirinto ainda maior. O caminho é longo e repetitivo — usa o bloco 🔁 Repetir para avançares mais depressa. Protege todos os pagamentos no escudo final!"}
+            {size:9,robot:[8,0],items:[[1,5],[2,3],[3,7],[4,4],[5,6],[6,7]],deposit:[[8,8]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[1,6],[1,7],[1,8],[2,4],[2,5],[2,6],[2,7],[2,8],[3,8],[4,5],[4,6],[4,7],[4,8],[5,7],[5,8],[6,8],[8,1],[8,2],[8,3],[8,4],[8,5],[8,6],[8,7]],difficulty:"Desafio",desc:"Desafio final contra os golpes online! Dark patterns, sites falsos e ofertas enganosas testam a tua atenção num labirinto ainda maior. O caminho é longo e repetitivo — usa o bloco 🔁 Repetir para avançares mais depressa. Protege todos os pagamentos no escudo final!"},
+            {size:9,robot:[8,8],items:[[3,6],[6,7],[5,2],[7,6],[2,7],[8,4],[1,3]],deposit:[[0,8]],obstacles:[[7,0],[6,0],[5,0],[4,0],[3,0],[2,0],[1,0],[0,0],[2,1],[1,1],[0,1],[4,2],[3,2],[2,2],[1,2],[0,2],[0,3],[3,4],[2,4],[1,4],[0,4],[1,5],[0,5],[0,6],[7,8],[6,8],[5,8],[4,8],[3,8],[2,8],[1,8]],difficulty:"Desafio",desc:"Verifica sempre antes de pagar! Leva o cartão 💳 para um sítio protegido 🛡️."},
+            {size:9,robot:[8,0],items:[[7,3],[7,8],[2,3],[6,7],[7,0],[4,1],[5,4]],deposit:[[8,8]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[1,6],[1,7],[1,8],[2,4],[2,5],[2,6],[2,7],[2,8],[3,8],[4,5],[4,6],[4,7],[4,8],[5,7],[5,8],[6,8],[8,1],[8,2],[8,3],[8,4],[8,5],[8,6],[8,7],[5,2],[5,6]],difficulty:"Desafio",desc:"Uma burla pode estar escondida como numa teia 🕸️ — usa a lupa 🔍 para investigar antes de avançar."}
           ]
         },
         ciberbullying:{
@@ -1916,7 +2028,9 @@ document.addEventListener("DOMContentLoaded", () => {
           levels:[
             {size:7,robot:[6,2],items:[[5,5],[3,1],[2,4]],deposit:[[0,3]],obstacles:[[4,3],[4,4],[3,3],[2,2]],difficulty:"Médio",desc:"Ninguém merece ser maltratado online! Recolhe os botões de denúncia 🚨 e leva-os a quem pode ajudar 🧑‍⚖️."},
             {size:8,robot:[7,2],items:[[6,6],[4,1],[3,6],[2,3]],deposit:[[0,4]],obstacles:[[6,4],[5,4],[4,4],[3,4],[2,5]],difficulty:"Difícil",desc:"Uma situação triste 😢 pede ajuda! Bloquear, denunciar e contar a um adulto de confiança são sempre os passos certos."},
-            {size:9,robot:[8,0],items:[[1,6],[2,3],[3,7],[4,4],[5,5],[6,8]],deposit:[[8,8]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[1,7],[1,8],[2,4],[2,5],[2,6],[2,7],[2,8],[3,8],[4,5],[4,6],[4,7],[4,8],[5,6],[5,7],[5,8],[8,1],[8,2],[8,3],[8,4],[8,5],[8,6],[8,7]],difficulty:"Desafio",desc:"Desafio final: catfishing, sextorsão e ciberbullying não têm lugar online! O caminho é ainda maior e mais labiríntico — usa o bloco 🔁 Repetir para avançares mais depressa. Reúne todas as denúncias e entrega-as a quem pode proteger-te."}
+            {size:9,robot:[8,0],items:[[1,6],[2,3],[3,7],[4,4],[5,5],[6,8]],deposit:[[8,8]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[1,7],[1,8],[2,4],[2,5],[2,6],[2,7],[2,8],[3,8],[4,5],[4,6],[4,7],[4,8],[5,6],[5,7],[5,8],[8,1],[8,2],[8,3],[8,4],[8,5],[8,6],[8,7]],difficulty:"Desafio",desc:"Desafio final: catfishing, sextorsão e ciberbullying não têm lugar online! O caminho é ainda maior e mais labiríntico — usa o bloco 🔁 Repetir para avançares mais depressa. Reúne todas as denúncias e entrega-as a quem pode proteger-te."},
+            {size:9,robot:[0,0],items:[[1,2],[1,5],[3,1],[5,1],[4,3],[7,5],[3,7]],deposit:[[8,0]],obstacles:[[1,8],[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[7,7],[8,7],[4,6],[5,6],[6,6],[7,6],[8,6],[8,5],[5,4],[6,4],[7,4],[8,4],[6,3],[7,3],[8,3],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0]],difficulty:"Desafio",desc:"Alguém precisa de ajuda! Leva o botão de denúncia 🚨 a quem pode intervir 🧑‍⚖️."},
+            {size:9,robot:[8,0],items:[[5,5],[7,8],[2,1],[6,3],[1,3],[4,2],[7,4]],deposit:[[8,8]],obstacles:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[1,7],[1,8],[2,4],[2,5],[2,6],[2,7],[2,8],[3,8],[4,5],[4,6],[4,7],[4,8],[5,6],[5,7],[5,8],[8,1],[8,2],[8,3],[8,4],[8,5],[8,6],[8,7],[2,3],[7,1],[5,1],[1,6]],difficulty:"Desafio",desc:"Ninguém deve sofrer 😢 online — recolhe a mensagem 💬 e entrega-a a quem pode ajudar 🧑‍⚖️."}
           ]
         }
       }
@@ -1930,6 +2044,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let allDeposited=false, doorPos=null, doorQuizOpen=false;
   let moveHistory=[];
   let runningQueue=false, queuedCommands=[], groupStack=[];
+  // Vista em pseudocódigo da fila (só Secundário): ligada/desligada pelo aluno
+  // e a última sequência executada (para não ficar em branco depois de "Executar").
+  let pseudoOn=false, pseudoLastRun=null;
+  const PSEUDO_CMD={MOVE:"AVANÇAR",BACK:"RECUAR",LEFT:"VIRAR À ESQUERDA",RIGHT:"VIRAR À DIREITA",COLLECT:"APANHAR",DROP:"DEPOSITAR"};
+  // Modo "✍️ Escrever" (só Secundário): o aluno escreve o programa em texto.
+  let writeMode=false, writeLevelKey=null, writeTabFree=false;
+  let writePref=true; // no Secundário abre por defeito no ✍️ Escrever; guarda a última escolha do aluno
+  const WRITE_CMDS=[[/^AVANCAR$/,"MOVE"],[/^RECUAR$/,"BACK"],[/^VIRAR (A )?ESQUERDA$/,"LEFT"],[/^VIRAR (A )?DIREITA$/,"RIGHT"],[/^APANHAR$/,"COLLECT"],[/^DEPOSITAR$/,"DROP"]];
+  const WRITE_WORDS=[["AVANCAR","AVANÇAR"],["RECUAR","RECUAR"],["VIRAR A ESQUERDA","VIRAR À ESQUERDA"],["VIRAR A DIREITA","VIRAR À DIREITA"],["APANHAR","APANHAR"],["DEPOSITAR","DEPOSITAR"],["REPETIR","REPETIR 3 VEZES"]];
+  const PSEUDO_KW=new Set(["SE","ENTÃO","SENÃO","ENQUANTO","PARA","CADA","EM","DE","ATÉ","REPETIR","VEZES","E","OU","NÃO","VERDADEIRO","FALSO"]);
   let currentMinMoves=null, currentMinBlocks=null, lastBlocksUsed=null, shouldDanceOnRender=false;
   let stuckMoves=0, lastItemCount=0, lastRobotPos=null, stuckHintIdx=0;
   const STUCK_THRESHOLD=8;
@@ -2458,6 +2582,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       qc.appendChild(span);
     });
+    renderPseudoView(entries);
   }
 
   // Corre a sequência de demonstração passo a passo, mantendo-a sempre
@@ -2542,7 +2667,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cr=$("crumb-level"); if(cr) cr.textContent="Nível "+(idx+1)+" de "+lvls.length;
     const ct=$("crumb-theme"); if(ct) ct.textContent=currentTheme.name+" "+currentTheme.emoji;
     dir=0; carriedItem=null; moveCount=0; allDeposited=false; doorQuizOpen=false;
-    moveHistory=[]; runningQueue=false; queuedCommands=[]; groupStack=[];
+    moveHistory=[]; runningQueue=false; queuedCommands=[]; groupStack=[]; pseudoLastRun=null;
     levelState={
       robot:[...base.robot],
       items:base.items.map(([r,c])=>({r,c,collected:false})),
@@ -2602,11 +2727,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const qbt=$("queue-blocks-toolbar");
     if(qbt) qbt.classList.toggle("hidden", currentCycleKey!=="sec"&&currentCycleKey!=="3c");
     renderQueueGroupBar();
-    // A demonstração só aparece no 1.º nível de cada tema do 3.º Ciclo e
-    // do Secundário — é onde quem nunca viu os blocos mais precisa de um
-    // exemplo ao vivo.
+    applyWriteModeUI();
+    // A demonstração aparece só no 1.º nível de cada tema do 2.º Ciclo, do
+    // 3.º Ciclo e do Secundário — é onde quem nunca viu a fila de comandos
+    // mais precisa de um exemplo ao vivo. (Nota: o jogo reabre no nível onde o
+    // aluno ficou; "Recomeçar tema" volta ao nível 1 e o botão reaparece.)
     const db=$("btn-demo");
-    if(db) db.classList.toggle("hidden", !((currentCycleKey==="sec"||currentCycleKey==="3c") && currentLevelIndex===0));
+    if(db){
+      db.classList.toggle("hidden", !((currentCycleKey==="2c"||currentCycleKey==="3c"||currentCycleKey==="sec") && currentLevelIndex===0));
+      db.title=currentCycleKey==="sec"?"Mostra uma forma de resolver este nível, escrita em pseudocódigo"
+        :currentCycleKey==="2c"?"Mostra uma forma de resolver este nível, comando a comando"
+        :"Mostra uma forma de resolver este nível usando os blocos";
+    }
     const ub=$("btn-undo-direct"); if(ub) ub.style.display=isQueueMode()?"none":"inline-flex";
     const bb=$("btn-cmd-back"); if(bb) bb.style.display="flex";
     renderGrid(); setFeedback("📍 Nível "+(idx+1)+" de "+lvls.length+" — "+currentTheme.name,"info");
@@ -3405,6 +3537,80 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /* ===== DESAFIO DE PSEUDOCÓDIGO (só Secundário) =====
+     Mesmo formato do CODE_SNIFF_DATA (code/q/ops/a) — aqui "code" é um
+     programa em pseudocódigo (não precisa de saber HTML) e o campo extra
+     "e" é a explicação passo a passo, mostrada depois de responder. A 1.ª
+     opção (a:0) é sempre a certa — as opções são baralhadas ao mostrar. */
+  const PSEUDO_DATA={
+    identidade:[
+      {code:"nome_de_utilizador ← \"ana_pt\"\npalavra_passe ← nome_de_utilizador\n\nSE palavra_passe = nome_de_utilizador ENTÃO\n    mostrar \"Palavra-passe fraca!\"\nSENÃO\n    mostrar \"Palavra-passe aceite.\"",
+       q:"O que mostra este programa quando corre?",
+       ops:["«Palavra-passe fraca!» — a 2.ª linha copia o nome de utilizador para a palavra-passe, por isso as duas ficam iguais","«Palavra-passe aceite.» — porque a palavra-passe tem letras e um sublinhado","As duas mensagens, uma a seguir à outra","Nada: dá erro porque as duas variáveis têm nomes diferentes"],
+       a:0,
+       e:"A linha 2 guarda em palavra_passe o mesmo valor de nome_de_utilizador, por isso a condição da linha 4 é verdadeira e só corre o ramo do SE. Usar o nome de utilizador como palavra-passe é das primeiras coisas que um atacante experimenta."},
+      {code:"tentativas ← 0\nautenticado ← FALSO\n\nENQUANTO tentativas < 3 E autenticado = FALSO\n    resposta ← pedir_palavra_passe()\n    SE resposta = palavra_passe_certa ENTÃO\n        autenticado ← VERDADEIRO\n    SENÃO\n        tentativas ← tentativas + 1\n\nSE autenticado = FALSO ENTÃO\n    bloquear_conta()",
+       q:"Um atacante tenta adivinhar a palavra-passe e falha sempre. O que acontece?",
+       ops:["O ciclo termina quando «tentativas» chega a 3 (à 3.ª tentativa errada) e a conta é bloqueada","O programa pede palavras-passe para sempre, até o atacante acertar","A conta é bloqueada logo à 1.ª tentativa errada","A conta só é bloqueada à 4.ª tentativa errada"],
+       a:0,
+       e:"Cada resposta errada soma 1 a tentativas. Quando chega a 3, a condição do ENQUANTO deixa de ser verdadeira e o ciclo pára. Como autenticado continua FALSO, a conta é bloqueada. Limitar as tentativas é o que trava os ataques de «força bruta»."},
+      {code:"palavra_passe_certa ← VERDADEIRO\ncodigo_sms_certo ← FALSO\n\nSE palavra_passe_certa E codigo_sms_certo ENTÃO\n    dar_acesso()\nSENÃO\n    negar_acesso()\n    avisar_dono_da_conta()",
+       q:"Alguém roubou a palavra-passe, mas não tem o telemóvel da vítima. O que faz este programa?",
+       ops:["Nega o acesso e avisa o dono da conta — com E, as duas condições têm de ser verdadeiras","Dá acesso, porque a palavra-passe está certa","Dá acesso e avisa o dono da conta","Nega o acesso, mas não avisa ninguém"],
+       a:0,
+       e:"O operador E só dá verdadeiro se AS DUAS condições forem verdadeiras. Como codigo_sms_certo é FALSO, corre o SENÃO. É por isso que a verificação em dois passos protege mesmo quando a palavra-passe é roubada. Com OU, bastava uma condição — e o atacante entrava."},
+      {code:"palavra_passe ← pedir_palavra_passe()\n\nSE tamanho(palavra_passe) >= 8 ENTÃO\n    guardar_na_base_de_dados(palavra_passe)\nSENÃO\n    mostrar \"Palavra-passe demasiado curta.\"",
+       q:"Este programa verifica o tamanho da palavra-passe, mas tem um grave problema de segurança. Qual?",
+       ops:["Guarda a palavra-passe tal como foi escrita: se a base de dados for roubada, todas as palavras-passe ficam expostas (devia guardar apenas um hash)","Devia aceitar palavras-passe com menos de 8 caracteres","Falta pedir também o nome de utilizador","Devia usar apenas SE, sem SENÃO"],
+       a:0,
+       e:"A linha guardar_na_base_de_dados(palavra_passe) grava o texto original. Se alguém roubar a base de dados, lê todas as palavras-passe. O correto é guardar só um «hash» (uma impressão digital da palavra-passe que não se consegue reverter) e comparar hashes no início de sessão."}
+    ],
+    golpes:[
+      {code:"dominio_oficial ← \"paypal.com\"\ndominio_do_link ← \"paypal.com.confirma-reembolso.info\"\n\nSE dominio_do_link = dominio_oficial ENTÃO\n    mostrar \"Link seguro.\"\nSENÃO\n    mostrar \"Cuidado: possível burla!\"",
+       q:"O que mostra este programa?",
+       ops:["«Cuidado: possível burla!» — a comparação exige textos exatamente iguais, e o domínio falso só tem «paypal.com» no início","«Link seguro.» — porque o link contém «paypal.com»","As duas mensagens","Nada, porque os dois textos têm tamanhos diferentes"],
+       a:0,
+       e:"O símbolo = compara os textos inteiros, não pedaços deles. «paypal.com.confirma-reembolso.info» não é igual a «paypal.com», por isso corre o SENÃO. Na vida real, o domínio verdadeiro lê-se no fim, antes da primeira barra — aqui é «confirma-reembolso.info»."},
+      {code:"sinais ← 0\n\nSE a_oferta_e_boa_demais_para_ser_verdade ENTÃO\n    sinais ← sinais + 1\nSE pede_pagamento_em_vales_ou_criptomoedas ENTÃO\n    sinais ← sinais + 1\nSE cria_urgencia ENTÃO\n    sinais ← sinais + 1\n\nSE sinais >= 2 ENTÃO\n    mostrar \"Não pagues!\"",
+       q:"Chega esta mensagem: «Ganhaste um telemóvel! Paga 5 € em vales, só hoje!» As três primeiras condições são verdadeiras. O que acontece no fim?",
+       ops:["«sinais» fica a 3 e aparece «Não pagues!»","«sinais» fica a 2 e aparece «Não pagues!»","«sinais» fica a 3, mas não aparece nada","«sinais» fica a 1 e não aparece nada"],
+       a:0,
+       e:"Cada SE verdadeiro soma 1: sinais vai de 0 a 1, a 2 e a 3. Como 3 >= 2, aparece «Não pagues!». Repara que dois sinais já chegavam para o aviso — as burlas raramente trazem só um."},
+      {code:"custo_total ← 0\n\nPARA mes DE 1 ATÉ 6\n    SE mes > 1 ENTÃO\n        custo_total ← custo_total + 10\n\nmostrar custo_total",
+       q:"Uma «oferta grátis» só é grátis no 1.º mês e depois custa 10 € por mês. Que valor mostra este programa ao fim de 6 meses?",
+       ops:["50 €: o mês 1 é grátis e os meses 2, 3, 4, 5 e 6 custam 10 € cada","60 €: os 6 meses custam 10 €","10 €: só se paga uma vez","0 €: a oferta é grátis"],
+       a:0,
+       e:"O ciclo PARA corre 6 vezes (mes = 1, 2, 3, 4, 5, 6), mas só soma 10 quando mes > 1, ou seja, 5 vezes: 5 × 10 = 50. As armadilhas de subscrição funcionam assim: o «grátis» dura pouco e a cobrança continua todos os meses até cancelares."},
+      {code:"pedir_dados_do_cartao()\npagar()\n\nSE o_site_tem_cadeado E o_dominio_e_o_oficial ENTÃO\n    mostrar \"Compra segura.\"\nSENÃO\n    mostrar \"Cuidado!\"",
+       q:"Onde está o erro de lógica deste programa?",
+       ops:["A verificação do site vem depois de o pagamento já ter sido feito — devia vir antes, e só pagar se passasse","Devia usar OU em vez de E, para ser mais fácil passar na verificação","Devia mostrar «Compra segura.» antes de pagar, sem verificar nada","Não devia verificar o cadeado, porque todos os sites têm cadeado"],
+       a:0,
+       e:"A ordem das linhas importa! Aqui o programa pede o cartão e paga (linhas 1 e 2) antes de verificar se o site é de confiança — quando aparece o «Cuidado!», o dinheiro já saiu. O correto é verificar primeiro (cadeado E domínio oficial) e só pagar se a verificação passar. Com OU seria ainda pior: bastava uma condição para passar."}
+    ],
+    ciberbullying:[
+      {code:"mensagem ← \"Ninguém gosta de ti, sai do grupo!\"\n\nSE mensagem_e_ofensiva(mensagem) ENTÃO\n    guardar_captura_de_ecra()\n    bloquear_remetente()\n    contar_a_um_adulto_de_confianca()\nSENÃO\n    responder_normalmente()",
+       q:"A mensagem é ofensiva. Por que ordem executa o programa as ações?",
+       ops:["1.º guarda a captura de ecrã, 2.º bloqueia o remetente, 3.º conta a um adulto de confiança","1.º bloqueia o remetente, 2.º guarda a captura de ecrã, 3.º conta a um adulto de confiança","Responde normalmente, porque a mensagem é só uma brincadeira","Só bloqueia o remetente; as outras linhas não correm"],
+       a:0,
+       e:"Dentro do SE, as linhas correm de cima para baixo. A captura de ecrã vem primeiro de propósito: depois de bloquear, a conversa pode desaparecer ou ficar difícil de encontrar, e perdes a prova. Guardar provas, bloquear e contar a um adulto de confiança são os passos certos."},
+      {code:"partilhas ← 1\n\nENQUANTO partilhas < 50\n    partilhas ← partilhas * 2",
+       q:"Uma foto humilhante começa com 1 partilha e, em cada ronda, o número de partilhas duplica. Que valor tem «partilhas» quando o ciclo termina?",
+       ops:["64 (1, 2, 4, 8, 16, 32, 64: só pára quando passa de 50)","50 (o ciclo pára exatamente em 50)","32 (pára antes de chegar a 50)","100"],
+       a:0,
+       e:"O ciclo repete enquanto partilhas < 50. Os valores 1, 2, 4, 8, 16 e 32 são todos menores que 50, por isso continua; 64 já não é, por isso pára. Bastaram 6 rondas para passar de 1 a 64 — o que se publica online espalha-se depressa e é muito difícil de apagar. Não partilhes!"},
+      {code:"mensagens ← [\"Boa!\", \"Ninguém te quer aqui\", \"Vemo-nos amanhã\", \"Não vales nada\"]\nofensas ← 0\n\nPARA CADA m EM mensagens\n    SE mensagem_e_ofensiva(m) ENTÃO\n        ofensas ← ofensas + 1\n\nSE ofensas >= 2 ENTÃO\n    denunciar_a_conta()",
+       q:"As mensagens 2 e 4 são ofensivas e as outras não. O que acontece no fim?",
+       ops:["«ofensas» fica a 2 e a conta é denunciada","«ofensas» fica a 2, mas a conta não é denunciada (só denuncia com mais de 2)","«ofensas» fica a 4 e a conta é denunciada","«ofensas» fica a 1 e a conta não é denunciada"],
+       a:0,
+       e:"O PARA CADA visita as 4 mensagens, uma a uma. Só nas mensagens 2 e 4 o SE é verdadeiro, por isso ofensas chega a 2. Como >= inclui o próprio 2, a condição final é verdadeira e a conta é denunciada."},
+      {code:"mensagens_ofensivas ← 5\n\nENQUANTO mensagens_ofensivas > 0\n    ignorar_a_mensagem()",
+       q:"O que acontece quando este programa corre?",
+       ops:["Nunca termina: nada dentro do ciclo diminui «mensagens_ofensivas», por isso a condição é sempre verdadeira","Termina depois de ignorar as 5 mensagens","Termina logo à 1.ª volta","Dá erro logo na 1.ª linha"],
+       a:0,
+       e:"Um ciclo ENQUANTO só pára quando a condição deixa de ser verdadeira. Ignorar não altera mensagens_ofensivas, que fica sempre a 5 — é um ciclo infinito. Na vida real passa-se o mesmo: ignorar não faz o problema desaparecer. É preciso agir (bloquear, denunciar, falar com um adulto de confiança)."}
+    ]
+  };
+
   /* ===== DESAFIO DE CÓDIGO (Secundário) =====
      Mesmo "esqueleto" técnico do openKidQuiz acima (overlay criado uma
      única vez e reutilizado), mas percorrendo os desafios de
@@ -3415,9 +3621,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function escapeHtml(str){
     return String(str).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
   }
-  function openCodeSniff(themeKey, idx){
+  // kind: "code" (Desafio de Código, HTML) ou "pseudo" (Desafio de Pseudocódigo).
+  function openCodeSniff(themeKey, idx, kind){
     idx=idx||0;
-    const list=CODE_SNIFF_DATA[themeKey]||[];
+    const isPseudo=(kind==="pseudo");
+    const list=(isPseudo?PSEUDO_DATA:CODE_SNIFF_DATA)[themeKey]||[];
     let popup=document.getElementById("popup-codesniff");
     let inner=document.getElementById("popup-codesniff-inner");
     if(!popup){
@@ -3438,9 +3646,10 @@ document.addEventListener("DOMContentLoaded", () => {
       popup.addEventListener("click",(e)=>{ if(e.target===popup) closeCodeSniff(); });
     }
     popup.style.display="flex"; popup.style.opacity="1"; popup.style.pointerEvents="auto"; updateOverlayOpenClass();
+    popup.setAttribute("aria-label",isPseudo?"Desafio de Pseudocódigo":"Desafio de Código");
     if(!list.length){
       inner.innerHTML=`<div style="text-align:center;">
-        <div style="font-size:.92rem;color:#ffa733;line-height:1.6;margin-bottom:16px;">Ainda não há desafios de código para este tema.</div>
+        <div style="font-size:.92rem;color:#ffa733;line-height:1.6;margin-bottom:16px;">Ainda não há desafios de ${isPseudo?"pseudocódigo":"código"} para este tema.</div>
         <button id="cs-close-empty" class="btn secondary small">← Voltar</button>
       </div>`;
       inner.querySelector("#cs-close-empty").addEventListener("click",closeCodeSniff);
@@ -3449,7 +3658,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(idx>=list.length){
       inner.innerHTML=`<div style="text-align:center;">
         <div style="font-size:2.2rem;margin-bottom:8px;">🕵️‍♀️✅</div>
-        <div style="font-size:.95rem;color:#ffa733;font-weight:400;line-height:1.6;margin-bottom:16px;">Completaste todos os desafios de código deste tema! Já sabes olhar para o código de uma página web à procura de sinais de perigo.</div>
+        <div style="font-size:.95rem;color:#ffa733;font-weight:400;line-height:1.6;margin-bottom:16px;">${isPseudo?"Completaste todos os desafios de pseudocódigo deste tema! Já sabes ler um algoritmo linha a linha e prever o que ele faz.":"Completaste todos os desafios de código deste tema! Já sabes olhar para o código de uma página web à procura de sinais de perigo."}</div>
         <button id="cs-close-done" class="btn small">← Voltar</button>
       </div>`;
       inner.querySelector("#cs-close-done").addEventListener("click",closeCodeSniff);
@@ -3460,16 +3669,17 @@ document.addEventListener("DOMContentLoaded", () => {
     for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}
     inner.innerHTML=`
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-size:.75rem;color:#38bdf8;text-transform:uppercase;letter-spacing:.07em;font-weight:400;">🔍 Desafio de Código</div>
+        <div style="font-size:.75rem;color:#38bdf8;text-transform:uppercase;letter-spacing:.07em;font-weight:400;">${isPseudo?"🧠 Desafio de Pseudocódigo":"🔍 Desafio de Código"}</div>
         <div style="font-size:.72rem;padding:3px 12px;border-radius:999px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.5);color:#ffb890;">${idx+1} / ${list.length}</div>
       </div>
-      <pre style="background:#0a0520;border:1px solid rgba(56,189,248,0.35);border-radius:10px;padding:12px 14px;overflow-x:auto;font-family:'Consolas','Courier New',monospace;font-size:.72rem;line-height:1.5;color:#7dd3fc;white-space:pre;margin:0 0 14px;"><code>${escapeHtml(ch.code)}</code></pre>
+      <pre style="background:#0a0520;border:1px solid rgba(56,189,248,0.35);border-radius:10px;padding:12px 14px;overflow-x:auto;font-family:'Consolas','Courier New',monospace;font-size:.72rem;line-height:1.5;color:${isPseudo?"#e0f2fe":"#7dd3fc"};white-space:pre;margin:0 0 14px;"><code>${isPseudo?highlightPseudo(ch.code):escapeHtml(ch.code)}</code></pre>
       <div style="font-size:.88rem;color:#ffa733;font-weight:400;line-height:1.6;margin-bottom:14px;">${ch.q}</div>
       <div id="cs-opts" style="display:flex;flex-direction:column;gap:8px;">
         ${opts.map(opt=>`<button data-correct="${opt.correct}" style="padding:10px 12px;border-radius:12px;border:2px solid rgba(56,189,248,0.4);background:rgba(56,189,248,0.08);color:#ffa733;font-size:.78rem;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;text-align:left;line-height:1.4;transition:all .12s;-webkit-tap-highlight-color:transparent;">${escapeHtml(opt.text)}</button>`).join("")}
       </div>
       <div id="cs-feedback" style="font-size:.82rem;font-weight:700;min-height:22px;margin-top:12px;color:#ffa733;text-align:center;"></div>
-      <div style="text-align:center;margin-top:8px;"><button id="cs-close" class="btn secondary small">← Voltar</button></div>`;
+      <div id="cs-expl" style="display:none;font-size:.78rem;line-height:1.55;color:#bae6fd;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.3);border-radius:10px;padding:9px 12px;margin-top:8px;font-family:'Nunito',sans-serif;font-weight:700;text-align:left;"></div>
+      <div style="text-align:center;margin-top:8px;"><button id="cs-next" class="btn small" style="display:none;margin-right:6px;">${idx+1>=list.length?"Terminar ✓":"Seguinte →"}</button><button id="cs-close" class="btn secondary small">← Voltar</button></div>`;
     inner.querySelector("#cs-close").addEventListener("click",closeCodeSniff);
     inner.querySelectorAll("#cs-opts button").forEach(btn=>{
       btn.addEventListener("click",()=>{
@@ -3478,17 +3688,25 @@ document.addEventListener("DOMContentLoaded", () => {
         inner.querySelectorAll("#cs-opts button").forEach(b=>{ b.disabled=true; b.style.pointerEvents="none"; });
         if(ok){
           btn.style.background="rgba(67,160,71,0.25)"; btn.style.borderColor="#66BB6A"; btn.style.color="#A5D6A7"; btn.style.fontWeight="900";
-          if(fb){fb.style.color="#81C784";fb.textContent="✅ Certo! Boa deteção.";}
+          if(fb){fb.style.color="#81C784";fb.textContent=isPseudo?"✅ Certo! Seguiste o programa passo a passo.":"✅ Certo! Boa deteção.";}
           playTone("quizOk");
         } else {
           inner.querySelectorAll("#cs-opts button").forEach(b=>{
             if(b.getAttribute("data-correct")==="true"){ b.style.background="rgba(67,160,71,0.25)"; b.style.borderColor="#66BB6A"; b.style.color="#A5D6A7"; b.style.fontWeight="900"; }
           });
           btn.style.background="rgba(229,57,53,0.25)"; btn.style.borderColor="#EF5350"; btn.style.color="#EF9A9A";
-          if(fb){fb.style.color="#EF9A9A";fb.textContent="❌ Não era essa — repara na parte marcada a verde.";}
+          if(fb){fb.style.color="#EF9A9A";fb.textContent=isPseudo?"❌ Não era essa — vê a opção a verde e a explicação.":"❌ Não era essa — repara na parte marcada a verde.";}
           playTone("quizErr");
         }
-        setTimeout(()=>openCodeSniff(themeKey, idx+1), 1900);
+        if(ch.e){
+          // Com explicação: mostra-a e espera pelo botão "Seguinte" (sem avanço automático).
+          const ex=inner.querySelector("#cs-expl");
+          if(ex){ ex.textContent="💡 "+ch.e; ex.style.display="block"; }
+          const nx=inner.querySelector("#cs-next");
+          if(nx){ nx.style.display="inline-flex"; nx.addEventListener("click",()=>openCodeSniff(themeKey, idx+1, kind)); if(nx.focus) nx.focus(); }
+        } else {
+          setTimeout(()=>openCodeSniff(themeKey, idx+1, kind), 1900);
+        }
       });
     });
   }
@@ -3686,8 +3904,299 @@ document.addEventListener("DOMContentLoaded", () => {
     if(rb) rb.style.display=has?"inline-flex":"none";
     if(ub) ub.style.display=has?"inline-flex":"none";
     if(cb) cb.style.display=has?"inline-flex":"none";
+    renderPseudoView();
   }
   function updateQueueUI(){ renderQueue(); }
+
+  /* ===== VISTA EM PSEUDOCÓDIGO DA FILA (só Secundário) =====
+     Converte a mesma árvore de blocos (queuedCommands + ciclos ainda abertos
+     em groupStack) em texto, com indentação — mostra que blocos e pseudocódigo
+     são a mesma coisa escrita de duas maneiras. Só leitura: não altera a fila. */
+  function pseudoTree(){
+    let tail=null;
+    for(let i=groupStack.length-1;i>=0;i--){
+      const g=groupStack[i];
+      tail={type:"repeat",times:g.times,open:true,children:tail?[...g.children,tail]:[...g.children]};
+    }
+    return tail?[...queuedCommands,tail]:[...queuedCommands];
+  }
+  function pseudoLines(entries,depth,out){
+    const pad="    ".repeat(depth);
+    entries.forEach(e=>{
+      if(e.type==="repeat"){
+        out.push(pad+"REPETIR "+e.times+" VEZES"+(e.open?"   // a construir…":""));
+        if(e.open&&!e.children.length) out.push(pad+"    // escolhe os passos a repetir");
+        pseudoLines(e.children,depth+1,out);
+      } else {
+        out.push(pad+(PSEUDO_CMD[e.cmd]||e.cmd));
+      }
+    });
+  }
+  // Realce simples: palavras-chave em maiúsculas e comentários "//".
+  function highlightPseudo(text){
+    return String(text).split("\n").map(line=>{
+      const i=line.indexOf("//");
+      const code=i>=0?line.slice(0,i):line, com=i>=0?line.slice(i):"";
+      const c=escapeHtml(code).replace(/[\p{L}\d_]+/gu,w=>PSEUDO_KW.has(w)?'<span class="ps-kw">'+w+'</span>':w);
+      return c+(com?'<span class="ps-cm">'+escapeHtml(com)+'</span>':"");
+    }).join("\n");
+  }
+  function renderPseudoView(entries){
+    const pre=$("queue-pseudo"), btn=$("btn-pseudo-toggle");
+    const isSec=currentCycleKey==="sec";
+    if(btn){
+      btn.style.display=isSec?"inline-flex":"none";
+      btn.textContent=pseudoOn?"🙈 Esconder pseudocódigo":"👁️ Pseudocódigo";
+      btn.setAttribute("aria-pressed",pseudoOn?"true":"false");
+    }
+    if(!pre) return;
+    if(!isSec||!pseudoOn||writeMode){ pre.classList.add("hidden"); return; }
+    pre.classList.remove("hidden");
+    const lines=[];
+    const tree=entries||pseudoTree();
+    if(tree.length){
+      pseudoLines(tree,0,lines);
+    } else if(pseudoLastRun&&pseudoLastRun.length){
+      lines.push("// última sequência executada");
+      pseudoLines(pseudoLastRun,0,lines);
+    } else {
+      lines.push("// Ainda não escolheste comandos.");
+      lines.push("// O teu programa vai aparecer aqui, linha a linha.");
+    }
+    pre.innerHTML=highlightPseudo(lines.join("\n"));
+  }
+
+  /* ===== MODO "✍️ ESCREVER" (só Secundário) =====
+     O aluno escreve o programa em pseudocódigo; o texto é convertido na MESMA
+     árvore de blocos (queuedCommands) que os blocos produzem, por isso o motor
+     do jogo, os ciclos aninhados, as estrelas e o "Ótimo" não mudam nada. */
+  function writeNorm(str){
+    return String(str).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/\s+/g," ").trim();
+  }
+  function writeLev(a,b){
+    const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
+    let prev=Array.from({length:n+1},(_,j)=>j);
+    for(let i=1;i<=m;i++){
+      const cur=[i];
+      for(let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+      prev=cur;
+    }
+    return prev[n];
+  }
+  function writeSuggest(norm){
+    let best=null,bd=99;
+    WRITE_WORDS.forEach(([n,disp])=>{
+      const head=norm.split(" ").slice(0,n.split(" ").length).join(" ");
+      const d=Math.min(writeLev(norm,n),writeLev(head,n));
+      if(d<bd){ bd=d; best=disp; }
+    });
+    return bd<=2?best:null;
+  }
+  // Converte o texto em { entries, errors:[{line,msg}] }. "line" é 1-based.
+  function parsePseudoProgram(text){
+    const errors=[], root={children:[]};
+    const stack=[{node:root,indent:null}];
+    let pending=null, count=0;
+    const err=(line,msg)=>errors.push({line,msg});
+    String(text).split(/\r?\n/).forEach((raw,i)=>{
+      const ln=i+1;
+      let code=raw; const ci=code.indexOf("//"); if(ci>=0) code=code.slice(0,ci);
+      if(!code.trim()) return;
+      const ind=code.match(/^[ \t]*/)[0].replace(/\t/g,"    ").length;
+      const shown=code.trim();
+      const norm=writeNorm(code.replace(/\(\s*\)\s*;?\s*$/,"").replace(/;\s*$/,""));
+      if(pending){
+        if(ind>pending.indent) stack.push({node:pending.node,indent:ind});
+        else err(pending.line,"Linha "+pending.line+": o REPETIR está vazio — escreve por baixo, mais para dentro, os passos a repetir.");
+        pending=null;
+      }
+      let top=stack[stack.length-1];
+      while(stack.length>1&&ind<top.indent){ stack.pop(); top=stack[stack.length-1]; }
+      if(top.indent===null) top.indent=ind;
+      if(ind!==top.indent){
+        err(ln,"Linha "+ln+": a indentação não bate certo — só se põe mais para dentro por baixo de um REPETIR, sempre com o mesmo número de espaços.");
+        return;
+      }
+      const rep=norm.match(/^REPETIR(?: (\d+))?(?: VEZES?)?$/);
+      if(rep){
+        const n=rep[1]?parseInt(rep[1],10):NaN;
+        if(!(n>=2&&n<=9)) err(ln,"Linha "+ln+": o REPETIR precisa de um número entre 2 e 9 — por exemplo REPETIR 3 VEZES.");
+        if(stack.length>MAX_NEST) err(ln,"Linha "+ln+": só podes pôr REPETIR dentro de REPETIR até "+MAX_NEST+" níveis.");
+        const node={type:"repeat",times:(n>=2&&n<=9)?n:2,children:[]};
+        top.node.children.push(node);
+        pending={node,indent:ind,line:ln};
+        return;
+      }
+      const hit=WRITE_CMDS.find(([re])=>re.test(norm));
+      if(hit){ top.node.children.push({cmd:hit[1],label:CMD_LABELS[hit[1]]}); count++; return; }
+      let msg;
+      const withNum=norm.match(/^(.*?) (\d+)(?: VEZES?)?$/);
+      if(/^(SE|ENQUANTO|PARA|SENAO|ENTAO)\b/.test(norm)) msg="SE, ENQUANTO e PARA ainda não existem neste jogo — por agora usa REPETIR n VEZES.";
+      else if(/^FIM\b/.test(norm)) msg="não é preciso escrever FIM — o REPETIR acaba quando as linhas deixam de estar mais para dentro.";
+      else if(withNum&&WRITE_CMDS.some(([re])=>re.test(withNum[1]))) msg="para repetir escreve REPETIR "+withNum[2]+" VEZES e, na linha de baixo (mais para dentro), "+shown.replace(/\s+\d+(\s+vezes?)?\s*$/i,"")+".";
+      else if(/^VIRAR\b/.test(norm)) msg="diz para que lado: VIRAR À ESQUERDA ou VIRAR À DIREITA.";
+      else { const sg=writeSuggest(norm); msg="não conheço «"+shown+"»."+(sg?" Querias dizer "+sg+"?":" Abre 📖 «Que palavras posso usar?»."); }
+      err(ln,"Linha "+ln+": "+msg);
+    });
+    if(pending) err(pending.line,"Linha "+pending.line+": o REPETIR está vazio — escreve por baixo, mais para dentro, os passos a repetir.");
+    if(!errors.length&&count===0) err(1,"Ainda não escreveste nenhum comando.");
+    return {entries:root.children,errors};
+  }
+
+  function showWriteMsg(kind,text){
+    const m=$("write-msg"); if(!m) return;
+    m.className="write-msg"+(kind?" "+kind:""); m.textContent=text||"";
+  }
+  // Mostra os primeiros erros e seleciona a linha do primeiro.
+  function showWriteErrors(errors){
+    const ta=$("write-code");
+    showWriteMsg("err",errors.slice(0,3).map(e=>"❌ "+e.msg).join("\n")+(errors.length>3?"\n… e mais "+(errors.length-3)+".":""));
+    if(!ta) return;
+    const lines=ta.value.split(/\r?\n/); const ln=Math.min(errors[0].line,lines.length)-1;
+    let start=0; for(let i=0;i<ln;i++) start+=lines[i].length+1;
+    ta.focus(); ta.setSelectionRange(start,start+(lines[ln]||"").length);
+  }
+  // Insere uma linha no cursor (usada pelos botões de direção, teclas e swipe).
+  function writeInsertLine(text){
+    const ta=$("write-code"); if(!ta) return;
+    const v=ta.value; let pos=ta.selectionEnd; if(typeof pos!=="number") pos=v.length;
+    const ls=v.lastIndexOf("\n",pos-1)+1; let le=v.indexOf("\n",pos); if(le<0) le=v.length;
+    const cur=v.slice(ls,le), ind=cur.match(/^[ \t]*/)[0];
+    let nv,caret;
+    if(!cur.trim()){ nv=v.slice(0,ls)+ind+text+v.slice(le); caret=ls+ind.length+text.length; }
+    else {
+      const ni=/^\s*REPETIR\b/i.test(cur)?ind+"    ":ind;
+      nv=v.slice(0,le)+"\n"+ni+text+v.slice(le); caret=le+1+ni.length+text.length;
+    }
+    ta.value=nv; ta.setSelectionRange(caret,caret);
+    showWriteMsg("","");
+  }
+  function writeShift(dir){
+    const ta=$("write-code"); if(!ta) return;
+    const v=ta.value, pos=ta.selectionStart;
+    const ls=v.lastIndexOf("\n",pos-1)+1;
+    if(dir>0){ ta.value=v.slice(0,ls)+"    "+v.slice(ls); ta.setSelectionRange(pos+4,pos+4); }
+    else {
+      const m=v.slice(ls).match(/^ {1,4}|^\t/); if(!m) return;
+      ta.value=v.slice(0,ls)+v.slice(ls+m[0].length); const np=Math.max(ls,pos-m[0].length); ta.setSelectionRange(np,np);
+    }
+  }
+  // Aplica o estado do modo (separadores, painéis) — chamada no loadLevel e ao trocar de separador.
+  function applyWriteModeUI(){
+    const isSec=currentCycleKey==="sec";
+    if(!isSec) writeMode=false;
+    const key=currentCycleKey+"|"+currentThemeKey+"|"+currentLevelIndex;
+    if(key!==writeLevelKey){ writeLevelKey=key; const ta0=$("write-code"); if(ta0) ta0.value=""; showWriteMsg("",""); }
+    const tabs=$("queue-mode-tabs"); if(tabs) tabs.classList.toggle("hidden",!isSec);
+    const tb=$("tab-blocks"), tw=$("tab-write");
+    if(tb){ tb.classList.toggle("secondary",writeMode); tb.setAttribute("aria-pressed",writeMode?"false":"true"); }
+    if(tw){ tw.classList.toggle("secondary",!writeMode); tw.setAttribute("aria-pressed",writeMode?"true":"false"); }
+    const qc=$("queue-commands"); if(qc) qc.classList.toggle("hidden",writeMode);
+    const qa=$("queue-actions-blocks"); if(qa) qa.classList.toggle("hidden",writeMode);
+    const qbt=$("queue-blocks-toolbar");
+    if(qbt) qbt.classList.toggle("hidden",writeMode||(currentCycleKey!=="sec"&&currentCycleKey!=="3c"));
+    const wp=$("write-panel"); if(wp) wp.classList.toggle("hidden",!writeMode);
+    renderPseudoView();
+  }
+  function setWriteMode(on){
+    writeMode=!!on&&currentCycleKey==="sec";
+    if(currentCycleKey==="sec") writePref=!!on;
+    if(writeMode){
+      // 1.ª vez: se já há blocos, traz-os para o texto para ele poder editá-los.
+      const ta=$("write-code");
+      if(ta&&!ta.value.trim()){
+        const tree=pseudoTree();
+        if(tree.length){ const ls=[]; pseudoLines(tree,0,ls); ta.value=ls.map(l=>l.replace(/\s*\/\/.*$/,"")).filter(l=>l.trim()).join("\n"); }
+      }
+    }
+    applyWriteModeUI();
+  }
+  async function runWrittenProgram(){
+    if(runningQueue||!currentTheme||!levelState) return;
+    const ta=$("write-code"), runBtn=$("wr-run");
+    const res=parsePseudoProgram(ta.value);
+    if(res.errors.length){ showWriteErrors(res.errors); setFeedback("✍️ Há linhas a corrigir — vê a mensagem por baixo da caixa de texto.","warn"); return; }
+    showWriteMsg("ok","✅ Programa válido — a executar…");
+    if(runBtn) runBtn.disabled=true;
+    try{
+      // O programa corre sempre desde o início do nível.
+      if(moveCount>0||levelState.items.some(i=>i.collected)){
+        runningQueue=false; resetQueue(); loadLevel(currentLevelIndex);
+        setFeedback("↺ A recomeçar o nível para correr o teu programa desde o início…","info");
+        const t0=Date.now(), tag=$("tag-optimal");
+        while(tag&&/a calcular/.test(tag.textContent)&&Date.now()-t0<8000) await new Promise(r=>setTimeout(r,100));
+      }
+      queuedCommands=res.entries; groupStack=[]; renderQueue();
+      await executeQueue();
+      if(levelState&&!doorQuizOpen){ setFeedback("🏁 O programa terminou. Não chegaste ao fim? Corrige o texto e carrega em ▶️ Executar — recomeça sempre do início.","info"); }
+      showWriteMsg("","");
+    } finally { if(runBtn) runBtn.disabled=false; }
+  }
+
+  // Demonstração no modo "✍️ Escrever": o programa vai sendo escrito linha a linha
+  // e depois executado, com a linha atual em destaque (mesma solução da demonstração em blocos).
+  function pseudoLinesMap(entries,lines,map){
+    entries.forEach(e=>{
+      map.set(e,lines.length);
+      if(e.type==="repeat"){
+        lines.push("REPETIR "+e.times+" VEZES");
+        e.children.forEach(c=>{ map.set(c,lines.length); lines.push("    "+(PSEUDO_CMD[c.cmd]||c.cmd)); });
+      } else lines.push(PSEUDO_CMD[e.cmd]||e.cmd);
+    });
+  }
+  async function runDemoWritten(entries){
+    const pre=$("write-demo"), ta=$("write-code");
+    if(!pre||!ta){ await runDemoEntries(entries); return; }
+    const lines=[], map=new Map(); pseudoLinesMap(entries,lines,map);
+    const wait=ms=>new Promise(r=>setTimeout(r,ms));
+    const done=new Set();
+    const paint=(visible,active)=>{
+      pre.innerHTML=lines.slice(0,visible).map((t,i)=>'<span class="ps-line'+(active&&active.has(i)?" ps-active":(done.has(i)?" ps-done":""))+'">'+highlightPseudo(t)+'</span>').join("");
+      // mantém a linha atual (ou a última escrita) à vista quando o programa é comprido
+      const el=pre.querySelector(".ps-active");
+      if(el){ const top=el.offsetTop, h=el.offsetHeight; if(top<pre.scrollTop||top+h>pre.scrollTop+pre.clientHeight) pre.scrollTop=Math.max(0,top-pre.clientHeight/2); }
+      else pre.scrollTop=pre.scrollHeight;
+    };
+    const qb=$("queue-box"), lbl=qb?qb.querySelector(".queue-label"):null, lblOriginal=lbl?lbl.textContent:null;
+    if(lbl) lbl.textContent="🎬 A demonstrar…";
+    runningQueue=true;
+    ta.classList.add("hidden"); pre.classList.remove("hidden");
+    showWriteMsg("","🎬 Repara: primeiro escreve-se o programa, depois o robô executa-o linha a linha.");
+    try{
+      for(let n=1;n<=lines.length;n++){ paint(n,null); await wait(280); }
+      await wait(500);
+      for(const entry of entries){
+        if(!runningQueue||doorQuizOpen) break;
+        const hdr=map.get(entry);
+        if(entry.type==="repeat"){
+          for(let k=0;k<entry.times;k++){
+            for(const child of entry.children){
+              if(!runningQueue||doorQuizOpen) break;
+              paint(lines.length,new Set([hdr,map.get(child)]));
+              _execCmd(child.cmd); await wait(420);
+            }
+            if(!runningQueue||doorQuizOpen) break;
+          }
+          done.add(hdr); entry.children.forEach(c=>done.add(map.get(c)));
+        } else {
+          paint(lines.length,new Set([hdr]));
+          _execCmd(entry.cmd); await wait(420);
+          done.add(hdr);
+        }
+      }
+      paint(lines.length,null);
+      await wait(300);
+    } catch(e){ console.error("Erro na demonstração:",e); }
+    finally{
+      runningQueue=false;
+      pre.classList.add("hidden"); ta.classList.remove("hidden");
+      if(lbl&&lblOriginal!==null) lbl.textContent=lblOriginal;
+      if(!ta.value.trim()){
+        ta.value=lines.join("\n");
+        showWriteMsg("ok","📋 A solução ficou escrita na caixa — carrega em ▶️ Executar para a veres outra vez, ou muda o que quiseres.");
+      } else showWriteMsg("","");
+    }
+  }
 
   // Mostra/esconde a barra "a construir um ciclo…" consoante groupStack.
   // groupStack pode ter mais de 1 nível — um ciclo aberto dentro de outro
@@ -3695,6 +4204,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // está mesmo a receber os próximos passos), com uma "trilha" (breadcrumb)
   // dos ciclos ainda por fechar por cima dele.
   function renderQueueGroupBar(){
+    renderPseudoView();
     const active=$("queue-group-active"), hint=$("queue-group-hint"), row=$("queue-blocks-row");
     if(!active) return;
     if(groupStack.length){
@@ -3716,6 +4226,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // sempre no bloco mais interno (o topo da pilha) em vez de ir direto
   // para a sequência principal.
   function queuePushCmd(cmd){
+    // No modo "✍️ Escrever", botões/teclas/swipe escrevem a linha no texto.
+    if(writeMode){ writeInsertLine(PSEUDO_CMD[cmd]||cmd); return; }
     const label=CMD_LABELS[cmd]||cmd;
     if(groupStack.length){
       const inner=groupStack[groupStack.length-1];
@@ -3763,6 +4275,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(runningQueue||queuedCommands.length===0) return;
     runningQueue=true;
     const cmds=[...queuedCommands]; queuedCommands=[];
+    pseudoLastRun=cmds;
     lastBlocksUsed=(lastBlocksUsed||0)+cmds.length;
     renderQueue();
     try{
@@ -3778,182 +4291,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* ===== EXTRA LEVELS GENERATOR ===== */
-  (function addExtraLevels(){
-    function rand(n){ return Math.floor(Math.random()*n); }
-
-    // Frases temáticas para os níveis EXTRA (gerados automaticamente).
-    // Sem isto, todos mostravam sempre a mesma frase genérica — e como
-    // há muito mais níveis extra do que feitos à mão (5 a 10 por tema,
-    // contra só 3), era a frase que a maioria dos alunos via. Uma por
-    // "ck/tk", escolhida ao calhas em cada nível gerado.
-    const EXTRA_LEVEL_DESCS = {
-      "1c/senhas": [
-        "Mais uma senha para proteger! Apanha a chave 🔑 e tranca-a bem no cofre 🔐.",
-        "Reforça a tua conta: recolhe o cadeado 🔒 e guarda-o em segurança no cofre 🔐.",
-        "Um escudo de proteção à espera! Leva-o ao cofre 🔐 antes que alguém tente adivinhar a tua senha."
-      ],
-      "1c/dispositivos": [
-        "O teu telemóvel também precisa de cuidados! Leva-o à oficina 🛡️ para o manter seguro.",
-        "Uma atualização em atraso! Apanha-a 🔄 e leva-a à oficina 🛡️ antes que apareça um vírus 🦠.",
-        "Protege mais um aparelho: recolhe o computador 💻 e entrega-o na oficina 🛡️."
-      ],
-      "1c/ajuda": [
-        "Chegou outra mensagem esquisita! Leva o telemóvel 📞 a um adulto de confiança 🧑‍🏫.",
-        "Sentes-te inseguro com algo online? Leva o pedido de ajuda 🆘 a um adulto de confiança 🧑‍🏫.",
-        "Nunca enfrentes isto sozinho: recolhe a mensagem 💬 e mostra-a a um adulto de confiança 🧑‍🏫."
-      ],
-      "2c/dados": [
-        "Mais dados pessoais para proteger! Leva o cartão 🪪 ao arquivo seguro 🗄️, longe de olhos curiosos 🕵️.",
-        "Os teus documentos não são para partilhar! Recolhe-os 📋 e tranca-os no arquivo seguro 🗄️.",
-        "Guarda bem esta informação: leva a ficha 📇 ao arquivo seguro 🗄️ antes que alguém a veja."
-      ],
-      "2c/privacidade": [
-        "Um segredo de um amigo! Leva-o para casa 🏡 e não o partilhes sem autorização.",
-        "Essa mensagem 💌 é privada — leva-a para casa 🏡, longe de olhares indiscretos 👀.",
-        "Mais uma foto que só deve ficar entre amigos: recolhe o cadeado 🔒 e guarda-o em casa 🏡."
-      ],
-      "2c/links": [
-        "Antes de clicares, verifica sempre! Leva o link seguro ✅ ao mundo digital 🌐.",
-        "Cuidado com o phishing 🎣! Recolhe o escudo 🛡️ e protege a tua navegação no mundo digital 🌐.",
-        "Esse link parece seguro? Confirma primeiro — depois leva-o 🔗 ao mundo digital 🌐."
-      ],
-      "3c/backup": [
-        "Mais um ficheiro importante! Guarda-o na nuvem ☁️ antes que algo corra mal.",
-        "Uma pasta cheia de memórias 🗂️ — não corras o risco, leva-a à nuvem ☁️.",
-        "Se o computador falhar ⚡, as cópias de segurança salvam-te: leva a disquete 💾 à nuvem ☁️."
-      ],
-      "3c/publicar": [
-        "Antes de publicares, pensa bem! Leva a ideia 💭 à publicação segura 📤.",
-        "Confirma que está tudo certo ✅ antes de partilhar — depois entrega na publicação segura 📤.",
-        "Um \"gosto\" impulsivo pode esperar: leva-o 👍 à publicação segura 📤 só depois de pensares bem."
-      ],
-      "3c/mundo": [
-        "Mais um escudo para a missão final! Leva-o ao troféu 🏆 e ajuda a proteger o mundo digital.",
-        "Uma ameaça 👾 apareceu — recolhe o cadeado 🔐 e entrega-o para vencer esta fase.",
-        "Estás quase lá: apanha o símbolo da rede 🌐 e leva-o ao troféu final 🏆."
-      ],
-      "sec/identidade": [
-        "Mais um documento digital para proteger da tua identidade! Leva-o ao cofre digital 🔐.",
-        "Cuidado com perfis falsos 🎭 — recolhe o teu avatar 👤 e guarda-o em segurança.",
-        "A tua pegada digital cresce a cada clique: protege este dado 🔏 no cofre digital 🔐."
-      ],
-      "sec/golpes": [
-        "Verifica sempre antes de pagar! Leva o cartão 💳 para um sítio protegido 🛡️.",
-        "Uma burla pode estar escondida como numa teia 🕸️ — usa a lupa 🔍 para investigar antes de avançar.",
-        "Confirma que é mesmo seguro ✅ e protege o pagamento 🛡️ antes que seja tarde."
-      ],
-      "sec/ciberbullying": [
-        "Alguém precisa de ajuda! Leva o botão de denúncia 🚨 a quem pode intervir 🧑‍⚖️.",
-        "Ninguém deve sofrer 😢 online — recolhe a mensagem 💬 e entrega-a a quem pode ajudar 🧑‍⚖️.",
-        "Diz basta 🛑! Leva esta prova a quem pode agir 🧑‍⚖️ e ajudar a parar o ciberbullying."
-      ]
-    };
-    function pickExtraDesc(ck,tk){
-      const pool=EXTRA_LEVEL_DESCS[ck+"/"+tk];
-      return pool ? pool[rand(pool.length)] : "Missão extra: apanha todos os itens e leva ao portal 🌀!";
-    }
-
-    /* Calcula o doorPos da mesma forma que computeDoorPos() */
-    function getDoorPos(size, robotPos, depositPos, obstacles){
-      const corners=[[0,0],[0,size-1],[size-1,0],[size-1,size-1]];
-      const obs=obstacles||[];
-      const free=corners.filter(([r,c])=>{
-        if(obs.some(o=>o[0]===r&&o[1]===c)) return false;
-        if(depositPos[0]===r&&depositPos[1]===c) return false;
-        if(robotPos[0]===r&&robotPos[1]===c) return false;
-        return true;
-      });
-      const pool=free.length?free:corners;
-      return pool.reduce((best,p)=>{
-        const d=Math.abs(p[0]-depositPos[0])+Math.abs(p[1]-depositPos[1]);
-        const bd=Math.abs(best[0]-depositPos[0])+Math.abs(best[1]-depositPos[1]);
-        return d>bd?p:best;
-      },pool[0]);
-    }
-
-    /* BFS completo: verifica se robô consegue alcançar todos os pontos-chave
-       incluindo o doorPos (portal de saída) — não apenas o depositPos */
-    function isLevelSolvable(size, robotPos, items, depositPos, obstacles){
-      const obsSet=new Set(obstacles.map(([r,c])=>r+","+c));
-      const isBlocked=(r,c)=>r<0||r>=size||c<0||c>=size||obsSet.has(r+","+c);
-      // BFS de flood-fill a partir do robô
-      const visited=new Set();
-      const queue=[[robotPos[0],robotPos[1]]];
-      visited.add(robotPos[0]+","+robotPos[1]);
-      const DR=[[-1,0],[1,0],[0,-1],[0,1]];
-      while(queue.length){
-        const [r,c]=queue.shift();
-        for(const [dr,dc] of DR){
-          const nr=r+dr, nc=c+dc;
-          const k=nr+","+nc;
-          if(!isBlocked(nr,nc)&&!visited.has(k)){ visited.add(k); queue.push([nr,nc]); }
-        }
-      }
-      // Todos os itens têm de ser alcançáveis
-      for(const [r,c] of items){ if(!visited.has(r+","+c)) return false; }
-      // O depositPos (portal) tem de ser alcançável
-      if(!visited.has(depositPos[0]+","+depositPos[1])) return false;
-      // O doorPos (canto de saída) também tem de ser alcançável
-      const door=getDoorPos(size, robotPos, depositPos, obstacles);
-      if(!visited.has(door[0]+","+door[1])) return false;
-      // Verificação extra: pelo menos 40% das células devem estar livres
-      // para garantir que o nível não é um labirinto sem saída
-      const totalCells=size*size;
-      const freeCells=totalCells-obstacles.length-items.length-1-1; // -robot -deposit
-      if(freeCells/totalCells < 0.40) return false;
-      return true;
-    }
-
-    function makeLevel(size,diff,ck,tk){
-      // Limitar obstáculos para garantir jogabilidade:
-      // diff 0=Médio: máx 4, diff 1=Difícil: máx 6, diff 2+=Desafio: máx 8
-      const ic=diff>=3?4:diff===2?3:2;
-      const maxObs=diff>=2?8:diff===1?6:4;
-      const ds=["Médio","Difícil","Desafio"];
-      const desc=pickExtraDesc(ck,tk);
-      const MAX_ATTEMPTS=50;
-      for(let attempt=0;attempt<MAX_ATTEMPTS;attempt++){
-        const used=new Set();
-        function pos(){ let r,c,k; do{r=rand(size);c=rand(size);k=r+"-"+c;}while(used.has(k)); used.add(k);return[r,c]; }
-        const robot=pos(), depositPos=pos();
-        const items=Array.from({length:ic},()=>pos());
-        // Gerar obstáculos até ao máximo, mas garantir que não bloqueiam cantos
-        const obstacles=[];
-        const corners=new Set([[0,0],[0,size-1],[size-1,0],[size-1,size-1]].map(([r,c])=>r+","+c));
-        for(let o=0;o<maxObs;o++){
-          let r,c,k;
-          let tries=0;
-          do{ r=rand(size); c=rand(size); k=r+"-"+c; tries++; }
-          while((used.has(k)||corners.has(k))&&tries<20);
-          if(!used.has(k)&&!corners.has(k)){ used.add(k); obstacles.push([r,c]); }
-        }
-        if(isLevelSolvable(size, robot, items, depositPos, obstacles)){
-          return{size,robot,items,deposit:[depositPos],obstacles,difficulty:ds[Math.min(diff,2)],desc,_generated:true};
-        }
-      }
-      // Fallback: nível simples sem obstáculos (sempre possível)
-      const used2=new Set();
-      function safePos(){ let r,c,k; do{r=rand(size);c=rand(size);k=r+"-"+c;}while(used2.has(k)); used2.add(k);return[r,c]; }
-      const robot=safePos(), depositPos=safePos();
-      const items=Array.from({length:ic},()=>safePos());
-      return{size,robot,items,deposit:[depositPos],obstacles:[],difficulty:ds[Math.min(diff,2)],desc,_generated:true};
-    }
-
-    Object.keys(GAME_DATA).forEach(ck=>{
-      const cycle=GAME_DATA[ck], extra=ck==="1c"?10:5;
-      Object.keys(cycle.themes).forEach(tk=>{
-        const theme=cycle.themes[tk];
-        theme._designedCount=theme.levels.length;
-        for(let i=0;i<extra;i++){
-          const size=ck==="1c"?6+rand(2):7+rand(2);
-          const diff=Math.min(3,Math.floor(i/2));
-          theme.levels.push(makeLevel(size,diff,ck,tk));
-        }
-      });
-    });
-  })();
-
+  /* ===== NÍVEIS ===== */
+  // Cada tema tem 5 níveis FIXOS (iguais para todos os alunos), com a dificuldade
+  // sempre a subir: os níveis 1-3 são feitos à mão e os 4-5 foram criados e
+  // verificados com o mesmo BFS do jogo (ver gerar-niveis.js / verificar-niveis.js,
+  // que avisa se algum nível for mais fácil do que o anterior).
   /* ===== EVENT LISTENERS ===== */
   function screenForCycle(ck){
     return ck==="1c"?themes1cScreen:ck==="2c"?themes2cScreen:ck==="sec"?themesSecScreen:themes3cScreen;
@@ -3982,6 +4324,49 @@ document.addEventListener("DOMContentLoaded", () => {
   const runQ=$("btn-run-queue"); if(runQ) runQ.addEventListener("click",executeQueue);
   const undQ=$("btn-undo-queue"); if(undQ) undQ.addEventListener("click",()=>{ if(queuedCommands.length>0){ queuedCommands.pop(); renderQueue(); setFeedback("↩ Último comando removido.","info"); } });
   const clrQ=$("btn-clear-queue"); if(clrQ) clrQ.addEventListener("click",()=>{ queuedCommands=[]; groupStack=[]; renderQueueGroupBar(); renderQueue(); setFeedback("🧹 Sequência limpa.","info"); });
+
+  // Botão "👁️ Pseudocódigo" (só Secundário): mostra/esconde a fila escrita em pseudocódigo.
+  const btnPseudo=$("btn-pseudo-toggle");
+  if(btnPseudo) btnPseudo.addEventListener("click",()=>{ pseudoOn=!pseudoOn; renderPseudoView(); });
+
+  // Modo "✍️ Escrever" (só Secundário)
+  const tabBlocks=$("tab-blocks"), tabWrite=$("tab-write"), wrCode=$("write-code");
+  if(tabBlocks) tabBlocks.addEventListener("click",()=>{ if(!runningQueue) setWriteMode(false); });
+  if(tabWrite) tabWrite.addEventListener("click",()=>{ if(!runningQueue) setWriteMode(true); });
+  const wrRun=$("wr-run"); if(wrRun) wrRun.addEventListener("click",runWrittenProgram);
+  const wrClear=$("wr-clear"); if(wrClear) wrClear.addEventListener("click",()=>{ if(wrCode) wrCode.value=""; showWriteMsg("","✍️ Caixa limpa."); });
+  const wrRepeat=$("wr-repeat"); if(wrRepeat) wrRepeat.addEventListener("click",()=>{
+    $("wr-repeat-picker")?.classList.remove("hidden");
+  });
+  document.querySelectorAll(".wr-times-btn").forEach(b=>{
+    b.addEventListener("click",()=>{
+      const times=parseInt(b.getAttribute("data-times"),10)||2;
+      $("wr-repeat-picker")?.classList.add("hidden");
+      writeInsertLine("REPETIR "+times+" VEZES");
+      showWriteMsg("info","🔁 Escreve agora, por baixo, os passos a repetir — usa ⇥ Indentar (ou os botões de direção, que já indentam sozinhos) para eles ficarem \"dentro\" do REPETIR.");
+    });
+  });
+  $("wr-repeat-cancel")?.addEventListener("click",()=>{ $("wr-repeat-picker")?.classList.add("hidden"); });
+  const wrIndent=$("wr-indent"); if(wrIndent) wrIndent.addEventListener("click",()=>writeShift(1));
+  const wrOutdent=$("wr-outdent"); if(wrOutdent) wrOutdent.addEventListener("click",()=>writeShift(-1));
+  const wrToBlocks=$("wr-to-blocks");
+  if(wrToBlocks) wrToBlocks.addEventListener("click",()=>{
+    if(runningQueue||!wrCode) return;
+    const res=parsePseudoProgram(wrCode.value);
+    if(res.errors.length){ showWriteErrors(res.errors); return; }
+    queuedCommands=res.entries; groupStack=[];
+    setWriteMode(false); renderQueueGroupBar(); renderQueue();
+    setFeedback("🧩 O teu texto foi convertido em blocos.","ok");
+  });
+  if(wrCode) wrCode.addEventListener("keydown",e=>{
+    // Tab escreve indentação; Esc e depois Tab deixa sair da caixa (acessibilidade).
+    if(e.key==="Escape"){ writeTabFree=true; return; }
+    if(e.key==="Tab"){
+      if(writeTabFree){ writeTabFree=false; return; }
+      e.preventDefault(); writeShift(e.shiftKey?-1:1); return;
+    }
+    writeTabFree=false;
+  });
 
   // Bloco "Repetir" (3.º Ciclo e Secundário — ver loadLevel). Só no
   // Secundário se pode aninhar (abrir "Repetir" outra vez enquanto já há
@@ -4075,6 +4460,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const lvls=levelsFor(ck,currentTheme);
       currentLevelIndex=Math.min(progress.currentLevelIndex||0,Math.max(0,lvls.length-1));
       const ct=$("crumb-theme"); if(ct) ct.textContent=currentTheme.name+" "+currentTheme.emoji;
+      writeMode=(ck==="sec")?writePref:false; // Secundário: ✍️ Escrever por defeito
       showScreen(gameScreen); loadLevel(currentLevelIndex);
     });
   });
@@ -4087,6 +4473,14 @@ document.addEventListener("DOMContentLoaded", () => {
       e.stopPropagation();
       const tk=btn.getAttribute("data-theme");
       openCodeSniff(tk, 0);
+    });
+  });
+
+  // Botão "🧠 Desafio de Pseudocódigo" (mesmo popup do Desafio de Código).
+  document.querySelectorAll(".pseudo-btn").forEach(btn=>{
+    btn.addEventListener("click",(e)=>{
+      e.stopPropagation();
+      openCodeSniff(btn.getAttribute("data-theme"), 0, "pseudo");
     });
   });
 
@@ -4214,16 +4608,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const hintBtn=$("btn-hint");
   if(hintBtn) hintBtn.addEventListener("click",showHint);
 
-  // "🎬 Demonstração" — só existe no 1.º nível de cada tema do 3.º Ciclo
-  // e do Secundário
-  // (ver toggle em loadLevel). Reinicia o nível, calcula uma solução real
+  // "🎬 Demonstração" — existe no 1.º nível de cada tema do 2.º Ciclo, do
+  // 3.º Ciclo e do Secundário (ver toggle em loadLevel). Reinicia o nível, calcula uma solução real
   // com bfsPathAsync, monta-a como uma sequência de blocos (com "Repetir"
   // sempre que houver 2+ ações iguais seguidas) e executa-a no ecrã, para
   // quem nunca usou os blocos ver o resultado antes de tentar sozinho.
   const demoBtn=$("btn-demo");
   if(demoBtn) demoBtn.addEventListener("click",()=>{
     if(!currentTheme||runningQueue) return;
-    doConfirm("🎬 Vou reiniciar este nível e mostrar uma forma de o resolver usando os blocos. Continuar?",()=>{
+    // No Secundário a demonstração é sempre em pseudocódigo (passa para o separador ✍️ Escrever);
+    // no 3.º Ciclo continua a ser em blocos.
+    const demoPseudo=(currentCycleKey==="sec");
+    const demoMsg=demoPseudo?"🎬 Vou reiniciar este nível e mostrar uma forma de o resolver escrevendo o pseudocódigo. Continuar?"
+      :currentCycleKey==="2c"?"🎬 Vou reiniciar este nível e mostrar uma forma de o resolver, comando a comando. Continuar?"
+      :"🎬 Vou reiniciar este nível e mostrar uma forma de o resolver usando os blocos. Continuar?";
+    doConfirm(demoMsg,()=>{
+      if(demoPseudo) writeMode=true; // o loadLevel abaixo mostra o painel ✍️ Escrever
       runningQueue=false; resetQueue(); loadLevel(currentLevelIndex);
       demoBtn.disabled=true;
       setFeedback("🎬 A calcular a demonstração…","info");
@@ -4236,10 +4636,11 @@ document.addEventListener("DOMContentLoaded", () => {
           demoBtn.disabled=false;
           return;
         }
-        const entries=compactPathToQueue(path);
+        // 2.º Ciclo ainda não tem o bloco "Repetir": a demonstração é uma fila simples, comando a comando.
+        const entries=(currentCycleKey==="2c")?path.map(cmd=>({cmd,label:CMD_LABELS[cmd]||cmd})):compactPathToQueue(path);
         setFeedback("🎬 Repara na sequência completa — o passo atual fica em destaque!","info");
         setTimeout(async ()=>{
-          await runDemoEntries(entries);
+          if(demoPseudo){ if(!writeMode) setWriteMode(true); await runDemoWritten(entries); } else await runDemoEntries(entries);
           demoBtn.disabled=false;
         },1200);
       });
@@ -4249,6 +4650,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown",e=>{
     if(!gameScreen||gameScreen.classList.contains("hidden")) return;
     if(!currentTheme||!levelState||runningQueue) return;
+    if(e.target&&e.target.matches&&e.target.matches("input, textarea")) return; // a escrever texto: não mexer o robô
     if((e.key==="z"||e.key==="Z")&&!isQueueMode()){ undoLastMove(); return; }
     const km={"ArrowUp":"MOVE","w":"MOVE","W":"MOVE","ArrowDown":"BACK","s":"BACK","S":"BACK","ArrowLeft":"LEFT","a":"LEFT","A":"LEFT","ArrowRight":"RIGHT","d":"RIGHT","D":"RIGHT","e":"COLLECT","E":"COLLECT","f":"DROP","F":"DROP"};
     const cmd=km[e.key]; if(!cmd) return;
@@ -4692,16 +5094,30 @@ document.addEventListener("DOMContentLoaded", () => {
     if(cv) vbFlashPose(cv, true, -1, false, 160);
   }, 4200);
 
-  /* ── TUTORIAL ── */
+  /* ── TUTORIAL ──
+     O número e a ordem dos passos variam consoante o modo do ciclo:
+       • modo "direct" (1.º Ciclo): 1 → 2 → 3 → 4
+       • modo "queue" (2.º/3.º Ciclo, Secundário): 1 → 2 → queue → 3 → 4
+         [→ 5 (Repetir), só 3.º Ciclo/Secundário] [→ write, só Secundário]
+     getStepOrder() calcula essa lista uma vez por abertura do tutorial;
+     todo o resto (navegação, botões, pontinhos) trabalha em cima dela,
+     em vez de números de passo fixos como acontecia antes. */
   (function(){
     const TUT_KEY = 'mundocrianca_tutorial_done_v1';
-    // Passo 5 (bloco "Repetir") existe no 3.º Ciclo e no Secundário; para
-    // 1.º/2.º Ciclo o fluxo continua a acabar no passo 4, exatamente como
-    // antes desta alteração.
-    const TOTAL = 5;
+    let order = ['1','2','3','4'];
+    let curIdx = 0;
+
+    function getStepOrder(){
+      const isQueue = currentCycle && currentCycle.mode === "queue";
+      if(!isQueue) return ['1','2','3','4'];
+      const o = ['1','2','queue','3','4'];
+      if(currentCycleKey==="sec" || currentCycleKey==="3c") o.push('5');
+      if(currentCycleKey==="sec") o.push('write');
+      return o;
+    }
 
     function tutDone(){
-      stopDemo();
+      stopDemo(); stopQueueDemo(); stopWriteDemo();
       try{ localStorage.setItem(TUT_KEY,'1'); }catch(e){}
       const overlay = document.getElementById('tutorial-overlay');
       if(overlay){
@@ -4711,9 +5127,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Demonstração animada e autónoma do bloco "Repetir" no passo 5 — mostra
-    // o robô a avançar 3 vezes seguidas, em ciclo, para quem nunca viu o
-    // bloco perceber o que ele faz antes de o experimentar a sério.
+    // ── Demonstração do passo 5: bloco "Repetir" — avança 3× seguidas em ciclo.
     let demoTimer=null, demoStep=0;
     function demoTick(){
       const robot=document.getElementById('demo-robot');
@@ -4750,57 +5164,187 @@ document.addEventListener("DOMContentLoaded", () => {
       if(demoTimer){ clearTimeout(demoTimer); demoTimer=null; }
     }
 
-    function goToStep(n){
-      document.querySelectorAll('.tutorial-step').forEach(s=>s.classList.remove('active'));
-      const el = document.getElementById('tut-step-'+n);
-      if(el) el.classList.add('active');
-      if(n===5) startDemo(); else stopDemo();
+    // ── Demonstração do passo "queue": constrói uma fila de 3× ⬆️ Avançar
+    // sem o robô se mexer, e só depois "carrega" em ▶️ Executar e o robô
+    // percorre tudo de uma vez — o cerne do que é diferente neste modo.
+    let qDemoTimer=null, qDemoPhase=0, qDemoStep=0;
+    const Q_TOTAL = 3;
+    function queueDemoTick(){
+      const chip=document.getElementById('demo-q-chip');
+      const status=document.getElementById('demo-q-status');
+      const robot=document.getElementById('demo-q-robot');
+      if(!chip||!status||!robot) return;
+      if(qDemoPhase===0){
+        qDemoStep++;
+        if(qDemoStep<=Q_TOTAL){
+          chip.textContent='Fila: '+'⬆️ '.repeat(qDemoStep).trim();
+          status.textContent='Carregaste em ⬆️ Avançar ('+qDemoStep+'/'+Q_TOTAL+') — ainda não me mexo!';
+          chip.classList.add('pulse'); setTimeout(()=>chip.classList.remove('pulse'),200);
+          qDemoTimer=setTimeout(queueDemoTick,700);
+        } else {
+          status.textContent='Fila pronta! A carregar em ▶️ Executar…';
+          qDemoTimer=setTimeout(()=>{ qDemoPhase=1; qDemoStep=0; queueDemoTick(); },900);
+        }
+      } else {
+        qDemoStep++;
+        if(qDemoStep>Q_TOTAL){
+          status.textContent='✅ Chegou ao portal! A recomeçar…';
+          qDemoTimer=setTimeout(()=>{
+            qDemoPhase=0; qDemoStep=0; robot.style.left='0px';
+            chip.textContent='Fila: (vazia)';
+            status.textContent='A carregar nos botões…';
+            qDemoTimer=setTimeout(queueDemoTick,900);
+          },1100);
+          return;
+        }
+        robot.style.left=(qDemoStep*38)+'px';
+        status.textContent='▶️ A executar — passo '+qDemoStep+' de '+Q_TOTAL;
+        qDemoTimer=setTimeout(queueDemoTick,750);
+      }
+    }
+    function startQueueDemo(){
+      stopQueueDemo(); qDemoPhase=0; qDemoStep=0;
+      const robot=document.getElementById('demo-q-robot'); if(robot) robot.style.left='0px';
+      const chip=document.getElementById('demo-q-chip'); if(chip) chip.textContent='Fila: (vazia)';
+      const status=document.getElementById('demo-q-status'); if(status) status.textContent='A carregar nos botões…';
+      qDemoTimer=setTimeout(queueDemoTick,900);
+    }
+    function stopQueueDemo(){
+      if(qDemoTimer){ clearTimeout(qDemoTimer); qDemoTimer=null; }
     }
 
-    for(let i=1;i<=TOTAL;i++){
-      (function(step){
-        const next = document.getElementById('tut-next-'+step);
-        if(next) next.addEventListener('click',()=>{
-          // No 4.º passo, quem não está no 3.º Ciclo nem no Secundário
-          // termina aqui (mesmo comportamento que existia antes do passo
-          // 5 ser criado — agora o passo 5 também serve o 3.º Ciclo).
-          if(step===4 && currentCycleKey!=="sec" && currentCycleKey!=="3c"){ tutDone(); return; }
-          if(step<TOTAL) goToStep(step+1);
-          else tutDone();
-        });
-        const skip = document.getElementById('tut-skip-'+step);
-        if(skip) skip.addEventListener('click', tutDone);
-      })(i);
+    // ── Demonstração do passo "✍️ Escrever": escreve um mini-programa com
+    // REPETIR + uma linha indentada por baixo (o próprio conceito de
+    // indentar), e depois executa-o — 1 AVANÇAR "solto" + 2 repetições do
+    // AVANÇAR indentado, para ligar visualmente "está mais para dentro" a
+    // "só esta linha repete".
+    let wDemoTimer=null, wDemoPhase=0, wDemoStep=0;
+    const W_PROGRAM=[
+      {text:'AVANÇAR', indent:0},
+      {text:'REPETIR 2 VEZES', indent:0},
+      {text:'AVANÇAR', indent:1}
+    ];
+    const W_RUN_LABELS=[
+      'A executar — AVANÇAR (linha de fora, corre 1×)',
+      'A executar — AVANÇAR indentado, repetição 1 de 2',
+      'A executar — AVANÇAR indentado, repetição 2 de 2'
+    ];
+    function writeProgramText(upTo){
+      return W_PROGRAM.slice(0,upTo).map(l=>'    '.repeat(l.indent)+l.text).join('\n');
+    }
+    function writeDemoTick(){
+      const pre=document.getElementById('demo-w-pre');
+      const status=document.getElementById('demo-w-status');
+      const robot=document.getElementById('demo-w-robot');
+      if(!pre||!status||!robot) return;
+      if(wDemoPhase===0){
+        wDemoStep++;
+        if(wDemoStep<=W_PROGRAM.length){
+          pre.textContent=writeProgramText(wDemoStep);
+          status.textContent = wDemoStep<W_PROGRAM.length
+            ? 'A escrever linha '+wDemoStep+' de '+W_PROGRAM.length+'…'
+            : 'Repara: esta linha está mais "para dentro" → só ela repete!';
+          wDemoTimer=setTimeout(writeDemoTick, wDemoStep<W_PROGRAM.length?750:1400);
+        } else {
+          status.textContent='Pronto! A carregar em ▶️ Executar…';
+          wDemoTimer=setTimeout(()=>{ wDemoPhase=1; wDemoStep=0; writeDemoTick(); },900);
+        }
+      } else {
+        wDemoStep++;
+        if(wDemoStep>W_RUN_LABELS.length){
+          status.textContent='✅ Chegou ao portal! A recomeçar…';
+          wDemoTimer=setTimeout(()=>{
+            wDemoPhase=0; wDemoStep=0; robot.style.left='0px';
+            pre.textContent=''; status.textContent='A escrever o programa…';
+            wDemoTimer=setTimeout(writeDemoTick,900);
+          },1100);
+          return;
+        }
+        robot.style.left=(wDemoStep*38)+'px';
+        status.textContent=W_RUN_LABELS[wDemoStep-1];
+        wDemoTimer=setTimeout(writeDemoTick,850);
+      }
+    }
+    function startWriteDemo(){
+      stopWriteDemo(); wDemoPhase=0; wDemoStep=0;
+      const robot=document.getElementById('demo-w-robot'); if(robot) robot.style.left='0px';
+      const pre=document.getElementById('demo-w-pre'); if(pre) pre.textContent='';
+      const status=document.getElementById('demo-w-status'); if(status) status.textContent='A escrever o programa…';
+      wDemoTimer=setTimeout(writeDemoTick,900);
+    }
+    function stopWriteDemo(){
+      if(wDemoTimer){ clearTimeout(wDemoTimer); wDemoTimer=null; }
     }
 
-    // Ajusta o botão do passo 4 (final para 1.º/2.º Ciclo, "Seguinte" para
-    // 3.º Ciclo e Secundário) e revela o 5º ponto dos indicadores.
-    function configureTutorialForCycle(){
-      // O passo dos ciclos (tut-step-5) agora aparece no 3.º Ciclo E no
-      // Secundário — só o TEXTO muda: no 3.º Ciclo só existe o "Repetir"
-      // simples (sem aninhar); no Secundário pode aninhar-se a si mesmo.
-      const hasCycleStep = currentCycleKey === "sec" || currentCycleKey === "3c";
-      document.querySelectorAll('.tutorial-dot-sec-only').forEach(d=>{
-        d.style.display = hasCycleStep ? '' : 'none';
+    // ── Pontinhos de progresso, gerados de acordo com o tamanho de "order".
+    function renderDots(){
+      const wrap = document.getElementById('tutorial-dots-shared');
+      if(!wrap) return;
+      wrap.innerHTML='';
+      order.forEach((_,i)=>{
+        const d=document.createElement('div');
+        d.className='tutorial-dot'+(i===curIdx?' active':'');
+        wrap.appendChild(d);
       });
+    }
+
+    function styleNextButton(id, isLast){
+      const btn=document.getElementById('tut-next-'+id);
+      if(!btn) return;
+      if(isLast){
+        btn.textContent='🚀 Vamos jogar!';
+        btn.style.background='linear-gradient(180deg,#4ecb71,#00b894)';
+        btn.style.borderColor='#ffa733';
+        btn.style.boxShadow='0 4px 0 #006644';
+      } else {
+        btn.textContent='Seguinte →';
+        btn.style.background=''; btn.style.borderColor=''; btn.style.boxShadow='';
+      }
+    }
+
+    function goToIndex(i){
+      document.querySelectorAll('.tutorial-step').forEach(s=>s.classList.remove('active'));
+      const id = order[i];
+      const el = document.getElementById('tut-step-'+id);
+      if(el) el.classList.add('active');
+      curIdx = i;
+      renderDots();
+      stopDemo(); stopQueueDemo(); stopWriteDemo();
+      if(id==='5') startDemo();
+      else if(id==='queue') startQueueDemo();
+      else if(id==='write') startWriteDemo();
+    }
+
+    function advance(){
+      if(curIdx < order.length-1) goToIndex(curIdx+1);
+      else tutDone();
+    }
+
+    // Um único listener por botão "Seguinte"/"Saltar" — a decisão de para
+    // onde ir (ou se acaba o tutorial) está toda em advance()/order, não
+    // espalhada por condições de número de passo como acontecia antes.
+    ['1','2','queue','3','4','5','write'].forEach(id=>{
+      const next = document.getElementById('tut-next-'+id);
+      if(next) next.addEventListener('click', advance);
+      const skip = document.getElementById('tut-skip-'+id);
+      if(skip) skip.addEventListener('click', tutDone);
+    });
+
+    // Ajusta o texto do passo "Repetir" consoante o ciclo (aninhamento só
+    // no Secundário) e o botão "Seguinte"/"Vamos jogar!" de cada passo,
+    // consoante qual deles é o último para este ciclo em concreto.
+    function configureTutorialForCycle(){
       const bubble = document.getElementById('tut-cycle-bubble');
       if(bubble){
         bubble.innerHTML = currentCycleKey === "sec"
           ? 'No Secundário tens um bloco extra por baixo da fila de comandos: <strong>🔁 Repetir</strong> junta vários passos e corre-os várias vezes seguidas. Podes até abrir um <strong>🔁 Repetir</strong> dentro de outro <strong>🔁 Repetir</strong> — um ciclo aninhado — para resolver caminhos com padrões dentro de padrões.'
           : 'Neste ciclo tens um bloco extra por baixo da fila de comandos: <strong>🔁 Repetir</strong> junta vários passos e corre-os várias vezes seguidas, para não teres de os escrever um a um.';
       }
-      const nb4 = document.getElementById('tut-next-4');
-      if(nb4){
-        if(hasCycleStep){
-          nb4.textContent = 'Seguinte →';
-          nb4.style.background=''; nb4.style.borderColor=''; nb4.style.boxShadow='';
-        } else {
-          nb4.textContent = '🚀 Vamos jogar!';
-          nb4.style.background='linear-gradient(180deg,#4ecb71,#00b894)';
-          nb4.style.borderColor='#ffa733';
-          nb4.style.boxShadow='0 4px 0 #006644';
-        }
-      }
+      order = getStepOrder();
+      const lastId = order[order.length-1];
+      ['1','2','queue','3','4','5','write'].forEach(id=>{
+        styleNextButton(id, id===lastId);
+      });
     }
 
     function showTutorial(){
@@ -4809,7 +5353,7 @@ document.addEventListener("DOMContentLoaded", () => {
         overlay.style.opacity='';
         overlay.style.transition='';
         configureTutorialForCycle();
-        goToStep(1);
+        goToIndex(0);
         overlay.classList.remove('hidden');
       }
     }
@@ -5163,9 +5707,6 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="tut-skip" id="tut-skip-1">Saltar tutorial</button>
         <button class="tut-next" id="tut-next-1">Seguinte →</button>
       </div>
-      <div class="tutorial-dots">
-        <div class="tutorial-dot active"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot tutorial-dot-sec-only"></div>
-      </div>
     </div>
 
     <!-- PASSO 2: D-pad -->
@@ -5193,8 +5734,35 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="tut-skip" id="tut-skip-2">Saltar</button>
         <button class="tut-next" id="tut-next-2">Seguinte →</button>
       </div>
-      <div class="tutorial-dots">
-        <div class="tutorial-dot"></div><div class="tutorial-dot active"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot tutorial-dot-sec-only"></div>
+    </div>
+
+    <!-- PASSO NOVO: Fila + Executar — só nos ciclos em modo "queue"
+         (2.º Ciclo, 3.º Ciclo, Secundário). Explica que os botões juntam
+         passos a uma lista e que só "▶️ Executar" faz o robô andar, desde
+         o início — a principal razão de confusão de quem vê o jogo pela
+         1.ª vez sem perceber que já não está no modo direto do 1.º Ciclo. -->
+    <div class="tutorial-step" id="tut-step-queue">
+      <div class="tutorial-title">Aqui é diferente! 📋</div>
+      <div class="tutorial-robot-row">
+        <div class="tutorial-robot"><canvas id="tut-vb-robot-q" class="tut-vb-robot" width="96" height="96" style="width:58px;height:58px;" aria-hidden="true"></canvas></div>
+        <div class="tutorial-bubble">
+          Neste ciclo os botões <strong>não me movem logo</strong>! Cada vez que carregas num botão, ele entra numa <strong>lista de passos</strong>. Só quando carregares em <strong>▶️ Executar</strong> é que faço tudo seguido, desde o início!
+        </div>
+      </div>
+      <div class="tutorial-demo" id="tutorial-demo-queue">
+        <div class="demo-chip" id="demo-q-chip">Fila: (vazia)</div>
+        <div class="demo-track">
+          <div class="demo-cell"></div>
+          <div class="demo-cell"></div>
+          <div class="demo-cell"></div>
+          <div class="demo-cell">🌀</div>
+          <div class="demo-robot" id="demo-q-robot">🤖</div>
+        </div>
+        <div class="demo-status" id="demo-q-status">A carregar nos botões…</div>
+      </div>
+      <div class="tutorial-footer">
+        <button class="tut-skip" id="tut-skip-queue">Saltar</button>
+        <button class="tut-next" id="tut-next-queue">Seguinte →</button>
       </div>
     </div>
 
@@ -5217,9 +5785,6 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="tutorial-footer">
         <button class="tut-skip" id="tut-skip-3">Saltar</button>
         <button class="tut-next" id="tut-next-3">Seguinte →</button>
-      </div>
-      <div class="tutorial-dots">
-        <div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot active"></div><div class="tutorial-dot"></div><div class="tutorial-dot tutorial-dot-sec-only"></div>
       </div>
     </div>
 
@@ -5247,11 +5812,8 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>
       <div class="tutorial-footer">
-        <div></div>
+        <button class="tut-skip" id="tut-skip-4">Saltar</button>
         <button class="tut-next" id="tut-next-4" style="background:linear-gradient(180deg,#4ecb71,#00b894);border-color:#ffa733;box-shadow:0 4px 0 #006644;">🚀 Vamos jogar!</button>
-      </div>
-      <div class="tutorial-dots">
-        <div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot active"></div><div class="tutorial-dot tutorial-dot-sec-only"></div>
       </div>
     </div>
 
@@ -5282,10 +5844,40 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="tut-skip" id="tut-skip-5">Saltar</button>
         <button class="tut-next" id="tut-next-5" style="background:linear-gradient(180deg,#4ecb71,#00b894);border-color:#ffa733;box-shadow:0 4px 0 #006644;">🚀 Vamos jogar!</button>
       </div>
-      <div class="tutorial-dots">
-        <div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot active"></div>
+    </div>
+
+    <!-- PASSO NOVO: ✍️ Escrever — só Secundário (writeMode só existe para
+         currentCycleKey==="sec"; ver getStepOrder()/writeMode no resto do
+         jogo). Mostra que, além dos blocos, dá para escrever o programa em
+         texto, linha a linha. -->
+    <div class="tutorial-step" id="tut-step-write">
+      <div class="tutorial-title">✍️ Escrever (só aqui!)</div>
+      <div class="tutorial-robot-row">
+        <div class="tutorial-robot"><canvas id="tut-vb-robot-w" class="tut-vb-robot" width="96" height="96" style="width:58px;height:58px;" aria-hidden="true"></canvas></div>
+        <div class="tutorial-bubble">
+          No Secundário também podes trocar de <strong>🧩 Blocos</strong> para <strong>✍️ Escrever</strong> — escreves o programa em texto, um comando por linha. Para repetir passos, escreve <strong>REPETIR N VEZES</strong> e usa <strong>⇥ Indentar</strong> (ou Tab) nas linhas que queres repetir: ficam mais "para dentro", coladas ao REPETIR, e é assim que ele sabe quais são as suas. <strong>⇤ Desindentar</strong> (Shift+Tab) tira uma linha de lá outra vez.
+        </div>
+      </div>
+      <div class="tutorial-demo" id="tutorial-demo-write">
+        <pre class="write-demo-pre" id="demo-w-pre"></pre>
+        <div class="demo-track">
+          <div class="demo-cell"></div>
+          <div class="demo-cell"></div>
+          <div class="demo-cell"></div>
+          <div class="demo-cell">🌀</div>
+          <div class="demo-robot" id="demo-w-robot">🤖</div>
+        </div>
+        <div class="demo-status" id="demo-w-status">A escrever o programa…</div>
+      </div>
+      <div class="tutorial-footer">
+        <button class="tut-skip" id="tut-skip-write">Saltar</button>
+        <button class="tut-next" id="tut-next-write" style="background:linear-gradient(180deg,#4ecb71,#00b894);border-color:#ffa733;box-shadow:0 4px 0 #006644;">🚀 Vamos jogar!</button>
       </div>
     </div>
+
+    <!-- Pontinhos de progresso — gerados dinamicamente em JS consoante o
+         número de passos deste ciclo (ver renderTutorialDots()). -->
+    <div class="tutorial-dots" id="tutorial-dots-shared"></div>
 
   </div>
 </div>

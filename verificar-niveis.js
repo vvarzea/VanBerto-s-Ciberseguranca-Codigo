@@ -18,6 +18,12 @@
  *      "🏁 Ótimo: —" para sempre nesse nível e a 3ª estrela fica impossível.
  *   6. Verifica as perguntas do quiz (QUIZ_DATA): pergunta não vazia, pelo
  *      menos 2 opções, índice da resposta certa dentro do intervalo.
+ *   7. Avisa se algum nível é MAIS FÁCIL do que o anterior do mesmo tema
+ *      (menos ações na solução ótima) — a dificuldade deve sempre subir.
+ *   8. Verifica os desafios de código (CODE_SNIFF_DATA) e os desafios de
+ *      pseudocódigo (PSEUDO_DATA) do Secundário: "code" e pergunta não
+ *      vazios, pelo menos 2 opções sem repetidas, índice da resposta certa
+ *      dentro do intervalo e, se existir, explicação ("e") não vazia.
  *
  * COMO USAR:
  *   node verificar-niveis.js                  (assume "./index.html")
@@ -110,6 +116,7 @@ const GAME_DATA = loadDataObject(html, "const GAME_DATA = {", "GAME_DATA");
 const QUIZ_DATA = loadDataObject(html, "const QUIZ_DATA={", "QUIZ_DATA")
   || loadDataObject(html, "const QUIZ_DATA = {", "QUIZ_DATA");
 let CODE_SNIFF_DATA = loadOptionalDataObject(html, "const CODE_SNIFF_DATA={", "CODE_SNIFF_DATA");
+let PSEUDO_DATA = loadOptionalDataObject(html, "const PSEUDO_DATA={", "PSEUDO_DATA");
 
 /* ===== Mesmo algoritmo de busca (BFS) do jogo ===== */
 function computeDoorPos(base) {
@@ -237,14 +244,25 @@ function checkLevel(ck, tk, listName, idx, lv) {
     console.log(`AVISO ${label}: solução ótima precisa de ${best} ações — passa o limite do jogo (${MOVE_CAP}); "Ótimo" vai ficar sempre em "—" e a 3ª estrela fica impossível`);
     warnings++;
   }
+  return best;
+}
+
+// Dificuldade a subir: cada nível deve precisar de MAIS ações ótimas do que o anterior.
+function checkRamp(ck, tk, listName, bests) {
+  for (let i = 1; i < bests.length; i++) {
+    if (bests[i] != null && bests[i - 1] != null && bests[i] <= bests[i - 1]) {
+      console.log(`AVISO ${ck}/${tk}/${listName}[${i}]: nível ${i + 1} (${bests[i]} ações) não é mais difícil do que o nível ${i} (${bests[i - 1]} ações)`);
+      warnings++;
+    }
+  }
 }
 
 Object.keys(GAME_DATA).forEach(ck => {
   const cycle = GAME_DATA[ck];
   Object.keys(cycle.themes).forEach(tk => {
     const theme = cycle.themes[tk];
-    (theme.levels || []).forEach((lv, idx) => checkLevel(ck, tk, "levels", idx, lv));
-    (theme.superEasyLevels || []).forEach((lv, idx) => checkLevel(ck, tk, "superEasyLevels", idx, lv));
+    checkRamp(ck, tk, "levels", (theme.levels || []).map((lv, idx) => checkLevel(ck, tk, "levels", idx, lv)));
+    checkRamp(ck, tk, "superEasyLevels", (theme.superEasyLevels || []).map((lv, idx) => checkLevel(ck, tk, "superEasyLevels", idx, lv)));
   });
 });
 
@@ -271,41 +289,55 @@ if (QUIZ_DATA) {
   console.log("AVISO: não encontrei QUIZ_DATA — perguntas do quiz não verificadas.");
 }
 
-// Desafios de código (CODE_SNIFF_DATA) — mesmo formato de validação do
-// quiz (q/ops/a), mais o campo "code" que tem de existir e não estar vazio.
-let totalCS = 0, csErrors = 0;
-if (CODE_SNIFF_DATA) {
-  Object.keys(CODE_SNIFF_DATA).forEach(key => {
-    const arr = CODE_SNIFF_DATA[key];
+// Desafios de código (CODE_SNIFF_DATA) e de pseudocódigo (PSEUDO_DATA) —
+// mesmo formato de validação do quiz (q/ops/a), mais o campo "code" que tem
+// de existir e não estar vazio. O campo "e" (explicação) é opcional, mas se
+// existir tem de ser texto não vazio.
+function checkChallenges(DATA, tag, missingMsg) {
+  let total = 0, errs = 0;
+  if (!DATA) { console.log(missingMsg); return { total, errs }; }
+  Object.keys(DATA).forEach(key => {
+    const arr = DATA[key];
     if (!Array.isArray(arr)) return;
     arr.forEach((item, idx) => {
-      totalCS++;
-      const label = `codesniff/${key}[${idx}]`;
+      total++;
+      const label = `${tag}/${key}[${idx}]`;
       if (typeof item.code !== "string" || !item.code.trim()) {
-        console.log(`ERRO  ${label}: campo "code" vazio/inválido`); csErrors++;
+        console.log(`ERRO  ${label}: campo "code" vazio/inválido`); errs++;
       }
       if (typeof item.q !== "string" || !item.q.trim()) {
-        console.log(`ERRO  ${label}: pergunta vazia/inválida`); csErrors++;
+        console.log(`ERRO  ${label}: pergunta vazia/inválida`); errs++;
       }
       if (!Array.isArray(item.ops) || item.ops.length < 2) {
-        console.log(`ERRO  ${label}: precisa de pelo menos 2 opções`); csErrors++;
+        console.log(`ERRO  ${label}: precisa de pelo menos 2 opções`); errs++;
+      } else if (new Set(item.ops).size !== item.ops.length) {
+        console.log(`ERRO  ${label}: há opções repetidas`); errs++;
       }
       if (typeof item.a !== "number" || item.a < 0 || (item.ops && item.a >= item.ops.length)) {
-        console.log(`ERRO  ${label}: índice da resposta certa (a=${item.a}) fora do intervalo de opções`); csErrors++;
+        console.log(`ERRO  ${label}: índice da resposta certa (a=${item.a}) fora do intervalo de opções`); errs++;
+      }
+      if ("e" in item && (typeof item.e !== "string" || !item.e.trim())) {
+        console.log(`ERRO  ${label}: explicação ("e") vazia/inválida`); errs++;
       }
     });
   });
-} else {
-  console.log("AVISO: não encontrei CODE_SNIFF_DATA — desafios de código não verificados (pode ser normal se esta versão do jogo ainda não os tiver).");
+  return { total, errs };
 }
+const csRes = checkChallenges(CODE_SNIFF_DATA, "codesniff",
+  "AVISO: não encontrei CODE_SNIFF_DATA — desafios de código não verificados (pode ser normal se esta versão do jogo ainda não os tiver).");
+const totalCS = csRes.total, csErrors = csRes.errs;
+const psRes = checkChallenges(PSEUDO_DATA, "pseudo",
+  "AVISO: não encontrei PSEUDO_DATA — desafios de pseudocódigo não verificados (pode ser normal se esta versão do jogo ainda não os tiver).");
+const totalPS = psRes.total, psErrors = psRes.errs;
 
 console.log("\n=== RESUMO ===");
 console.log(`Níveis verificados: ${totalLevels}  |  Erros: ${errors}  |  Avisos: ${warnings}`);
 if (QUIZ_DATA) console.log(`Perguntas verificadas: ${totalQ}  |  Erros: ${quizErrors}`);
 if (CODE_SNIFF_DATA) console.log(`Desafios de código verificados: ${totalCS}  |  Erros: ${csErrors}`);
-if (errors === 0 && quizErrors === 0 && csErrors === 0) {
+if (PSEUDO_DATA) console.log(`Desafios de pseudocódigo verificados: ${totalPS}  |  Erros: ${psErrors}`);
+if (errors === 0 && quizErrors === 0 && csErrors === 0 && psErrors === 0) {
   console.log("\n✅ Tudo em ordem — todos os níveis são possíveis e o quiz está bem formado.");
 } else {
   console.log("\n⚠️  Há problemas por corrigir — ver detalhes acima.");
 }
-process.exit(errors > 0 || quizErrors > 0 || csErrors > 0 ? 1 : 0);
+process.exit(errors > 0 || quizErrors > 0 || csErrors > 0 || psErrors > 0 ? 1 : 0);
