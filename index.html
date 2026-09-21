@@ -2484,6 +2484,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // normal do Ótimo/estrelas continua a usar bfsOptimalAsync, sem caminho,
   // por ser mais leve. Sem cache própria (chamada só quando alguém clica
   // no botão, não em cada renderização).
+  // Limite de 180 ações igual a bfsOptimal/bfsOptimalAsync (antes estava
+  // em 200 aqui, provavelmente por engano ao copiar — verificar-niveis.js
+  // agora avisa sozinho se isto voltar a desalinhar).
   function bfsPathAsync(base, door, callback){
     door=door||computeDoorPos(base);
     const schedule = typeof requestIdleCallback==="function"
@@ -2509,7 +2512,7 @@ document.addEventListener("DOMContentLoaded", () => {
         processed++;
         const cur=queue.shift();
         if(best!==null&&cur.moves>=best) continue;
-        if(cur.moves>200) continue;
+        if(cur.moves>180) continue;
         const remaining=cur.items.filter(i=>!i.collected);
         const [rr,rc]=cur.rob;
         if(remaining.length===0&&!cur.carry&&rr===door[0]&&rc===door[1]){ best=cur.moves; bestPath=cur.path; continue; }
