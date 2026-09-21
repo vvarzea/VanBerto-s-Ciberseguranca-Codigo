@@ -34,17 +34,19 @@
  *   à mão no ficheiro do jogo. Não precisa de internet nem de instalar nada
  *   — só precisa de Node.js instalado no computador.
  *
- * IMPORTANTE se um dia mudares o limite de ações no jogo:
- *   Procura por "cur.moves>180" dentro do <script> do index.html (aparece
- *   duas vezes, dentro de bfsOptimal e bfsOptimalAsync) e atualiza também
- *   o MOVE_CAP aqui em baixo para o mesmo valor, para os dois lados
- *   continuarem de acordo.
+ * SOBRE O LIMITE DE AÇÕES (180):
+ *   Em vez de confiar em alguém ler este comentário sempre que editar o
+ *   limite, este script agora LÊ os valores reais de "cur.moves>N" dentro
+ *   do index.html e avisa sozinho se alguma cópia ficar desincronizada
+ *   (ver checkMoveCaps() abaixo). Continua a precisar que MOVE_CAP aqui
+ *   em baixo seja atualizado à mão para o valor que quiseres usar como
+ *   referência.
  */
 
 const fs = require("fs");
 const path = require("path");
 
-const MOVE_CAP = 180; // manter igual ao "cur.moves>180" do index.html
+const MOVE_CAP = 180; // referência para checkMoveCaps() comparar com o index.html
 
 const filePath = process.argv[2] || "./index.html";
 if (!fs.existsSync(filePath)) {
@@ -191,6 +193,54 @@ function bfsOptimal(base, door) {
 /* ===== Verificações ===== */
 let totalLevels = 0, errors = 0, warnings = 0;
 
+// Lê todas as ocorrências de "cur.moves>N" dentro do <script> do jogo
+// (uma por cada cópia do BFS: bfsOptimal, bfsOptimalAsync, bfsPathAsync...)
+// e avisa se alguma delas não corresponder a MOVE_CAP. Isto substitui o
+// aviso manual que existia antes neste ficheiro — em vez de pedir a quem
+// edita para se lembrar de atualizar 3+ sítios à mão, o script lê os
+// valores reais e diz se algum ficou por sincronizar.
+function checkMoveCaps(html) {
+  // Só as funções BFS "de fora" nos interessam como donas de cada limite —
+  // "stKey" e "runChunk" são auxiliares internas repetidas em mais do que
+  // uma destas, por isso não servem para identificar de onde vem cada cap.
+  const OUTER_FN_NAMES = ["bfsOptimal", "bfsOptimalAsync", "bfsPathAsync"];
+  const fnStarts = [];
+  OUTER_FN_NAMES.forEach(name => {
+    const re = new RegExp("function\\s+" + name + "\\s*\\(", "g");
+    let m;
+    while ((m = re.exec(html))) fnStarts.push({ name, idx: m.index });
+  });
+  fnStarts.sort((a, b) => a.idx - b.idx);
+  const capRe = /cur\.moves\s*>\s*(\d+)/g;
+  const caps = [];
+  let m2;
+  while ((m2 = capRe.exec(html))) {
+    // Ignora ocorrências dentro de comentários // — só nos interessa o
+    // limite tal como está a ser aplicado no código, não texto que o
+    // descreva (ex: um comentário que mencione "cur.moves>180" a explicar
+    // outra linha).
+    const lineStart = html.lastIndexOf("\n", m2.index) + 1;
+    const linePrefix = html.slice(lineStart, m2.index);
+    if (linePrefix.includes("//")) continue;
+    let owner = "desconhecida";
+    for (const fn of fnStarts) { if (fn.idx <= m2.index) owner = fn.name; else break; }
+    caps.push({ fn: owner, value: parseInt(m2[1], 10) });
+  }
+  if (caps.length === 0) {
+    console.log("AVISO: não encontrei nenhum \"cur.moves>N\" no index.html — o formato pode ter mudado; verifica à mão se o limite de ações ainda é aplicado.");
+    warnings++;
+    return;
+  }
+  caps.forEach(c => {
+    if (c.value !== MOVE_CAP) {
+      console.log(`AVISO cur.moves>${c.value} em "${c.fn}" não corresponde a MOVE_CAP=${MOVE_CAP} — confirma se é intencional (ex: a demonstração ter mais margem do que o cálculo de estrelas) ou se é uma cópia desincronizada.`);
+      warnings++;
+    }
+  });
+  console.log(`Limites de ações encontrados no index.html: ${caps.map(c => `${c.fn}=${c.value}`).join(", ")}  (referência MOVE_CAP=${MOVE_CAP})`);
+}
+checkMoveCaps(html);
+
 function checkLevel(ck, tk, listName, idx, lv) {
   totalLevels++;
   const label = `${ck}/${tk}/${listName}[${idx}]`;
@@ -226,6 +276,12 @@ function checkLevel(ck, tk, listName, idx, lv) {
   if (obsSet.has(robotKey)) { console.log(`ERRO  ${label}: robô começa sobre um obstáculo (${robotKey})`); errors++; }
   (lv.items || []).forEach(([r, c], i) => {
     if (obsSet.has(r + "," + c)) { console.log(`ERRO  ${label}: item${i} sobre um obstáculo (${r},${c})`); errors++; }
+  });
+  const itemSeen = new Set();
+  (lv.items || []).forEach(([r, c], i) => {
+    const k = r + "," + c;
+    if (itemSeen.has(k)) { console.log(`AVISO ${label}: item${i} está na mesma célula (${k}) que outro item — pode ser propositado, mas confirma`); warnings++; }
+    itemSeen.add(k);
   });
   // Nota: "deposit" sobre um obstáculo NÃO é erro — esse campo é só uma
   // referência de distância para calcular o canto do portal (doorPos),

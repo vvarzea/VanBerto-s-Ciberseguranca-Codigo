@@ -63,18 +63,11 @@
       --muted:#a29bfe;
     }
 
-    body.dark{ /* dark is default — vars defined on body */ }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    /* O jogo é sempre escuro por design — não existe modo claro nem
+       alternância de tema. (Havia aqui uma regra "body.dark{}" vazia e
+       uma classe "dark" no <body> que nunca era trocada por nenhum "light";
+       eram resquícios de um sistema de temas que nunca chegou a ter uma
+       segunda opção, por isso foram removidos.) */
     *{box-sizing:border-box;}
     @keyframes festFlicker{
       0%,100%{background:radial-gradient(ellipse 70% 55% at 50% 35%,rgba(236,30,121,.1) 0%,rgba(36,17,67,0) 55%,rgba(10,4,20,.95) 100%) #241143;}
@@ -103,7 +96,6 @@
       min-height:100vh;min-height:100dvh;
       overflow-x:hidden;transition:background .3s,color .3s;
     }
-    body.dark{background:var(--bg-dark);}
     h1,h2,h3,h4{font-family:'Fredoka One',cursive;}
     /* Hierarquia tipográfica:
        Fredoka One  → títulos e headings
@@ -1401,7 +1393,7 @@
     }
   </style>
 </head>
-<body class="dark">
+<body>
 <div id="scale-root">
 <div id="app">
   <header>
@@ -1433,7 +1425,7 @@
         <!-- Boas-vindas após introduzir nome -->
         <div class="hero-welcome" id="hero-welcome" style="display:none;margin-bottom:18px;background:linear-gradient(145deg,#2a0a4e,#1a0835);border:2.5px solid #ec1e79;border-radius:14px;padding:14px 18px;">
           <span class="hero-welcome-text">👋 Olá, <strong id="hero-welcome-name"></strong>! Escolhe a tua aventura! 🚀</span>
-          <button class="hero-change-btn" id="hero-change-btn">✏️</button>
+          <button class="hero-change-btn" id="hero-change-btn" aria-label="Mudar nome">✏️</button>
         </div>
 
         <div class="menu-header">
@@ -1717,7 +1709,7 @@
               <button class="btn small times-btn" data-times="3">3×</button>
               <button class="btn small times-btn" data-times="4">4×</button>
               <button class="btn small times-btn" data-times="5">5×</button>
-              <button class="btn secondary small" id="btn-repeat-cancel">❌</button>
+              <button class="btn secondary small" id="btn-repeat-cancel" aria-label="Cancelar repetição">❌</button>
             </div>
             <div class="queue-group-active hidden" id="queue-group-active">
               <span class="queue-blocks-hint" id="queue-group-hint"></span>
@@ -1737,7 +1729,7 @@
               <button type="button" class="btn small wr-times-btn" data-times="3">3×</button>
               <button type="button" class="btn small wr-times-btn" data-times="4">4×</button>
               <button type="button" class="btn small wr-times-btn" data-times="5">5×</button>
-              <button type="button" class="btn secondary small" id="wr-repeat-cancel">❌</button>
+              <button type="button" class="btn secondary small" id="wr-repeat-cancel" aria-label="Cancelar repetição">❌</button>
             </div>
             <pre id="write-demo" class="hidden" aria-label="Demonstração: o programa a ser escrito e executado"></pre>
             <textarea id="write-code" rows="8" wrap="off" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
