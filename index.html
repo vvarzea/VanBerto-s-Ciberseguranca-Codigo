@@ -2107,6 +2107,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   const OPT_CACHE=new Map();
   function cacheSet(key,val){ if(OPT_CACHE.size>=80){ OPT_CACHE.delete(OPT_CACHE.keys().next().value); } OPT_CACHE.set(key,val); }
+
+  // Fórmula das estrelas, num único sítio (antes estava copiada 3 vezes:
+  // em cycleCertStats, themeCertStats, e ao terminar um nível — se algum
+  // dia ajustares os limiares, mudas aqui e as 3 chamadas seguem-se logo).
+  // 3 estrelas = solução ótima; 2 estrelas = até 1.5× o ótimo; senão 1.
+  // minMoves null (nível sem ótimo calculável) conta sempre como 1 estrela.
+  function starsFor(moves, minMoves){
+    if(minMoves===null||minMoves===undefined) return 1;
+    if(moves<=minMoves) return 3;
+    if(moves<=minMoves*1.5) return 2;
+    return 1;
+  }
   let isMuted=false, superEasy1c=false;
 
   const menuScreen=$("menu-screen"), themes1cScreen=$("themes-1c"), themes2cScreen=$("themes-2c");
@@ -2207,7 +2219,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const base={robot:lv.robot,items:lv.items,deposit:lv.deposit,obstacles:lv.obstacles||[],size:lv.size};
           const minMoves=bfsOptimal(base);
           const bm=ld.bestMoves||99999;
-          const stars=minMoves!==null?(bm<=minMoves?3:bm<=minMoves*1.5?2:1):1;
+          const stars=starsFor(bm,minMoves);
           starsEarned+=stars;
         }
       });
@@ -2234,7 +2246,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const base={robot:lv.robot,items:lv.items,deposit:lv.deposit,obstacles:lv.obstacles||[],size:lv.size};
         const minMoves=bfsOptimal(base);
         const bm=ld.bestMoves||99999;
-        const stars=minMoves!==null?(bm<=minMoves?3:bm<=minMoves*1.5?2:1):1;
+        const stars=starsFor(bm,minMoves);
         starsEarned+=stars;
       }
     });
@@ -3723,8 +3735,7 @@ document.addEventListener("DOMContentLoaded", () => {
     prog.currentLevelIndex=Math.min(li+1,lvls.length-1);
     saveProgress(currentCycleKey,currentThemeKey,prog);
     updateThemeProgressUI(); updateSideProgress();
-    const stars=currentMinMoves!==null?
-      (moveCount<=currentMinMoves?3:moveCount<=currentMinMoves*1.5?2:1):1;
+    const stars=starsFor(moveCount,currentMinMoves);
     showPopup(stars, lvls[li]);
   }
 
