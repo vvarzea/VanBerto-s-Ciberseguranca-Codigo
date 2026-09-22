@@ -63,11 +63,18 @@
       --muted:#a29bfe;
     }
 
-    /* O jogo é sempre escuro por design — não existe modo claro nem
-       alternância de tema. (Havia aqui uma regra "body.dark{}" vazia e
-       uma classe "dark" no <body> que nunca era trocada por nenhum "light";
-       eram resquícios de um sistema de temas que nunca chegou a ter uma
-       segunda opção, por isso foram removidos.) */
+    body.dark{ /* dark is default — vars defined on body */ }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     *{box-sizing:border-box;}
     @keyframes festFlicker{
       0%,100%{background:radial-gradient(ellipse 70% 55% at 50% 35%,rgba(236,30,121,.1) 0%,rgba(36,17,67,0) 55%,rgba(10,4,20,.95) 100%) #241143;}
@@ -96,6 +103,7 @@
       min-height:100vh;min-height:100dvh;
       overflow-x:hidden;transition:background .3s,color .3s;
     }
+    body.dark{background:var(--bg-dark);}
     h1,h2,h3,h4{font-family:'Fredoka One',cursive;}
     /* Hierarquia tipográfica:
        Fredoka One  → títulos e headings
@@ -1309,14 +1317,7 @@
       display:flex;align-items:center;justify-content:center;font-size:1.15rem;
       transition:left .5s cubic-bezier(.34,1.56,.64,1);
     }
-    .demo-status{font-size:.7rem;color:var(--surface-text2);font-family:'Fredoka One',cursive;min-height:1.2em;text-align:center;}
-    /* Demonstração animada dos passos "Fila+Executar" e "✍️ Escrever" do tutorial */
-    .write-demo-pre{
-      font-family:'Fredoka One',cursive;font-size:.68rem;line-height:1.5;
-      background:rgba(26,8,53,0.7);border:1.5px dashed #38bdf8;border-radius:10px;
-      padding:8px 10px;color:#7dd3fc;min-height:64px;width:100%;max-width:220px;
-      white-space:pre-wrap;margin:0;
-    }
+    .demo-status{font-size:.7rem;color:var(--surface-text2);font-family:'Fredoka One',cursive;min-height:1.2em;}
     .tutorial-footer{
       display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;
     }
@@ -1393,7 +1394,7 @@
     }
   </style>
 </head>
-<body>
+<body class="dark">
 <div id="scale-root">
 <div id="app">
   <header>
@@ -1425,7 +1426,7 @@
         <!-- Boas-vindas após introduzir nome -->
         <div class="hero-welcome" id="hero-welcome" style="display:none;margin-bottom:18px;background:linear-gradient(145deg,#2a0a4e,#1a0835);border:2.5px solid #ec1e79;border-radius:14px;padding:14px 18px;">
           <span class="hero-welcome-text">👋 Olá, <strong id="hero-welcome-name"></strong>! Escolhe a tua aventura! 🚀</span>
-          <button class="hero-change-btn" id="hero-change-btn" aria-label="Mudar nome">✏️</button>
+          <button class="hero-change-btn" id="hero-change-btn">✏️</button>
         </div>
 
         <div class="menu-header">
@@ -1709,7 +1710,7 @@
               <button class="btn small times-btn" data-times="3">3×</button>
               <button class="btn small times-btn" data-times="4">4×</button>
               <button class="btn small times-btn" data-times="5">5×</button>
-              <button class="btn secondary small" id="btn-repeat-cancel" aria-label="Cancelar repetição">❌</button>
+              <button class="btn secondary small" id="btn-repeat-cancel">❌</button>
             </div>
             <div class="queue-group-active hidden" id="queue-group-active">
               <span class="queue-blocks-hint" id="queue-group-hint"></span>
@@ -1719,17 +1720,9 @@
           </div>
           <div class="write-panel hidden" id="write-panel">
             <div class="write-tools">
-              <button type="button" class="btn secondary small" id="wr-repeat" title="Escreve uma linha REPETIR — escolhes quantas vezes e os passos a repetir vão por baixo, mais para dentro">🔁 REPETIR</button>
-              <button type="button" class="btn secondary small" id="wr-indent" title="Põe a linha onde está o cursor mais para dentro (Tab)">⇥ Indentar</button>
-              <button type="button" class="btn secondary small" id="wr-outdent" title="Põe a linha onde está o cursor mais para fora (Shift+Tab)">⇤ Desindentar</button>
-            </div>
-            <div class="queue-repeat-picker hidden" id="wr-repeat-picker">
-              <span class="queue-blocks-hint">Quantas vezes?</span>
-              <button type="button" class="btn small wr-times-btn" data-times="2">2×</button>
-              <button type="button" class="btn small wr-times-btn" data-times="3">3×</button>
-              <button type="button" class="btn small wr-times-btn" data-times="4">4×</button>
-              <button type="button" class="btn small wr-times-btn" data-times="5">5×</button>
-              <button type="button" class="btn secondary small" id="wr-repeat-cancel" aria-label="Cancelar repetição">❌</button>
+              <button type="button" class="btn secondary small" id="wr-repeat" title="Escreve uma linha REPETIR — os passos a repetir vão por baixo, mais para dentro">🔁 REPETIR</button>
+              <button type="button" class="btn secondary small" id="wr-indent" title="Põe a linha mais para dentro (Tab)">⇥ Indentar</button>
+              <button type="button" class="btn secondary small" id="wr-outdent" title="Põe a linha mais para fora (Shift+Tab)">⇤ Desindentar</button>
             </div>
             <pre id="write-demo" class="hidden" aria-label="Demonstração: o programa a ser escrito e executado"></pre>
             <textarea id="write-code" rows="8" wrap="off" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
@@ -2107,18 +2100,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   const OPT_CACHE=new Map();
   function cacheSet(key,val){ if(OPT_CACHE.size>=80){ OPT_CACHE.delete(OPT_CACHE.keys().next().value); } OPT_CACHE.set(key,val); }
-
-  // Fórmula das estrelas, num único sítio (antes estava copiada 3 vezes:
-  // em cycleCertStats, themeCertStats, e ao terminar um nível — se algum
-  // dia ajustares os limiares, mudas aqui e as 3 chamadas seguem-se logo).
-  // 3 estrelas = solução ótima; 2 estrelas = até 1.5× o ótimo; senão 1.
-  // minMoves null (nível sem ótimo calculável) conta sempre como 1 estrela.
-  function starsFor(moves, minMoves){
-    if(minMoves===null||minMoves===undefined) return 1;
-    if(moves<=minMoves) return 3;
-    if(moves<=minMoves*1.5) return 2;
-    return 1;
-  }
   let isMuted=false, superEasy1c=false;
 
   const menuScreen=$("menu-screen"), themes1cScreen=$("themes-1c"), themes2cScreen=$("themes-2c");
@@ -2148,6 +2129,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function loadAllProgress(){ try{ const r=localStorage.getItem(STORAGE_KEY); return r?JSON.parse(r):{}; }catch(e){ return {}; } }
   function saveAllProgress(obj){ try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(obj)); }catch(e){} }
   function effectiveCycleKey(ck){ return(ck==="1c"&&superEasy1c)?"1c_se":ck; }
+  // O bloco "Repetir" existe no 2.º Ciclo, no 3.º Ciclo e no Secundário — só
+  // o ANINHAMENTO (Repetir dentro de Repetir) fica exclusivo do Secundário
+  // (ver MAX_NEST junto ao botão "🔁 Repetir").
+  function cycleHasRepeat(ck){ return ck==="2c"||ck==="3c"||ck==="sec"; }
   function levelsFor(ck,theme){
     if(ck==="1c"&&superEasy1c&&theme?.superEasyLevels?.length) return theme.superEasyLevels;
     return theme?.levels||[];
@@ -2160,6 +2145,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if(!d.levels) d.levels={};
     if(typeof d.currentLevelIndex!=="number") d.currentLevelIndex=0;
     return d;
+  }
+  // Os temas passaram a ter só 5 níveis (antes tinham 8, ou 13 no 1.º
+  // Ciclo). Quem tinha progresso nos níveis antigos (6 em diante) ficaria
+  // "preso" no novo último nível sem ter feito a rampa de dificuldade até
+  // lá — por isso reiniciamos esse tema (uma única vez) em vez de o deixar
+  // aterrar direto no nível mais difícil.
+  function checkLegacyOverflow(ck,tk,lvls){
+    const p=loadProgress(ck,tk);
+    if((p.currentLevelIndex||0) > Math.max(0,lvls.length-1)){
+      saveProgress(ck,tk,{currentLevelIndex:0,levels:{}});
+      return true;
+    }
+    return false;
   }
   function saveProgress(ck,tk,data){
     ck=effectiveCycleKey(ck);
@@ -2219,7 +2217,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const base={robot:lv.robot,items:lv.items,deposit:lv.deposit,obstacles:lv.obstacles||[],size:lv.size};
           const minMoves=bfsOptimal(base);
           const bm=ld.bestMoves||99999;
-          const stars=starsFor(bm,minMoves);
+          const stars=minMoves!==null?(bm<=minMoves?3:bm<=minMoves*1.5?2:1):1;
           starsEarned+=stars;
         }
       });
@@ -2246,7 +2244,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const base={robot:lv.robot,items:lv.items,deposit:lv.deposit,obstacles:lv.obstacles||[],size:lv.size};
         const minMoves=bfsOptimal(base);
         const bm=ld.bestMoves||99999;
-        const stars=starsFor(bm,minMoves);
+        const stars=minMoves!==null?(bm<=minMoves?3:bm<=minMoves*1.5?2:1):1;
         starsEarned+=stars;
       }
     });
@@ -2484,9 +2482,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // normal do Ótimo/estrelas continua a usar bfsOptimalAsync, sem caminho,
   // por ser mais leve. Sem cache própria (chamada só quando alguém clica
   // no botão, não em cada renderização).
-  // Limite de 180 ações igual a bfsOptimal/bfsOptimalAsync (antes estava
-  // em 200 aqui, provavelmente por engano ao copiar — verificar-niveis.js
-  // agora avisa sozinho se isto voltar a desalinhar).
   function bfsPathAsync(base, door, callback){
     door=door||computeDoorPos(base);
     const schedule = typeof requestIdleCallback==="function"
@@ -2512,7 +2507,7 @@ document.addEventListener("DOMContentLoaded", () => {
         processed++;
         const cur=queue.shift();
         if(best!==null&&cur.moves>=best) continue;
-        if(cur.moves>180) continue;
+        if(cur.moves>200) continue;
         const remaining=cur.items.filter(i=>!i.collected);
         const [rr,rc]=cur.rob;
         if(remaining.length===0&&!cur.carry&&rr===door[0]&&rc===door[1]){ best=cur.moves; bestPath=cur.path; continue; }
@@ -2705,7 +2700,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentMinBlocks=null; lastBlocksUsed=0;
     const tb=$("tag-blocks");
     if(tb){
-      if(currentCycleKey==="sec"||currentCycleKey==="3c"){
+      if(cycleHasRepeat(currentCycleKey)){
         tb.classList.remove("hidden");
         tb.textContent="🧩 Blocos: a calcular…";
         bfsPathAsync(base, doorPos, (path)=>{
@@ -2728,11 +2723,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // crianças mais velhas, que não precisam de alvos de toque tão grandes
     // como o 1.º Ciclo. O 1.º Ciclo mantém-se sempre no tamanho grande.
     document.body.classList.toggle("queue-mode-dpad", isQueueMode());
-    // "Repetir" existe no 3.º Ciclo e no Secundário — só o ANINHAMENTO
-    // (Repetir dentro de Repetir) fica exclusivo do Secundário, decidido
-    // no MAX_NEST junto ao botão "🔁 Repetir".
     const qbt=$("queue-blocks-toolbar");
-    if(qbt) qbt.classList.toggle("hidden", currentCycleKey!=="sec"&&currentCycleKey!=="3c");
+    if(qbt) qbt.classList.toggle("hidden", !cycleHasRepeat(currentCycleKey));
     renderQueueGroupBar();
     applyWriteModeUI();
     // A demonstração aparece só no 1.º nível de cada tema do 2.º Ciclo, do
@@ -2743,7 +2735,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(db){
       db.classList.toggle("hidden", !((currentCycleKey==="2c"||currentCycleKey==="3c"||currentCycleKey==="sec") && currentLevelIndex===0));
       db.title=currentCycleKey==="sec"?"Mostra uma forma de resolver este nível, escrita em pseudocódigo"
-        :currentCycleKey==="2c"?"Mostra uma forma de resolver este nível, comando a comando"
+        :currentCycleKey==="2c"?"Mostra uma forma de resolver este nível usando os blocos"
         :"Mostra uma forma de resolver este nível usando os blocos";
     }
     const ub=$("btn-undo-direct"); if(ub) ub.style.display=isQueueMode()?"none":"inline-flex";
@@ -3738,7 +3730,8 @@ document.addEventListener("DOMContentLoaded", () => {
     prog.currentLevelIndex=Math.min(li+1,lvls.length-1);
     saveProgress(currentCycleKey,currentThemeKey,prog);
     updateThemeProgressUI(); updateSideProgress();
-    const stars=starsFor(moveCount,currentMinMoves);
+    const stars=currentMinMoves!==null?
+      (moveCount<=currentMinMoves?3:moveCount<=currentMinMoves*1.5?2:1):1;
     showPopup(stars, lvls[li]);
   }
 
@@ -3760,7 +3753,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // (quantos blocos foram usados vs. uma referência com ciclos) — só
     // informativo, não altera as estrelas (essas continuam a medir só
     // movimentos, como sempre fizeram).
-    if((currentCycleKey==="sec"||currentCycleKey==="3c")&&lastBlocksUsed>0&&currentMinBlocks!==null){
+    if(cycleHasRepeat(currentCycleKey)&&lastBlocksUsed>0&&currentMinBlocks!==null){
       if(lastBlocksUsed<=currentMinBlocks) msgText+=" 🧩 E usaste só "+lastBlocksUsed+" blocos — tão eficiente como a referência ("+currentMinBlocks+")!";
       else msgText+=" 🧩 Usaste "+lastBlocksUsed+" blocos (referência com ciclos: "+currentMinBlocks+") — tenta agrupar mais passos em \"Repetir\" para reduzir.";
     }
@@ -4100,7 +4093,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const qc=$("queue-commands"); if(qc) qc.classList.toggle("hidden",writeMode);
     const qa=$("queue-actions-blocks"); if(qa) qa.classList.toggle("hidden",writeMode);
     const qbt=$("queue-blocks-toolbar");
-    if(qbt) qbt.classList.toggle("hidden",writeMode||(currentCycleKey!=="sec"&&currentCycleKey!=="3c"));
+    if(qbt) qbt.classList.toggle("hidden",writeMode||!cycleHasRepeat(currentCycleKey));
     const wp=$("write-panel"); if(wp) wp.classList.toggle("hidden",!writeMode);
     renderPseudoView();
   }
@@ -4341,18 +4334,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if(tabWrite) tabWrite.addEventListener("click",()=>{ if(!runningQueue) setWriteMode(true); });
   const wrRun=$("wr-run"); if(wrRun) wrRun.addEventListener("click",runWrittenProgram);
   const wrClear=$("wr-clear"); if(wrClear) wrClear.addEventListener("click",()=>{ if(wrCode) wrCode.value=""; showWriteMsg("","✍️ Caixa limpa."); });
-  const wrRepeat=$("wr-repeat"); if(wrRepeat) wrRepeat.addEventListener("click",()=>{
-    $("wr-repeat-picker")?.classList.remove("hidden");
-  });
-  document.querySelectorAll(".wr-times-btn").forEach(b=>{
-    b.addEventListener("click",()=>{
-      const times=parseInt(b.getAttribute("data-times"),10)||2;
-      $("wr-repeat-picker")?.classList.add("hidden");
-      writeInsertLine("REPETIR "+times+" VEZES");
-      showWriteMsg("info","🔁 Escreve agora, por baixo, os passos a repetir — usa ⇥ Indentar (ou os botões de direção, que já indentam sozinhos) para eles ficarem \"dentro\" do REPETIR.");
-    });
-  });
-  $("wr-repeat-cancel")?.addEventListener("click",()=>{ $("wr-repeat-picker")?.classList.add("hidden"); });
+  const wrRepeat=$("wr-repeat"); if(wrRepeat) wrRepeat.addEventListener("click",()=>writeInsertLine("REPETIR 2 VEZES"));
   const wrIndent=$("wr-indent"); if(wrIndent) wrIndent.addEventListener("click",()=>writeShift(1));
   const wrOutdent=$("wr-outdent"); if(wrOutdent) wrOutdent.addEventListener("click",()=>writeShift(-1));
   const wrToBlocks=$("wr-to-blocks");
@@ -4462,12 +4444,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const ck=card.getAttribute("data-cycle"), tk=card.getAttribute("data-theme");
       currentCycleKey=ck; currentThemeKey=tk;
       currentCycle=GAME_DATA[ck]; currentTheme=currentCycle.themes[tk];
-      const progress=loadProgress(ck,tk);
       const lvls=levelsFor(ck,currentTheme);
+      const legacyReset=checkLegacyOverflow(ck,tk,lvls);
+      const progress=loadProgress(ck,tk);
       currentLevelIndex=Math.min(progress.currentLevelIndex||0,Math.max(0,lvls.length-1));
       const ct=$("crumb-theme"); if(ct) ct.textContent=currentTheme.name+" "+currentTheme.emoji;
       writeMode=(ck==="sec")?writePref:false; // Secundário: ✍️ Escrever por defeito
       showScreen(gameScreen); loadLevel(currentLevelIndex);
+      if(legacyReset) setFeedback("🔄 Este tema ganhou níveis novos — vais começar do nível 1!","info");
     });
   });
 
@@ -4566,7 +4550,14 @@ document.addEventListener("DOMContentLoaded", () => {
     doConfirm(next?"🧸 Ativar modo super fácil para o 1.º Ciclo?":"Voltar ao modo normal do 1.º Ciclo?",()=>{
       superEasy1c=next; try{localStorage.setItem(SUPER_EASY_KEY,next?"1":"0");}catch(e){}
       updateSuperEasyBtn(); updateThemeProgressUI(); updateSideProgress();
-      if(currentCycleKey==="1c"&&currentTheme){ const lvls=levelsFor("1c",currentTheme); const p=loadProgress("1c",currentThemeKey); currentLevelIndex=Math.min(p.currentLevelIndex||0,Math.max(0,lvls.length-1)); loadLevel(currentLevelIndex); }
+      if(currentCycleKey==="1c"&&currentTheme){
+        const lvls=levelsFor("1c",currentTheme);
+        const legacyReset=checkLegacyOverflow("1c",currentThemeKey,lvls);
+        const p=loadProgress("1c",currentThemeKey);
+        currentLevelIndex=Math.min(p.currentLevelIndex||0,Math.max(0,lvls.length-1));
+        loadLevel(currentLevelIndex);
+        if(legacyReset) setFeedback("🔄 Este tema ganhou níveis novos — vais começar do nível 1!","info");
+      }
       setFeedback(next?"🧸 Modo super fácil ativo!":"Modo normal ativo.","ok");
     });
   });
@@ -4626,7 +4617,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // no 3.º Ciclo continua a ser em blocos.
     const demoPseudo=(currentCycleKey==="sec");
     const demoMsg=demoPseudo?"🎬 Vou reiniciar este nível e mostrar uma forma de o resolver escrevendo o pseudocódigo. Continuar?"
-      :currentCycleKey==="2c"?"🎬 Vou reiniciar este nível e mostrar uma forma de o resolver, comando a comando. Continuar?"
+      :currentCycleKey==="2c"?"🎬 Vou reiniciar este nível e mostrar uma forma de o resolver usando os blocos. Continuar?"
       :"🎬 Vou reiniciar este nível e mostrar uma forma de o resolver usando os blocos. Continuar?";
     doConfirm(demoMsg,()=>{
       if(demoPseudo) writeMode=true; // o loadLevel abaixo mostra o painel ✍️ Escrever
@@ -4642,8 +4633,7 @@ document.addEventListener("DOMContentLoaded", () => {
           demoBtn.disabled=false;
           return;
         }
-        // 2.º Ciclo ainda não tem o bloco "Repetir": a demonstração é uma fila simples, comando a comando.
-        const entries=(currentCycleKey==="2c")?path.map(cmd=>({cmd,label:CMD_LABELS[cmd]||cmd})):compactPathToQueue(path);
+        const entries=compactPathToQueue(path);
         setFeedback("🎬 Repara na sequência completa — o passo atual fica em destaque!","info");
         setTimeout(async ()=>{
           if(demoPseudo){ if(!writeMode) setWriteMode(true); await runDemoWritten(entries); } else await runDemoEntries(entries);
@@ -5100,30 +5090,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if(cv) vbFlashPose(cv, true, -1, false, 160);
   }, 4200);
 
-  /* ── TUTORIAL ──
-     O número e a ordem dos passos variam consoante o modo do ciclo:
-       • modo "direct" (1.º Ciclo): 1 → 2 → 3 → 4
-       • modo "queue" (2.º/3.º Ciclo, Secundário): 1 → 2 → queue → 3 → 4
-         [→ 5 (Repetir), só 3.º Ciclo/Secundário] [→ write, só Secundário]
-     getStepOrder() calcula essa lista uma vez por abertura do tutorial;
-     todo o resto (navegação, botões, pontinhos) trabalha em cima dela,
-     em vez de números de passo fixos como acontecia antes. */
+  /* ── TUTORIAL ── */
   (function(){
     const TUT_KEY = 'mundocrianca_tutorial_done_v1';
-    let order = ['1','2','3','4'];
-    let curIdx = 0;
-
-    function getStepOrder(){
-      const isQueue = currentCycle && currentCycle.mode === "queue";
-      if(!isQueue) return ['1','2','3','4'];
-      const o = ['1','2','queue','3','4'];
-      if(currentCycleKey==="sec" || currentCycleKey==="3c") o.push('5');
-      if(currentCycleKey==="sec") o.push('write');
-      return o;
-    }
+    // Passo 5 (bloco "Repetir") existe no 3.º Ciclo e no Secundário; para
+    // 1.º/2.º Ciclo o fluxo continua a acabar no passo 4, exatamente como
+    // antes desta alteração.
+    const TOTAL = 5;
 
     function tutDone(){
-      stopDemo(); stopQueueDemo(); stopWriteDemo();
+      stopDemo();
       try{ localStorage.setItem(TUT_KEY,'1'); }catch(e){}
       const overlay = document.getElementById('tutorial-overlay');
       if(overlay){
@@ -5133,7 +5109,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // ── Demonstração do passo 5: bloco "Repetir" — avança 3× seguidas em ciclo.
+    // Demonstração animada e autónoma do bloco "Repetir" no passo 5 — mostra
+    // o robô a avançar 3 vezes seguidas, em ciclo, para quem nunca viu o
+    // bloco perceber o que ele faz antes de o experimentar a sério.
     let demoTimer=null, demoStep=0;
     function demoTick(){
       const robot=document.getElementById('demo-robot');
@@ -5170,187 +5148,57 @@ document.addEventListener("DOMContentLoaded", () => {
       if(demoTimer){ clearTimeout(demoTimer); demoTimer=null; }
     }
 
-    // ── Demonstração do passo "queue": constrói uma fila de 3× ⬆️ Avançar
-    // sem o robô se mexer, e só depois "carrega" em ▶️ Executar e o robô
-    // percorre tudo de uma vez — o cerne do que é diferente neste modo.
-    let qDemoTimer=null, qDemoPhase=0, qDemoStep=0;
-    const Q_TOTAL = 3;
-    function queueDemoTick(){
-      const chip=document.getElementById('demo-q-chip');
-      const status=document.getElementById('demo-q-status');
-      const robot=document.getElementById('demo-q-robot');
-      if(!chip||!status||!robot) return;
-      if(qDemoPhase===0){
-        qDemoStep++;
-        if(qDemoStep<=Q_TOTAL){
-          chip.textContent='Fila: '+'⬆️ '.repeat(qDemoStep).trim();
-          status.textContent='Carregaste em ⬆️ Avançar ('+qDemoStep+'/'+Q_TOTAL+') — ainda não me mexo!';
-          chip.classList.add('pulse'); setTimeout(()=>chip.classList.remove('pulse'),200);
-          qDemoTimer=setTimeout(queueDemoTick,700);
-        } else {
-          status.textContent='Fila pronta! A carregar em ▶️ Executar…';
-          qDemoTimer=setTimeout(()=>{ qDemoPhase=1; qDemoStep=0; queueDemoTick(); },900);
-        }
-      } else {
-        qDemoStep++;
-        if(qDemoStep>Q_TOTAL){
-          status.textContent='✅ Chegou ao portal! A recomeçar…';
-          qDemoTimer=setTimeout(()=>{
-            qDemoPhase=0; qDemoStep=0; robot.style.left='0px';
-            chip.textContent='Fila: (vazia)';
-            status.textContent='A carregar nos botões…';
-            qDemoTimer=setTimeout(queueDemoTick,900);
-          },1100);
-          return;
-        }
-        robot.style.left=(qDemoStep*38)+'px';
-        status.textContent='▶️ A executar — passo '+qDemoStep+' de '+Q_TOTAL;
-        qDemoTimer=setTimeout(queueDemoTick,750);
-      }
-    }
-    function startQueueDemo(){
-      stopQueueDemo(); qDemoPhase=0; qDemoStep=0;
-      const robot=document.getElementById('demo-q-robot'); if(robot) robot.style.left='0px';
-      const chip=document.getElementById('demo-q-chip'); if(chip) chip.textContent='Fila: (vazia)';
-      const status=document.getElementById('demo-q-status'); if(status) status.textContent='A carregar nos botões…';
-      qDemoTimer=setTimeout(queueDemoTick,900);
-    }
-    function stopQueueDemo(){
-      if(qDemoTimer){ clearTimeout(qDemoTimer); qDemoTimer=null; }
-    }
-
-    // ── Demonstração do passo "✍️ Escrever": escreve um mini-programa com
-    // REPETIR + uma linha indentada por baixo (o próprio conceito de
-    // indentar), e depois executa-o — 1 AVANÇAR "solto" + 2 repetições do
-    // AVANÇAR indentado, para ligar visualmente "está mais para dentro" a
-    // "só esta linha repete".
-    let wDemoTimer=null, wDemoPhase=0, wDemoStep=0;
-    const W_PROGRAM=[
-      {text:'AVANÇAR', indent:0},
-      {text:'REPETIR 2 VEZES', indent:0},
-      {text:'AVANÇAR', indent:1}
-    ];
-    const W_RUN_LABELS=[
-      'A executar — AVANÇAR (linha de fora, corre 1×)',
-      'A executar — AVANÇAR indentado, repetição 1 de 2',
-      'A executar — AVANÇAR indentado, repetição 2 de 2'
-    ];
-    function writeProgramText(upTo){
-      return W_PROGRAM.slice(0,upTo).map(l=>'    '.repeat(l.indent)+l.text).join('\n');
-    }
-    function writeDemoTick(){
-      const pre=document.getElementById('demo-w-pre');
-      const status=document.getElementById('demo-w-status');
-      const robot=document.getElementById('demo-w-robot');
-      if(!pre||!status||!robot) return;
-      if(wDemoPhase===0){
-        wDemoStep++;
-        if(wDemoStep<=W_PROGRAM.length){
-          pre.textContent=writeProgramText(wDemoStep);
-          status.textContent = wDemoStep<W_PROGRAM.length
-            ? 'A escrever linha '+wDemoStep+' de '+W_PROGRAM.length+'…'
-            : 'Repara: esta linha está mais "para dentro" → só ela repete!';
-          wDemoTimer=setTimeout(writeDemoTick, wDemoStep<W_PROGRAM.length?750:1400);
-        } else {
-          status.textContent='Pronto! A carregar em ▶️ Executar…';
-          wDemoTimer=setTimeout(()=>{ wDemoPhase=1; wDemoStep=0; writeDemoTick(); },900);
-        }
-      } else {
-        wDemoStep++;
-        if(wDemoStep>W_RUN_LABELS.length){
-          status.textContent='✅ Chegou ao portal! A recomeçar…';
-          wDemoTimer=setTimeout(()=>{
-            wDemoPhase=0; wDemoStep=0; robot.style.left='0px';
-            pre.textContent=''; status.textContent='A escrever o programa…';
-            wDemoTimer=setTimeout(writeDemoTick,900);
-          },1100);
-          return;
-        }
-        robot.style.left=(wDemoStep*38)+'px';
-        status.textContent=W_RUN_LABELS[wDemoStep-1];
-        wDemoTimer=setTimeout(writeDemoTick,850);
-      }
-    }
-    function startWriteDemo(){
-      stopWriteDemo(); wDemoPhase=0; wDemoStep=0;
-      const robot=document.getElementById('demo-w-robot'); if(robot) robot.style.left='0px';
-      const pre=document.getElementById('demo-w-pre'); if(pre) pre.textContent='';
-      const status=document.getElementById('demo-w-status'); if(status) status.textContent='A escrever o programa…';
-      wDemoTimer=setTimeout(writeDemoTick,900);
-    }
-    function stopWriteDemo(){
-      if(wDemoTimer){ clearTimeout(wDemoTimer); wDemoTimer=null; }
-    }
-
-    // ── Pontinhos de progresso, gerados de acordo com o tamanho de "order".
-    function renderDots(){
-      const wrap = document.getElementById('tutorial-dots-shared');
-      if(!wrap) return;
-      wrap.innerHTML='';
-      order.forEach((_,i)=>{
-        const d=document.createElement('div');
-        d.className='tutorial-dot'+(i===curIdx?' active':'');
-        wrap.appendChild(d);
-      });
-    }
-
-    function styleNextButton(id, isLast){
-      const btn=document.getElementById('tut-next-'+id);
-      if(!btn) return;
-      if(isLast){
-        btn.textContent='🚀 Vamos jogar!';
-        btn.style.background='linear-gradient(180deg,#4ecb71,#00b894)';
-        btn.style.borderColor='#ffa733';
-        btn.style.boxShadow='0 4px 0 #006644';
-      } else {
-        btn.textContent='Seguinte →';
-        btn.style.background=''; btn.style.borderColor=''; btn.style.boxShadow='';
-      }
-    }
-
-    function goToIndex(i){
+    function goToStep(n){
       document.querySelectorAll('.tutorial-step').forEach(s=>s.classList.remove('active'));
-      const id = order[i];
-      const el = document.getElementById('tut-step-'+id);
+      const el = document.getElementById('tut-step-'+n);
       if(el) el.classList.add('active');
-      curIdx = i;
-      renderDots();
-      stopDemo(); stopQueueDemo(); stopWriteDemo();
-      if(id==='5') startDemo();
-      else if(id==='queue') startQueueDemo();
-      else if(id==='write') startWriteDemo();
+      if(n===5) startDemo(); else stopDemo();
     }
 
-    function advance(){
-      if(curIdx < order.length-1) goToIndex(curIdx+1);
-      else tutDone();
+    for(let i=1;i<=TOTAL;i++){
+      (function(step){
+        const next = document.getElementById('tut-next-'+step);
+        if(next) next.addEventListener('click',()=>{
+          // No 4.º passo, quem não está no 3.º Ciclo nem no Secundário
+          // termina aqui (mesmo comportamento que existia antes do passo
+          // 5 ser criado — agora o passo 5 também serve o 3.º Ciclo).
+          if(step===4 && !cycleHasRepeat(currentCycleKey)){ tutDone(); return; }
+          if(step<TOTAL) goToStep(step+1);
+          else tutDone();
+        });
+        const skip = document.getElementById('tut-skip-'+step);
+        if(skip) skip.addEventListener('click', tutDone);
+      })(i);
     }
 
-    // Um único listener por botão "Seguinte"/"Saltar" — a decisão de para
-    // onde ir (ou se acaba o tutorial) está toda em advance()/order, não
-    // espalhada por condições de número de passo como acontecia antes.
-    ['1','2','queue','3','4','5','write'].forEach(id=>{
-      const next = document.getElementById('tut-next-'+id);
-      if(next) next.addEventListener('click', advance);
-      const skip = document.getElementById('tut-skip-'+id);
-      if(skip) skip.addEventListener('click', tutDone);
-    });
-
-    // Ajusta o texto do passo "Repetir" consoante o ciclo (aninhamento só
-    // no Secundário) e o botão "Seguinte"/"Vamos jogar!" de cada passo,
-    // consoante qual deles é o último para este ciclo em concreto.
+    // Ajusta o botão do passo 4 (final para 1.º/2.º Ciclo, "Seguinte" para
+    // 3.º Ciclo e Secundário) e revela o 5º ponto dos indicadores.
     function configureTutorialForCycle(){
+      // O passo dos ciclos (tut-step-5) aparece no 2.º Ciclo, no 3.º Ciclo e
+      // no Secundário — só o TEXTO muda: no 2.º/3.º Ciclo só existe o
+      // "Repetir" simples (sem aninhar); no Secundário pode aninhar-se a si mesmo.
+      const hasCycleStep = cycleHasRepeat(currentCycleKey);
+      document.querySelectorAll('.tutorial-dot-sec-only').forEach(d=>{
+        d.style.display = hasCycleStep ? '' : 'none';
+      });
       const bubble = document.getElementById('tut-cycle-bubble');
       if(bubble){
         bubble.innerHTML = currentCycleKey === "sec"
           ? 'No Secundário tens um bloco extra por baixo da fila de comandos: <strong>🔁 Repetir</strong> junta vários passos e corre-os várias vezes seguidas. Podes até abrir um <strong>🔁 Repetir</strong> dentro de outro <strong>🔁 Repetir</strong> — um ciclo aninhado — para resolver caminhos com padrões dentro de padrões.'
           : 'Neste ciclo tens um bloco extra por baixo da fila de comandos: <strong>🔁 Repetir</strong> junta vários passos e corre-os várias vezes seguidas, para não teres de os escrever um a um.';
       }
-      order = getStepOrder();
-      const lastId = order[order.length-1];
-      ['1','2','queue','3','4','5','write'].forEach(id=>{
-        styleNextButton(id, id===lastId);
-      });
+      const nb4 = document.getElementById('tut-next-4');
+      if(nb4){
+        if(hasCycleStep){
+          nb4.textContent = 'Seguinte →';
+          nb4.style.background=''; nb4.style.borderColor=''; nb4.style.boxShadow='';
+        } else {
+          nb4.textContent = '🚀 Vamos jogar!';
+          nb4.style.background='linear-gradient(180deg,#4ecb71,#00b894)';
+          nb4.style.borderColor='#ffa733';
+          nb4.style.boxShadow='0 4px 0 #006644';
+        }
+      }
     }
 
     function showTutorial(){
@@ -5359,7 +5207,7 @@ document.addEventListener("DOMContentLoaded", () => {
         overlay.style.opacity='';
         overlay.style.transition='';
         configureTutorialForCycle();
-        goToIndex(0);
+        goToStep(1);
         overlay.classList.remove('hidden');
       }
     }
@@ -5713,6 +5561,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="tut-skip" id="tut-skip-1">Saltar tutorial</button>
         <button class="tut-next" id="tut-next-1">Seguinte →</button>
       </div>
+      <div class="tutorial-dots">
+        <div class="tutorial-dot active"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot tutorial-dot-sec-only"></div>
+      </div>
     </div>
 
     <!-- PASSO 2: D-pad -->
@@ -5740,35 +5591,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="tut-skip" id="tut-skip-2">Saltar</button>
         <button class="tut-next" id="tut-next-2">Seguinte →</button>
       </div>
-    </div>
-
-    <!-- PASSO NOVO: Fila + Executar — só nos ciclos em modo "queue"
-         (2.º Ciclo, 3.º Ciclo, Secundário). Explica que os botões juntam
-         passos a uma lista e que só "▶️ Executar" faz o robô andar, desde
-         o início — a principal razão de confusão de quem vê o jogo pela
-         1.ª vez sem perceber que já não está no modo direto do 1.º Ciclo. -->
-    <div class="tutorial-step" id="tut-step-queue">
-      <div class="tutorial-title">Aqui é diferente! 📋</div>
-      <div class="tutorial-robot-row">
-        <div class="tutorial-robot"><canvas id="tut-vb-robot-q" class="tut-vb-robot" width="96" height="96" style="width:58px;height:58px;" aria-hidden="true"></canvas></div>
-        <div class="tutorial-bubble">
-          Neste ciclo os botões <strong>não me movem logo</strong>! Cada vez que carregas num botão, ele entra numa <strong>lista de passos</strong>. Só quando carregares em <strong>▶️ Executar</strong> é que faço tudo seguido, desde o início!
-        </div>
-      </div>
-      <div class="tutorial-demo" id="tutorial-demo-queue">
-        <div class="demo-chip" id="demo-q-chip">Fila: (vazia)</div>
-        <div class="demo-track">
-          <div class="demo-cell"></div>
-          <div class="demo-cell"></div>
-          <div class="demo-cell"></div>
-          <div class="demo-cell">🌀</div>
-          <div class="demo-robot" id="demo-q-robot">🤖</div>
-        </div>
-        <div class="demo-status" id="demo-q-status">A carregar nos botões…</div>
-      </div>
-      <div class="tutorial-footer">
-        <button class="tut-skip" id="tut-skip-queue">Saltar</button>
-        <button class="tut-next" id="tut-next-queue">Seguinte →</button>
+      <div class="tutorial-dots">
+        <div class="tutorial-dot"></div><div class="tutorial-dot active"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot tutorial-dot-sec-only"></div>
       </div>
     </div>
 
@@ -5791,6 +5615,9 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="tutorial-footer">
         <button class="tut-skip" id="tut-skip-3">Saltar</button>
         <button class="tut-next" id="tut-next-3">Seguinte →</button>
+      </div>
+      <div class="tutorial-dots">
+        <div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot active"></div><div class="tutorial-dot"></div><div class="tutorial-dot tutorial-dot-sec-only"></div>
       </div>
     </div>
 
@@ -5818,8 +5645,11 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>
       <div class="tutorial-footer">
-        <button class="tut-skip" id="tut-skip-4">Saltar</button>
+        <div></div>
         <button class="tut-next" id="tut-next-4" style="background:linear-gradient(180deg,#4ecb71,#00b894);border-color:#ffa733;box-shadow:0 4px 0 #006644;">🚀 Vamos jogar!</button>
+      </div>
+      <div class="tutorial-dots">
+        <div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot active"></div><div class="tutorial-dot tutorial-dot-sec-only"></div>
       </div>
     </div>
 
@@ -5850,40 +5680,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="tut-skip" id="tut-skip-5">Saltar</button>
         <button class="tut-next" id="tut-next-5" style="background:linear-gradient(180deg,#4ecb71,#00b894);border-color:#ffa733;box-shadow:0 4px 0 #006644;">🚀 Vamos jogar!</button>
       </div>
-    </div>
-
-    <!-- PASSO NOVO: ✍️ Escrever — só Secundário (writeMode só existe para
-         currentCycleKey==="sec"; ver getStepOrder()/writeMode no resto do
-         jogo). Mostra que, além dos blocos, dá para escrever o programa em
-         texto, linha a linha. -->
-    <div class="tutorial-step" id="tut-step-write">
-      <div class="tutorial-title">✍️ Escrever (só aqui!)</div>
-      <div class="tutorial-robot-row">
-        <div class="tutorial-robot"><canvas id="tut-vb-robot-w" class="tut-vb-robot" width="96" height="96" style="width:58px;height:58px;" aria-hidden="true"></canvas></div>
-        <div class="tutorial-bubble">
-          No Secundário também podes trocar de <strong>🧩 Blocos</strong> para <strong>✍️ Escrever</strong> — escreves o programa em texto, um comando por linha. Para repetir passos, escreve <strong>REPETIR N VEZES</strong> e usa <strong>⇥ Indentar</strong> (ou Tab) nas linhas que queres repetir: ficam mais "para dentro", coladas ao REPETIR, e é assim que ele sabe quais são as suas. <strong>⇤ Desindentar</strong> (Shift+Tab) tira uma linha de lá outra vez.
-        </div>
-      </div>
-      <div class="tutorial-demo" id="tutorial-demo-write">
-        <pre class="write-demo-pre" id="demo-w-pre"></pre>
-        <div class="demo-track">
-          <div class="demo-cell"></div>
-          <div class="demo-cell"></div>
-          <div class="demo-cell"></div>
-          <div class="demo-cell">🌀</div>
-          <div class="demo-robot" id="demo-w-robot">🤖</div>
-        </div>
-        <div class="demo-status" id="demo-w-status">A escrever o programa…</div>
-      </div>
-      <div class="tutorial-footer">
-        <button class="tut-skip" id="tut-skip-write">Saltar</button>
-        <button class="tut-next" id="tut-next-write" style="background:linear-gradient(180deg,#4ecb71,#00b894);border-color:#ffa733;box-shadow:0 4px 0 #006644;">🚀 Vamos jogar!</button>
+      <div class="tutorial-dots">
+        <div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot"></div><div class="tutorial-dot active"></div>
       </div>
     </div>
-
-    <!-- Pontinhos de progresso — gerados dinamicamente em JS consoante o
-         número de passos deste ciclo (ver renderTutorialDots()). -->
-    <div class="tutorial-dots" id="tutorial-dots-shared"></div>
 
   </div>
 </div>
