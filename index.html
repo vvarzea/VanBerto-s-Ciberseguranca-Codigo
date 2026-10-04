@@ -1398,6 +1398,111 @@
       overflow-x: hidden;
       position: relative;
     }
+
+    /* ══════════ TABULEIRO 3D ══════════
+       CSS + um pequeno wrapper: a lógica do jogo não muda.
+       .bb (billboard) = conteúdo da célula (robô, itens, obstáculos) que
+       "fica de pé" no tabuleiro inclinado. Em 2D é transparente (display:contents).
+       O enquadramento (altura da caixa, escala e centragem vertical) é calculado
+       em JS (função layout() em board3dToggle) a partir da projeção real do
+       tabuleiro + a altura do robô — já não depende de margens em percentagem. */
+    .bb{display:contents;}
+    @property --yaw{syntax:'<angle>';inherits:true;initial-value:0deg;}
+    @property --tilt{syntax:'<angle>';inherits:true;initial-value:50deg;}
+    @property --sfit{syntax:'<number>';inherits:true;initial-value:.84;}
+    @property --zoom{syntax:'<number>';inherits:true;initial-value:1;}
+    @property --px{syntax:'<length>';inherits:true;initial-value:0px;}
+    @property --py{syntax:'<length>';inherits:true;initial-value:0px;}
+    @property --cy{syntax:'<length>';inherits:true;initial-value:0px;}
+    @property --fx{syntax:'<percentage>';inherits:true;initial-value:0%;}
+    @property --fy{syntax:'<percentage>';inherits:true;initial-value:0%;}
+    .grid-wrapper{--n:5;
+      --s:calc(var(--sfit) * var(--zoom));
+      transition:--yaw .55s cubic-bezier(.25,.8,.25,1),--sfit .55s cubic-bezier(.25,.8,.25,1),
+                 --tilt .45s ease,--cy .55s cubic-bezier(.25,.8,.25,1),height .5s ease,
+                 --zoom .5s ease,--fx .4s ease-out,--fy .4s ease-out,
+                 --px .6s cubic-bezier(.2,.9,.3,1.15),--py .6s cubic-bezier(.2,.9,.3,1.15);}
+    .grid-wrapper.dragging,.grid-wrapper.notrans{transition:none;}
+    @media(max-width:600px){.grid-wrapper{--tilt:40deg;}}
+    .grid-wrapper.mode3d.dragging{cursor:grabbing;}
+    .grid-wrapper.mode3d{
+      perspective:1700px;perspective-origin:50% 50%;
+      cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;
+    }
+    .mode3d .grid{
+      position:relative;
+      transform-style:preserve-3d;
+      transform:translate(var(--px),calc(var(--py) + var(--cy))) rotateX(var(--tilt)) rotateZ(var(--yaw)) scale(var(--s)) translate(var(--fx),var(--fy));
+      transform-origin:50% 50%;
+      margin:0;
+    }
+    /* Entrada do nível: só transform e sem fill-mode — qualquer animação de
+       opacity "achata" o contexto 3D e os objetos deixavam de ficar de pé. */
+    .mode3d .grid.level-fade-in{animation:levelFadeIn3d .3s ease;}
+    @keyframes levelFadeIn3d{
+      from{transform:translate(var(--px),calc(var(--py) + var(--cy))) rotateX(var(--tilt)) rotateZ(var(--yaw)) scale(var(--s)) translate(var(--fx),var(--fy)) translateY(16px);}
+      to{transform:translate(var(--px),calc(var(--py) + var(--cy))) rotateX(var(--tilt)) rotateZ(var(--yaw)) scale(var(--s)) translate(var(--fx),var(--fy)) translateY(0);}
+    }
+    /* Laje de base do tabuleiro + sombra no chão */
+    .mode3d .grid::before{
+      content:"";position:absolute;inset:-9px;border-radius:16px;
+      background:linear-gradient(160deg,#3b1560,#1a0835);
+      border:2px solid rgba(236,30,121,.55);
+      transform:translateZ(-16px);
+      box-shadow:0 22px 28px rgba(0,0,0,.55),0 0 28px rgba(236,30,121,.25);
+    }
+    /* Cada casa é um bloco com espessura */
+    .mode3d .cell{transform-style:preserve-3d;}
+    .mode3d .cell::before{
+      content:"";position:absolute;inset:-1px;border-radius:inherit;
+      background:#4a1d78;
+      transform:translateZ(-6px);
+      box-shadow:0 0 0 1px rgba(0,0,0,.25);
+    }
+    .mode3d .cell.item::before{background:#9a5d12;}
+    .mode3d .cell.deposit::before,.mode3d .cell.door-cell::before{background:#1f6b3a;}
+    .mode3d .cell.obstacle{transform:translateZ(7px);}
+    .mode3d .cell.obstacle::before{background:#7a1f22;transform:translateZ(-13px);}
+    /* Conteúdo que fica de pé (itens, obstáculos) */
+    .mode3d .bb{
+      display:flex;align-items:center;justify-content:center;
+      position:absolute;inset:0;pointer-events:none;
+      transform-origin:50% 72%;
+      transform:translateZ(3px) rotateZ(calc(-1 * var(--yaw))) rotateX(calc(-1 * var(--tilt))) scale(1.3);
+      filter:drop-shadow(0 7px 3px rgba(0,0,0,.45));
+    }
+    .mode3d .cell.obstacle .bb{transform:translateZ(3px) rotateZ(calc(-1 * var(--yaw))) rotateX(calc(-1 * var(--tilt))) scale(1.3);}
+    /* Robô: os PÉS ficam exatamente no ponto de rotação do "de pé" (78% da casa).
+       Antes o ponto estava a 72% e o robô era centrado, por isso os ~19% de baixo
+       (os pés) afundavam no chão e eram cortados. Agora assenta em cima da casa. */
+    .mode3d .robot-cell .bb{
+      align-items:flex-end;padding-bottom:22%;
+      transform-origin:50% 78%;
+      transform:translateZ(3px) rotateZ(calc(-1 * var(--yaw))) rotateX(calc(-1 * var(--tilt))) scale(1.15);
+    }
+    .mode3d .robot-cell .robot-icon{width:78%;height:auto;aspect-ratio:1/1;flex:none;}
+    /* O robô não gira (fica de frente para a câmara); a direção vê-se no brilho
+       dourado da borda da casa para onde está virado (+ a pastilha com a seta). */
+    .mode3d .robot-icon{--rot:0deg;}
+    .mode3d .robot-cell::after{
+      content:"";position:absolute;inset:0;border-radius:inherit;
+      background:linear-gradient(to bottom,rgba(255,213,79,.95) 0,rgba(255,152,0,.45) 16%,rgba(255,152,0,0) 40%);
+      transform:rotate(var(--rot));
+      pointer-events:none;
+    }
+    /* A pastilha da seta fica presa ao robô (ao lado do corpo), e não ao canto da casa
+       — antes aparecia solta, por cima da casa seguinte. */
+    .mode3d .robot-dir{
+      position:absolute!important;top:auto;left:auto;right:-4%;bottom:50%;
+      transform:rotate(var(--yaw));
+    }
+    /* grelhas grandes (casas pequenas): pastilha mais pequena e mais para fora,
+       para não tapar o robô */
+    .mode3d .grid.big .robot-dir,.mode3d .grid.huge .robot-dir{right:-16%;bottom:56%;font-size:.58rem;padding:0 1px;}
+    /* Botão 2D/3D */
+    button.tag.tag-btn{cursor:pointer;font-family:'Fredoka One',cursive;}
+    button.tag.tag-btn:hover{background:rgba(126,87,194,0.18);}
+    button.tag.tag-btn[aria-pressed="true"]{background:rgba(236,30,121,.14);border-color:rgba(236,30,121,.55);}
   </style>
 </head>
 <body class="dark">
@@ -1636,6 +1741,12 @@
             <span class="tag" id="tag-optimal">🏁 Ótimo: —</span>
             <span class="tag hidden" id="tag-blocks">🧩 Blocos: —</span>
             <span class="tag" id="moves">Movimentos: 0</span>
+            <button type="button" class="tag tag-btn" id="btn-3d" aria-pressed="true" title="Alternar tabuleiro 2D / 3D">🧊 3D</button>
+            <button type="button" class="tag tag-btn" id="btn-cam-l" title="Rodar o tabuleiro para a esquerda" aria-label="Rodar o tabuleiro para a esquerda">⟲</button>
+            <button type="button" class="tag tag-btn" id="btn-cam-r" title="Rodar o tabuleiro para a direita" aria-label="Rodar o tabuleiro para a direita">⟳</button>
+            <button type="button" class="tag tag-btn" id="btn-tilt" title="Mudar a inclinação da vista" aria-label="Mudar a inclinação da vista">📐 Média</button>
+            <button type="button" class="tag tag-btn" id="btn-follow" aria-pressed="false" title="A câmara segue o robô" aria-label="A câmara segue o robô">🎥 Seguir</button>
+            <button type="button" class="tag tag-btn" id="btn-cam-reset" title="Recentrar a vista (também: duplo clique no tabuleiro)" aria-label="Recentrar a vista">🎯 Recentrar</button>
           </div>
         </div>
         <div class="grid-wrapper">
@@ -2762,6 +2873,219 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* 3D: agrupa o conteúdo "de pé" de cada célula (tudo menos o SVG do portal) */
+  function wrapBillboards(g){
+    g.querySelectorAll(".cell").forEach(cell=>{
+      const nodes=[...cell.childNodes].filter(n=>!(n.nodeType===1&&n.nodeName.toLowerCase()==="svg"));
+      if(!nodes.length) return;
+      const bb=document.createElement("div"); bb.className="bb";
+      nodes.forEach(n=>bb.appendChild(n));
+      cell.appendChild(bb);
+    });
+  }
+
+  /* 3D: alternar 2D/3D, rodar, inclinar e seguir o robô (preferências guardadas) */
+  (function board3dToggle(){
+    const KEY="ciber_board3d", KEYF="ciber_board3d_follow";
+    const gw=document.querySelector(".grid-wrapper"), btn=document.getElementById("btn-3d");
+    const g=document.getElementById("grid");
+    if(!gw||!btn||!g) return;
+    let on=true, follow=false;
+    try{ on=localStorage.getItem(KEY)!=="0"; follow=localStorage.getItem(KEYF)==="1"; }catch(e){}
+    const camL=document.getElementById("btn-cam-l"), camR=document.getElementById("btn-cam-r");
+    const tiltB=document.getElementById("btn-tilt"), folB=document.getElementById("btn-follow");
+    const rstB=document.getElementById("btn-cam-reset");
+    const PRESETS=[[30,"De cima"],[50,"Média"],[65,"Baixa"]];
+    const DEF_TILT=window.matchMedia("(max-width:600px)").matches?40:50;
+    let yaw=0, tilt=DEF_TILT, pos=null;
+    const rad=d=>d*Math.PI/180;
+    const D=1700;        // perspective do CSS
+    const GAP=4;         // gap da grelha
+    const PADV=14;       // folga vertical dentro da caixa (px)
+    const SAFE_X=6;      // folga horizontal (px)
+
+    /* ── Enquadramento ────────────────────────────────────────────────
+       Em vez de margens em % (que só serviam para o tabuleiro plano), projeta-se
+       o tabuleiro 3D de verdade — laje + uma "parede" com a altura do robô a
+       cada canto — e daí saem: a escala que cabe na largura, a altura da caixa
+       e o deslocamento vertical que centra tudo. O robô nunca fica cortado. */
+    function layout(){
+      if(!on){ gw.style.height=""; gw.style.setProperty("--cy","0px"); return; }
+      const Wg=g.offsetWidth, Hg=g.offsetHeight;
+      if(!gw.clientWidth||!Wg||!Hg) return;
+      const n=pos?pos[2]:5;
+      const cell=(Wg-(n-1)*GAP)/n;
+      const hS=cell*0.95+6;                       // altura do robô de pé (px, antes da escala)
+      const ct=Math.cos(rad(tilt)), st=Math.sin(rad(tilt));
+      const cw=Math.cos(rad(yaw)),  sw=Math.sin(rad(yaw));
+      const u=[-hS*ct*sw, -hS*ct*cw, hS*st];      // vetor "para cima" do robô, no referencial da grelha
+      const hw=Wg/2, hh=Hg/2, pts=[];
+      [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([a,b])=>{
+        pts.push([a*(hw+9),b*(hh+9),-16]);          // cantos da laje
+        const x=a*(hw-cell*0.2), y=b*(hh-cell*0.2);
+        pts.push([x,y,3],[x+u[0],y+u[1],3+u[2]]);   // pé e cabeça de um robô nesse canto
+      });
+      const proj=(p,s,fx,fy)=>{
+        const x=(p[0]+fx)*s, y=(p[1]+fy)*s;
+        const rx=x*cw-y*sw, ry=x*sw+y*cw;
+        return [rx, ry*ct-p[2]*st, ry*st+p[2]*ct];
+      };
+      const box=(s,T)=>{
+        let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+        pts.forEach(p=>{
+          const q=proj(p,s,0,0), k=D/(D-q[2]), X=q[0]*k, Y=(q[1]+T)*k;
+          if(X<x0)x0=X; if(X>x1)x1=X; if(Y<y0)y0=Y; if(Y>y1)y1=Y;
+        });
+        return [x0,x1,y0,y1];
+      };
+      // 1) escala que cabe na largura
+      const avail=gw.clientWidth-16-SAFE_X;
+      let s=0.85;
+      for(let i=0;i<6;i++){ const b=box(s,0); const w=Math.max(-b[0],b[1])*2; if(w>0) s*=avail/w; }
+      s=Math.max(0.3,Math.min(1.2,s));
+      // 2) desloca (T) até o conjunto ficar centrado na vertical
+      let T=0, b=box(s,T);
+      for(let i=0;i<6;i++){ b=box(s,T); T-=((b[2]+b[3])/2)/1.05; }
+      b=box(s,T);
+      const Hb=Math.round((b[3]-b[2])+2*PADV);
+      // 3) com "Seguir": o robô vai para o centro (um pouco abaixo, para a cabeça caber)
+      let T2=T;
+      if(follow&&pos){
+        const zf=Math.max(1.3,n/3.6), q=proj([0,cell*0.28,3],s*zf,0,0), k=D/(D-q[2]);
+        T2=(0.12*Hb)/k-q[1];
+      }
+      // posição da grelha no fluxo (a partir do topo da caixa) vs. onde queremos o centro
+      const Cflow=gw.clientTop+g.offsetTop+Hg/2;
+      const cy=T2-(Cflow-Hb/2);
+      gw.style.height=Hb+"px";
+      gw.style.setProperty("--sfit",s.toFixed(4));
+      gw.style.setProperty("--cy",cy.toFixed(1)+"px");
+    }
+
+    function setYaw(y){
+      yaw=y;
+      gw.style.setProperty("--yaw",y+"deg");
+      layout();
+    }
+    function setTilt(t){
+      tilt=Math.max(25,Math.min(68,t));
+      gw.style.setProperty("--tilt",tilt.toFixed(1)+"deg");
+      if(tiltB){ let best=PRESETS[0]; PRESETS.forEach(q=>{ if(Math.abs(q[0]-tilt)<Math.abs(best[0]-tilt)) best=q; }); tiltB.textContent="📐 "+best[1]; }
+      layout();
+    }
+    function applyFollow(){
+      let fx=0,fy=0,z=1;
+      if(on&&follow&&pos){
+        const r=pos[0], c=pos[1], n=pos[2];
+        fx=-(c+0.5-n/2)/n*100; fy=-(r+0.5-n/2)/n*100; z=Math.max(1.3,n/3.6);
+      }
+      gw.style.setProperty("--fx",fx.toFixed(2)+"%");
+      gw.style.setProperty("--fy",fy.toFixed(2)+"%");
+      gw.style.setProperty("--zoom",z.toFixed(2));
+      layout();
+    }
+    // chamado pelo renderGrid sempre que o robô (ou o nível) muda
+    window._cam3dUpdate=function(r,c,n){ pos=[r,c,n]; refit(); applyFollow(); };
+
+    function apply(){
+      gw.classList.toggle("mode3d",on);
+      btn.setAttribute("aria-pressed",on?"true":"false");
+      btn.textContent=on?"🧊 3D":"🔲 2D";
+      [camL,camR,tiltB,folB,rstB].forEach(b=>{ if(b) b.style.display=on?"":"none"; });
+      if(folB){ folB.setAttribute("aria-pressed",follow?"true":"false"); }
+      applyFollow();
+    }
+    // Recentrar: rotação, inclinação e arrasto voltam ao padrão (o "Seguir" fica como estava)
+    function recenter(){
+      const tgt=Math.round(yaw/360)*360;           // caminho mais curto até à rotação 0
+      setYaw(tgt); setTilt(DEF_TILT); setPan(0,0);
+      if(tgt!==0) setTimeout(()=>{
+        if(yaw!==tgt) return;
+        gw.classList.add("notrans"); setYaw(0);    // 360° == 0°: troca invisível
+        requestAnimationFrame(()=>requestAnimationFrame(()=>gw.classList.remove("notrans")));
+      },650);
+    }
+    btn.addEventListener("click",()=>{ on=!on; try{ localStorage.setItem(KEY,on?"1":"0"); }catch(e){} apply(); });
+    if(camL) camL.addEventListener("click",()=>setYaw((Math.round(yaw/90)-1)*90));
+    if(camR) camR.addEventListener("click",()=>setYaw((Math.round(yaw/90)+1)*90));
+    if(tiltB) tiltB.addEventListener("click",()=>{
+      let i=PRESETS.findIndex(q=>Math.abs(q[0]-tilt)<8); i=(i+1)%PRESETS.length; setTilt(PRESETS[i][0]);
+    });
+    if(folB) folB.addEventListener("click",()=>{ follow=!follow; try{ localStorage.setItem(KEYF,follow?"1":"0"); }catch(e){} apply(); });
+    if(rstB) rstB.addEventListener("click",recenter);
+    gw.addEventListener("dblclick",()=>{ if(on) recenter(); });
+
+    // Arrastar (rato) ou 2 dedos (telemóvel): move o tabuleiro para espreitar e, ao largar,
+    // ele volta sozinho ao sítio. Shift+arrastar com o rato roda/inclina (encaixa nos 90°).
+    // (Com 1 dedo, deslizar continua a mover o robô.)
+    const clampPan=(v,m)=>Math.max(-m,Math.min(m,v));
+    function setPan(x,y){
+      gw.style.setProperty("--px",x+"px"); gw.style.setProperty("--py",y+"px");
+    }
+    // o arrasto é limitado: o tabuleiro nunca sai da caixa
+    function pan(dx,dy){ setPan(clampPan(dx,gw.clientWidth*0.3),clampPan(dy,gw.clientHeight*0.3)); }
+    let drag=null, panning=false;
+    const touches=new Map();
+    const centroid=()=>{ let x=0,y=0; touches.forEach(v=>{x+=v[0];y+=v[1];}); return [x/touches.size,y/touches.size]; };
+    gw.addEventListener("pointerdown",e=>{
+      if(!on) return;
+      if(e.pointerType==="touch"){
+        touches.set(e.pointerId,[e.clientX,e.clientY]);
+        if(touches.size===2){ panning=true; const c0=centroid(); drag={mode:"pan",x:c0[0],y:c0[1]}; gw.classList.add("dragging"); }
+        return;
+      }
+      if(e.pointerType!=="mouse"||e.button!==0) return;
+      drag=e.shiftKey?{mode:"orbit",x:e.clientX,y:e.clientY,y0:yaw,t0:tilt}:{mode:"pan",x:e.clientX,y:e.clientY};
+      gw.classList.add("dragging");
+      try{ gw.setPointerCapture(e.pointerId); }catch(_){}
+    });
+    gw.addEventListener("pointermove",e=>{
+      if(e.pointerType==="touch"){
+        if(!touches.has(e.pointerId)) return;
+        touches.set(e.pointerId,[e.clientX,e.clientY]);
+        if(panning&&drag&&touches.size>=2){ const c1=centroid(); pan(c1[0]-drag.x,c1[1]-drag.y); }
+        return;
+      }
+      if(!drag) return;
+      if(drag.mode==="orbit"){ setYaw(drag.y0+(e.clientX-drag.x)*0.4); setTilt(drag.t0+(e.clientY-drag.y)*0.15); }
+      else pan(e.clientX-drag.x,e.clientY-drag.y);
+    });
+    function endDrag(e){
+      if(e&&e.pointerType==="touch"){
+        touches.delete(e.pointerId);
+        if(touches.size>=2) return;
+        if(!panning) return;
+        setTimeout(()=>{ panning=false; },80);   // evita que o fim do gesto conte como "deslizar" do robô
+      } else if(!drag) return;
+      const was=drag; drag=null; gw.classList.remove("dragging");
+      if(was&&was.mode==="orbit") setYaw(Math.round(yaw/90)*90);
+      setPan(0,0);                                 // volta ao sítio (com animação)
+    }
+    gw.addEventListener("pointerup",endDrag);
+    gw.addEventListener("pointercancel",endDrag);
+    // Rede de segurança: se o "largar" se perder (rato fora da janela, separador em segundo
+    // plano, gesto interrompido), o tabuleiro não pode ficar deslocado.
+    gw.addEventListener("lostpointercapture",e=>{ if(e.pointerType!=="touch") endDrag(e); });
+    window.addEventListener("blur",()=>{ touches.clear(); panning=false; if(drag) endDrag(); else setPan(0,0); });
+    document.addEventListener("visibilitychange",()=>{ if(document.hidden){ touches.clear(); panning=false; if(drag) endDrag(); else setPan(0,0); } });
+    // enquanto 2 dedos estão a mover o tabuleiro, o "deslizar" do robô não pode disparar
+    ["touchend","touchmove","touchstart"].forEach(t=>gw.addEventListener(t,e=>{ if(panning) e.stopImmediatePropagation(); },{capture:true,passive:false}));
+
+    // A escala depende da largura real: recalcula quando o jogo aparece/muda de tamanho
+    // (antes era calculada com o jogo escondido, largura 0, e o tabuleiro saía grande demais e cortado).
+    let lastW=0;
+    function refit(){
+      const w=gw.clientWidth; if(!w||w===lastW) return;
+      lastW=w; gw.classList.add("notrans"); layout();
+      requestAnimationFrame(()=>requestAnimationFrame(()=>gw.classList.remove("notrans")));
+    }
+    if(window.ResizeObserver) new ResizeObserver(refit).observe(gw);
+    window.addEventListener("resize",refit);
+    window._cam3dRefit=refit;
+
+    setTilt(tilt); setYaw(0); apply();
+  })();
+
   function renderGrid(){
     if(!levelState) return;
     updateCompass();
@@ -2770,6 +3094,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const sizeClass=size>=9?"huge":size>=7?"big":"";
     g.className="grid"+(sizeClass?" "+sizeClass:"");
     g.style.gridTemplateColumns=`repeat(${size},1fr)`;
+    if(g.parentElement) g.parentElement.style.setProperty("--n",size);
     g.innerHTML="";
     const itemEms=currentTheme?.itemEmojis||["🎈","⭐","🤝"];
     currentItemEms=itemEms;
@@ -2849,9 +3174,9 @@ document.addEventListener("DOMContentLoaded", () => {
             // Portal as background, robot on top
             cell.classList.add("robot-cell");
             if(carriedItem) cell.classList.add("robot-carrying");
-            const angle=dir*90;
-            const carryBadge=carriedItem?`<span class="carry-badge" style="transform:rotate(${-angle}deg);">${carriedItem}</span>`:"";
-            cell.innerHTML=portalSvg+`<div class="robot-icon" style="transform:rotate(${angle}deg);position:relative;z-index:2;"><span class="robot-icon-inner">${VB_ROBOT_CANVAS_HTML}</span>${carryBadge}</div><span class="robot-dir" style="position:relative;z-index:2;">${DIR_ARROWS[dir]}</span>`;
+            const angle=dir*90; cell.style.setProperty("--rot",angle+"deg");
+            const carryBadge=carriedItem?`<span class="carry-badge" style="transform:rotate(calc(var(--rot) * -1));">${carriedItem}</span>`:"";
+            cell.innerHTML=portalSvg+`<div class="robot-icon" style="transform:rotate(var(--rot));position:relative;z-index:2;"><span class="robot-icon-inner">${VB_ROBOT_CANVAS_HTML}</span>${carryBadge}</div><span class="robot-dir" style="position:relative;z-index:2;">${DIR_ARROWS[dir]}</span>`;
             const gcv=cell.querySelector(".grid-vb-robot"); if(gcv){ const gctx=gcv.getContext("2d"); if(gctx) drawVanBerto(gctx,false,-1,false); }
             const dance1=shouldDanceOnRender;
             setTimeout(()=>{
@@ -2872,10 +3197,10 @@ document.addEventListener("DOMContentLoaded", () => {
         else if(isRobot){
           cell.classList.add("robot-cell");
           if(carriedItem) cell.classList.add("robot-carrying");
-          const angle=dir*90;
-          const carryBadge=carriedItem?`<span class="carry-badge" style="transform:rotate(${-angle}deg);">${carriedItem}</span>`:"";
+          const angle=dir*90; cell.style.setProperty("--rot",angle+"deg");
+          const carryBadge=carriedItem?`<span class="carry-badge" style="transform:rotate(calc(var(--rot) * -1));">${carriedItem}</span>`:"";
           const itemBadge=(!carriedItem&&itemIdx>=0)?`<span class="item-under-robot">${itemEms[itemIdx%itemEms.length]}</span>`:"";
-          cell.innerHTML=`<div class="robot-icon" style="transform:rotate(${angle}deg);"><span class="robot-icon-inner">${VB_ROBOT_CANVAS_HTML}</span>${carryBadge}</div><span class="robot-dir">${DIR_ARROWS[dir]}</span>${itemBadge}`;
+          cell.innerHTML=`<div class="robot-icon" style="transform:rotate(var(--rot));"><span class="robot-icon-inner">${VB_ROBOT_CANVAS_HTML}</span>${carryBadge}</div><span class="robot-dir">${DIR_ARROWS[dir]}</span>${itemBadge}`;
           const gcv2=cell.querySelector(".grid-vb-robot"); if(gcv2){ const gctx2=gcv2.getContext("2d"); if(gctx2) drawVanBerto(gctx2,false,-1,false); }
           const dance2=shouldDanceOnRender;
           setTimeout(()=>{
@@ -2894,6 +3219,8 @@ document.addEventListener("DOMContentLoaded", () => {
         g.appendChild(cell);
       }
     }
+    wrapBillboards(g);
+    if(window._cam3dUpdate) window._cam3dUpdate(robot[0],robot[1],size);
     shouldDanceOnRender=false;
     const ht=$("hint-text");
     if(ht){
