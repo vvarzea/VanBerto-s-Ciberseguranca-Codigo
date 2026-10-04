@@ -478,6 +478,27 @@
     .robot-icon-shake .robot-icon-inner{animation:robotShake .35s ease;}
     @keyframes robotDance{0%{transform:rotate(0deg) scale(1);}15%{transform:rotate(-15deg) scale(1.1);}30%{transform:rotate(15deg) scale(1.1);}45%{transform:rotate(-15deg) scale(1.12);}60%{transform:rotate(15deg) scale(1.12);}80%{transform:rotate(0deg) scale(1.05);}100%{transform:rotate(0deg) scale(1);}}
     .robot-dance .robot-icon-inner{animation:robotDance 1s ease;}
+    /* Pirueta da vitória: agacha, salta, roda 360° sobre si próprio e aterra a "esmagar" */
+    @keyframes robotPirouette{
+      0%{transform:perspective(520px) translateY(0) rotateY(0deg) scale(1,1);}
+      14%{transform:perspective(520px) translateY(2%) rotateY(0deg) scale(1.08,.9);}
+      50%{transform:perspective(520px) translateY(-30%) rotateY(200deg) scale(1.03,1.03);}
+      78%{transform:perspective(520px) translateY(-6%) rotateY(340deg) scale(1,1);}
+      90%{transform:perspective(520px) translateY(2%) rotateY(360deg) scale(1.1,.88);}
+      100%{transform:perspective(520px) translateY(0) rotateY(360deg) scale(1,1);}
+    }
+    .robot-pirouette .robot-icon-inner{animation:robotPirouette 1.15s cubic-bezier(.3,.7,.4,1) both;transform-origin:50% 100%;}
+    /* Deslize do robô entre casas: --gx/--gy = distância à casa anterior (definida em JS),
+       a animar até 0. A propriedade "translate" soma-se ao transform existente (2D e 3D). */
+    @property --gx{syntax:'<length>';inherits:true;initial-value:0px;}
+    @property --gy{syntax:'<length>';inherits:true;initial-value:0px;}
+    .cell.robot-cell{transition:--gx .22s ease-out,--gy .22s ease-out,background .1s,border-color .1s,box-shadow .1s;}
+    .grid-wrapper:not(.mode3d) .robot-cell{z-index:4;}
+    .grid-wrapper:not(.mode3d) .robot-cell .robot-icon{translate:var(--gx) var(--gy);}
+    @media (prefers-reduced-motion:reduce){
+      .cell.robot-cell{transition:none!important;}
+      .robot-pirouette .robot-icon-inner{animation:none;}
+    }
     @keyframes levelFadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
     .level-fade-in{animation:levelFadeIn .22s ease both;}
 
@@ -914,6 +935,24 @@
     .cert-sig-line{height:2px;background:linear-gradient(90deg,transparent,#ffd700,transparent);margin-bottom:6px;}
     .cert-sig-name{font-family:'Baloo 2',sans-serif;font-size:13px;font-weight:800;color:#ffd700;margin:0 0 2px;font-style:italic;}
     .cert-sig-role{font-size:10px;color:#ff9060;text-transform:uppercase;letter-spacing:.5px;margin:0;}
+    .certificate-robot{height:auto;flex-direction:column;}
+    .certificate-brand{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;color:#ffd700;letter-spacing:.5px;margin-top:2px;}
+    .theme-cert-btn,.cycle-cert-btn{font-size:.72rem!important;padding:6px 12px!important;margin-top:8px;}
+    .cycle-cert-btn[disabled]{opacity:.55;cursor:not-allowed;filter:grayscale(.4);}
+    .back-row .cycle-cert-btn{margin:0 0 0 auto;}
+    /* Horizontal (paisagem) em ecrãs largos: o VanBerto's fica à esquerda, como no jogo do e-mail */
+    @media (min-width:820px) and (min-height:560px){
+      .certificate-card{
+        width:min(900px,96vw)!important;max-width:min(900px,96vw)!important;
+        display:grid!important;grid-template-columns:230px 1fr;column-gap:22px;align-items:center;
+        grid-template-areas:"robot header" "robot body" "robot stats" "robot date" "robot sig" "btns btns";
+      }
+      .certificate-header{grid-area:header;} .certificate-robot{grid-area:robot;height:auto!important;flex-direction:column;align-self:stretch;justify-content:center;border-right:1px dashed rgba(255,215,0,.35);padding-right:16px;}
+      .certificate-body{grid-area:body;} .certificate-stats{grid-area:stats;} .certificate-date{grid-area:date;}
+      .certificate-signature{grid-area:sig;} .certificate-card>.popup-btns{grid-area:btns;}
+      .certificate-card #cert-vb-robot{width:170px!important;height:170px!important;}
+      .certificate-brand{font-size:20px;margin-top:6px;}
+    }
     @media print{
       body *{visibility:hidden!important;}
       #certificateOverlay,#certificateOverlay *{visibility:visible!important;}
@@ -928,6 +967,8 @@
       #certificateOverlay .cert-stat{background:rgba(217,164,65,.12)!important;border-color:rgba(217,164,65,.4)!important;}
       #certificateOverlay .cert-stat strong{color:#8a5a00!important;}
       #certificateOverlay .cert-sig-line{background:linear-gradient(90deg,transparent,#d9a441,transparent)!important;}
+      #certificateOverlay .certificate-brand{color:#8a5a00!important;}
+      #certificateOverlay .certificate-robot{height:auto!important;flex-direction:column;}
     }
     .popup-fact{
       background:rgba(236,30,121,0.1);border:1px solid rgba(236,30,121,0.3);
@@ -1481,6 +1522,7 @@
       transform:translateZ(3px) rotateZ(calc(-1 * var(--yaw))) rotateX(calc(-1 * var(--tilt))) scale(1.15);
     }
     .mode3d .robot-cell .robot-icon{width:78%;height:auto;aspect-ratio:1/1;flex:none;}
+    .mode3d .robot-cell .bb{translate:var(--gx) var(--gy);}
     /* O robô não gira (fica de frente para a câmara); a direção vê-se no brilho
        dourado da borda da casa para onde está virado (+ a pastilha com a seta). */
     .mode3d .robot-icon{--rot:0deg;}
@@ -1903,6 +1945,7 @@
       <button class="btn small" id="popup-next">➡️ Próxima missão</button>
       <button class="btn secondary small" id="popup-menu">🏠 Menu</button>
       <button class="btn primary small" id="popup-cert-btn" style="display:none;">🎓 Certificado</button>
+      <button class="btn primary small" id="popup-cert-cycle-btn" style="display:none;">🏅 Certificado do ciclo</button>
     </div>
   </div>
 </div>
@@ -1917,16 +1960,17 @@
     </div>
     <div class="certificate-robot">
       <canvas id="cert-vb-robot" width="96" height="96" style="width:100px;height:100px;" aria-hidden="true"></canvas>
+      <div class="certificate-brand">VanBerto's</div>
     </div>
     <div class="certificate-body">
       <p class="certificate-text">Este certificado é atribuído a</p>
       <p class="certificate-name" id="certPlayerName">Ciber-Herói</p>
       <p class="certificate-text" id="certAchText">que, com coragem, atenção e sabedoria, completou o tema</p>
       <p class="certificate-highlight" id="certHighlight">1.º Ciclo de Cibersegurança</p>
-      <p class="certificate-text">tornando-se oficialmente Guardião da Cibersegurança.</p>
+      <p class="certificate-text" id="certFinalText">tornando-se oficialmente Guardião da Cibersegurança.</p>
     </div>
     <div class="certificate-stats">
-      <div class="cert-stat"><span class="cert-stat-icon">📚</span><strong id="certThemes">0/3</strong><span>níveis</span></div>
+      <div class="cert-stat"><span class="cert-stat-icon">📚</span><strong id="certThemes">0/3</strong><span id="certStatLabel">níveis</span></div>
       <div class="cert-stat"><span class="cert-stat-icon">⭐</span><strong id="certStars">0/27</strong><span>estrelas</span></div>
       <div class="cert-stat"><span class="cert-stat-icon">🏆</span><strong id="certMedal">—</strong><span>medalha</span></div>
     </div>
@@ -1939,6 +1983,8 @@
     <div class="popup-btns" style="margin-top:14px;">
       <button class="btn secondary small" id="btnCertBack">← Voltar</button>
       <button class="btn small" id="btnCertPrint">🖨️ Imprimir</button>
+      <button class="btn small" id="btnCertPng">🖼️ Guardar PNG</button>
+      <button class="btn small" id="btnCertPdf">📄 Guardar PDF</button>
     </div>
   </div>
 </div>
@@ -2368,30 +2414,136 @@ document.addEventListener("DOMContentLoaded", () => {
     return {levelsDone, levelsTotal:lvls.length, starsEarned, starsTotal};
   }
 
+  // Certificado de TEMA (ck+tk) ou de CICLO (só ck, quando os 3 temas estão completos).
   function showCertificate(ck,tk){
     const overlay=$("certificateOverlay"); if(!overlay) return;
     const cycle=GAME_DATA[ck]; if(!cycle) return;
-    const theme=cycle.themes[tk];
+    const theme=tk?cycle.themes[tk]:null;
+    const isCycle=!theme;
+    const cycleLabel=ck==="sec"?"Ensino Secundário":cycle.name;
     const pName=(localStorage.getItem('mundocrianca_player')||'').trim();
     const cn=$("certPlayerName"); if(cn) cn.textContent=pName||"Ciber-Herói";
-    const sub=$("certSubtitle"); if(sub) sub.textContent="de Guardião da Cibersegurança";
+    const sub=$("certSubtitle"); if(sub) sub.textContent=isCycle?"de Guardião da Cibersegurança — Ciclo completo":"de Guardião da Cibersegurança";
+    const ach=$("certAchText"); if(ach) ach.textContent=isCycle?"que, com coragem, atenção e sabedoria, completou os 3 temas do":"que, com coragem, atenção e sabedoria, completou o tema";
     const hl=$("certHighlight");
-    if(hl){
-      const cycleLabel=ck==="sec"?"Ensino Secundário":cycle.name;
-      hl.textContent=theme ? `${theme.name} (${cycleLabel})` : `${cycleLabel} de Cibersegurança`;
-    }
-    const {levelsDone,levelsTotal,starsEarned,starsTotal}=theme
-      ? themeCertStats(ck,tk)
-      : {levelsDone:0,levelsTotal:0,starsEarned:0,starsTotal:0};
-    const ct=$("certThemes"); if(ct) ct.textContent=`${levelsDone}/${levelsTotal}`;
+    if(hl) hl.textContent=isCycle?(ck==="sec"?"Ensino Secundário — Cibersegurança":`${cycleLabel} de Cibersegurança`):`${theme.name} (${cycleLabel})`;
+    const fin=$("certFinalText"); if(fin) fin.textContent=isCycle?"tornando-se oficialmente Guardião da Cibersegurança deste ciclo.":"tornando-se oficialmente Guardião da Cibersegurança.";
+    let done,total,starsEarned,starsTotal;
+    if(isCycle){ const c=cycleCertStats(ck); done=c.themesDone; total=c.themesTotal; starsEarned=c.starsEarned; starsTotal=c.starsTotal; }
+    else { const t=themeCertStats(ck,tk); done=t.levelsDone; total=t.levelsTotal; starsEarned=t.starsEarned; starsTotal=t.starsTotal; }
+    const ct=$("certThemes"); if(ct) ct.textContent=`${done}/${total}`;
+    const lab=$("certStatLabel"); if(lab) lab.textContent=isCycle?"temas":"níveis";
     const cs=$("certStars"); if(cs) cs.textContent=`${starsEarned}/${starsTotal}`;
     const pct=starsTotal>0?Math.round(starsEarned/starsTotal*100):0;
     const cm=$("certMedal"); if(cm) cm.textContent=pct===100?"🥇 Perfeito":pct>=80?"🥈 Excelente":pct>=60?"🥉 Bom":"📚 A Melhorar";
     const cd=$("certDate"); if(cd){ const now=new Date(); cd.textContent=now.toLocaleDateString("pt-PT",{day:"numeric",month:"long",year:"numeric"}); }
+    overlay.dataset.kind=isCycle?"ciclo":"tema";
+    overlay.dataset.slug=(isCycle?"ciclo-"+ck:"tema-"+tk);
     overlay.classList.remove("hidden");
     updateOverlayOpenClass();
     const cvs=$("cert-vb-robot");
     if(cvs) vbDanceSequence(cvs, 3);
+  }
+
+  /* ── Guardar o certificado em imagem (PNG) e PDF — A4 paisagem, sem bibliotecas ──
+     Desenha o certificado num canvas a partir dos textos que estão no ecrã. */
+  function buildCertCanvas(){
+    const W=1600,H=1131,GOLD="#8a5a00",ORG="#c04a1a",F="'Baloo 2', sans-serif",FB="'Nunito', 'Inter', sans-serif";
+    const cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+    const g=cv.getContext("2d");
+    const txt=id=>($(id)?.textContent||"").trim();
+    function fit(text,maxW,px,weight,fam,minPx){ let z=px; for(;;){ g.font=`${weight} ${z}px ${fam}`; if(g.measureText(text).width<=maxW||z<=(minPx||18)) break; z-=2; } }
+    g.fillStyle="#fffdf6"; g.fillRect(0,0,W,H);
+    g.strokeStyle="#d9a441"; g.lineWidth=10; g.strokeRect(46,46,W-92,H-92);
+    g.strokeStyle=GOLD; g.lineWidth=3; g.strokeRect(68,68,W-136,H-136);
+    // coluna esquerda: VanBerto's
+    const lx=250, midY=H/2;
+    const rb=document.createElement("canvas"); rb.width=rb.height=480;
+    const rg=rb.getContext("2d"); rg.scale(5,5); drawVanBerto(rg,"happy",-1,true);
+    g.drawImage(rb,lx-150,midY-250,300,300);
+    g.fillStyle=GOLD; g.textAlign="center"; g.font=`800 38px ${F}`; g.fillText("VanBerto's",lx,midY+95);
+    g.strokeStyle="#c9b27a"; g.lineWidth=2; g.setLineDash([10,8]); g.beginPath(); g.moveTo(450,140); g.lineTo(450,H-140); g.stroke(); g.setLineDash([]);
+    // coluna direita (centrada)
+    const cx=1025, mw=960; g.textAlign="center";
+    g.fillStyle=GOLD; fit("CERTIFICADO OFICIAL",mw,46,"900",F); g.fillText("CERTIFICADO OFICIAL",cx,175);
+    g.fillStyle=ORG; fit(txt("certSubtitle").toUpperCase(),mw,24,"700",FB); g.fillText(txt("certSubtitle").toUpperCase(),cx,220);
+    g.fillStyle="#555"; g.font=`500 28px ${FB}`; g.fillText("Este certificado é atribuído a",cx,300);
+    g.fillStyle=GOLD; fit(txt("certPlayerName"),mw,88,"900",F,36); g.fillText(txt("certPlayerName"),cx,395);
+    g.fillStyle="#444"; fit(txt("certAchText"),mw,28,"500",FB); g.fillText(txt("certAchText"),cx,465);
+    g.fillStyle=ORG; fit(txt("certHighlight"),mw,50,"900",F,26); g.fillText(txt("certHighlight"),cx,535);
+    g.fillStyle="#444"; fit(txt("certFinalText"),mw,28,"500",FB); g.fillText(txt("certFinalText"),cx,595);
+    // estatísticas
+    const stats=[["📚",txt("certThemes"),txt("certStatLabel")],["⭐",txt("certStars"),"estrelas"],["🏆",txt("certMedal"),"medalha"]];
+    const bw=290,bh=140,gap=28,x0=cx-(3*bw+2*gap)/2,y0=655;
+    stats.forEach((st,i)=>{
+      const x=x0+i*(bw+gap);
+      g.fillStyle="rgba(217,164,65,0.12)"; g.strokeStyle="#d9a441"; g.lineWidth=2;
+      g.beginPath(); g.roundRect?g.roundRect(x,y0,bw,bh,16):g.rect(x,y0,bw,bh); g.fill(); g.stroke();
+      g.fillStyle=GOLD; fit(st[1],bw-30,46,"900",F,22); g.fillText(st[1],x+bw/2,y0+66);
+      g.fillStyle="#777"; g.font=`700 22px ${FB}`; g.fillText((st[0]+" "+st[2]).toUpperCase(),x+bw/2,y0+112);
+    });
+    g.fillStyle="#888"; g.font=`italic 600 26px ${F}`; g.fillText(txt("certDate"),cx,860);
+    g.strokeStyle=GOLD; g.lineWidth=3; g.beginPath(); g.moveTo(cx-190,945); g.lineTo(cx+190,945); g.stroke();
+    g.fillStyle=GOLD; g.font=`italic 800 30px ${F}`; g.fillText("Professora Vanda Várzea",cx,985);
+    g.fillStyle="#777"; fit("Professora de Tecnologias de Informação e Comunicação",mw,20,"600",FB); g.fillText("Professora de Tecnologias de Informação e Comunicação",cx,1018);
+    return cv;
+  }
+  function certSafeName(){
+    const n=($("certPlayerName")?.textContent||"jogador").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"")||"jogador";
+    return "certificado-vanbertos-"+($("certificateOverlay")?.dataset.slug||"tema")+"-"+n;
+  }
+  function certDownload(href,name){
+    const a=document.createElement("a"); a.href=href; a.download=name; a.style.display="none"; document.body.appendChild(a);
+    try{ a.click(); } finally { if(a.parentNode) a.parentNode.removeChild(a); }
+  }
+  function certPdfBytes(jpg,iw,ih){
+    const PW=842,PH=595, sc=Math.min(PW/iw,PH/ih), w=iw*sc, h=ih*sc, ox=(PW-w)/2, oy=(PH-h)/2;
+    const content="q "+w.toFixed(2)+" 0 0 "+h.toFixed(2)+" "+ox.toFixed(2)+" "+oy.toFixed(2)+" cm /Im0 Do Q";
+    const chunks=[],offs=[]; let size=0;
+    const put=d=>{ let u=d; if(typeof d==="string"){ u=new Uint8Array(d.length); for(let i=0;i<d.length;i++) u[i]=d.charCodeAt(i)&255; } chunks.push(u); size+=u.length; };
+    const begin=n=>{ offs[n]=size; put(n+" 0 obj\n"); };
+    put("%PDF-1.4\n");
+    begin(1); put("<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+    begin(2); put("<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n");
+    begin(3); put("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 "+PW+" "+PH+"] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n");
+    begin(4); put("<< /Type /XObject /Subtype /Image /Width "+iw+" /Height "+ih+" /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+jpg.length+" >>\nstream\n"); put(jpg); put("\nendstream\nendobj\n");
+    begin(5); put("<< /Length "+content.length+" >>\nstream\n"+content+"\nendstream\nendobj\n");
+    const xp=size; let xr="xref\n0 6\n0000000000 65535 f \n";
+    for(let n=1;n<=5;n++) xr+=("0000000000"+offs[n]).slice(-10)+" 00000 n \n";
+    put(xr+"trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n"+xp+"\n%%EOF\n");
+    const out=new Uint8Array(size); let pos=0; chunks.forEach(c=>{ out.set(c,pos); pos+=c.length; });
+    return out;
+  }
+  function certPrintHtml(url){
+    return '<!doctype html><html><head><meta charset="utf-8"><title>Certificado</title><style>@page{size:A4 landscape;margin:0}html,body{margin:0;padding:0;background:#fff;height:100%}img{display:block;width:100vw;height:100vh;object-fit:contain}</style></head><body><img src="'+url+'" alt="Certificado"></body></html>';
+  }
+  function certPrint(){
+    const go=()=>{
+      try{
+        const url=buildCertCanvas().toDataURL("image/png");
+        const f=document.createElement("iframe");
+        f.style.cssText="position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;";
+        document.body.appendChild(f);
+        const d=f.contentWindow.document; d.open(); d.write(certPrintHtml(url)); d.close();
+        const img=d.querySelector("img");
+        const fire=()=>{ try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){ window.print(); } setTimeout(()=>{ if(f.parentNode) f.parentNode.removeChild(f); },3000); };
+        if(img.complete) fire(); else img.onload=fire;
+      }catch(e){ console.error("certPrint:",e); window.print(); }
+    };
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(go); else go();
+  }
+  function certSaveAs(kind){
+    const go=()=>{
+      try{
+        const cv=buildCertCanvas();
+        if(kind==="png"){ certDownload(cv.toDataURL("image/png"),certSafeName()+".png"); return; }
+        const bin=atob(cv.toDataURL("image/jpeg",0.92).split(",")[1]);
+        const jpg=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) jpg[i]=bin.charCodeAt(i);
+        const url=URL.createObjectURL(new Blob([certPdfBytes(jpg,cv.width,cv.height)],{type:"application/pdf"}));
+        certDownload(url,certSafeName()+".pdf"); setTimeout(()=>URL.revokeObjectURL(url),5000);
+      }catch(e){ console.error("certSaveAs:",e); alert('Não foi possível gerar o ficheiro neste navegador. Usa "Imprimir" em alternativa.'); }
+    };
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(go); else go();
   }
 
   function updateThemeProgressUI(){
@@ -2414,6 +2566,28 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       const allDone=done===total&&total>0;
       countEl.innerHTML=allDone?`✅ ${total} níveis — concluído!`:`📋 ${done} / ${total} níveis`;
+      // 🎓 certificado do tema — sempre acessível quando o tema está completo
+      let tb=card.querySelector(".theme-cert-btn");
+      if(allDone&&!tb){
+        tb=document.createElement("button"); tb.type="button"; tb.className="btn small theme-cert-btn";
+        tb.textContent="🎓 Certificado";
+        tb.addEventListener("click",e=>{ e.stopPropagation(); showCertificate(ck,tk); });
+        card.appendChild(tb);
+      } else if(!allDone&&tb){ tb.remove(); }
+    });
+    // 🏅 certificado do ciclo — só abre quando os 3 temas estão completos
+    [["1c","themes-1c"],["2c","themes-2c"],["3c","themes-3c"],["sec","themes-sec"]].forEach(([ck,id])=>{
+      const row=document.querySelector("#"+id+" .back-row"); if(!row) return;
+      const st=cycleCertStats(ck); const ok=st.themesTotal>0&&st.themesDone===st.themesTotal;
+      let cb=row.querySelector(".cycle-cert-btn");
+      if(!cb){
+        cb=document.createElement("button"); cb.type="button"; cb.className="btn small cycle-cert-btn";
+        cb.addEventListener("click",()=>{ if(!cb.disabled) showCertificate(ck,null); });
+        row.appendChild(cb);
+      }
+      cb.disabled=!ok;
+      cb.textContent=ok?"🏅 Certificado do ciclo":`🔒 Certificado do ciclo (${st.themesDone}/${st.themesTotal} temas)`;
+      cb.title=ok?"Abrir o certificado do ciclo":"Completa os 3 temas deste ciclo para o desbloquear";
     });
   }
   function updateSideProgress(){
@@ -3183,8 +3357,9 @@ document.addEventListener("DOMContentLoaded", () => {
               const icon=cell.querySelector(".robot-icon");
               if(!icon) return;
               if(dance1){
-                icon.classList.add("robot-dance");
-                icon.addEventListener("animationend",()=>icon.classList.remove("robot-dance"),{once:true});
+                const pir1=icon.querySelector(".robot-icon-inner");
+                icon.classList.add("robot-pirouette");
+                if(pir1) pir1.addEventListener("animationend",()=>icon.classList.remove("robot-pirouette"),{once:true});
                 vbDanceSequence(icon.querySelector(".grid-vb-robot"),3);
               } else {
                 icon.classList.add("robot-icon-bounce"); icon.addEventListener("animationend",()=>icon.classList.remove("robot-icon-bounce"),{once:true});
@@ -3207,8 +3382,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const icon=cell.querySelector(".robot-icon");
             if(!icon) return;
             if(dance2){
-              icon.classList.add("robot-dance");
-              icon.addEventListener("animationend",()=>icon.classList.remove("robot-dance"),{once:true});
+              const pir2=icon.querySelector(".robot-icon-inner");
+              icon.classList.add("robot-pirouette");
+              if(pir2) pir2.addEventListener("animationend",()=>icon.classList.remove("robot-pirouette"),{once:true});
               vbDanceSequence(icon.querySelector(".grid-vb-robot"),3);
             } else {
               icon.classList.add("robot-icon-bounce"); icon.addEventListener("animationend",()=>icon.classList.remove("robot-icon-bounce"),{once:true});
@@ -3221,6 +3397,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     wrapBillboards(g);
     if(window._cam3dUpdate) window._cam3dUpdate(robot[0],robot[1],size);
+    // Deslize: se o robô andou exatamente 1 casa no mesmo nível, parte da casa anterior
+    const gp=renderGrid._prev;
+    if(gp && gp.ls===levelState && gp.size===size && g.offsetParent!==null){
+      const step=Math.abs(gp.r-robot[0])+Math.abs(gp.c-robot[1]);
+      const rcell=g.children[robot[0]*size+robot[1]], pcell=g.children[gp.r*size+gp.c];
+      if(step===1 && rcell && pcell && rcell.classList.contains("robot-cell")){
+        rcell.style.transition="none";
+        rcell.style.setProperty("--gx",(pcell.offsetLeft-rcell.offsetLeft)+"px");
+        rcell.style.setProperty("--gy",(pcell.offsetTop-rcell.offsetTop)+"px");
+        void rcell.offsetWidth;                     // fixa o ponto de partida
+        rcell.style.transition="";
+        rcell.style.setProperty("--gx","0px");
+        rcell.style.setProperty("--gy","0px");
+      }
+    }
+    renderGrid._prev={ls:levelState,size,r:robot[0],c:robot[1]};
     shouldDanceOnRender=false;
     const ht=$("hint-text");
     if(ht){
@@ -3713,7 +3905,7 @@ document.addEventListener("DOMContentLoaded", () => {
       {q:"Antes de publicares uma foto ou comentário, deves...?",ops:["Publicar imediatamente sem pensar","Pensar se realmente precisas de partilhar aquilo","Perguntar a estranhos se gostam","Publicar em todas as redes possíveis"],a:1},
       {q:"O que significa \"o que publicas pode ficar online para sempre\"?",ops:["As publicações desaparecem sozinhas depois de um dia","Mesmo que apagues, cópias podem continuar a existir","Só os administradores veem","Só fica visível uma hora"],a:1},
       {q:"É boa ideia publicar que vais estar sozinho em casa esta noite?",ops:["Sim, é informação inofensiva","Não, avisa desconhecidos de que a casa pode estar vazia","Só se marcares os amigos","Sim, sempre"],a:1},
-      {q:"Antes de publicares uma foto de um amigo, deves...?",ops:["Publicar sem avisar","Pedir autorização a essa pessoa","Só avisar depois","Nunca é preciso pedir"],a:1},
+      {q:"Queres publicar uma foto em que aparece um colega teu. O que deves fazer primeiro?",ops:["Publicar sem avisar","Pedir autorização a essa pessoa","Só avisar depois","Nunca é preciso pedir"],a:1},
       {q:"O que podes fazer se te arrependeste de algo que publicaste?",ops:["Ignorar, já não há nada a fazer","Apagar rapidamente e falar com um adulto se for grave","Publicar mais para distrair","Culpar outra pessoa"],a:1},
       {q:"Publicar a tua localização em tempo real é seguro?",ops:["Sim, é sempre seguro","Não, pode revelar onde estás a qualquer momento","Só é arriscado à noite","Sim, se for só para amigos"],a:1},
       {q:"O que é \"pensar antes de publicar\"?",ops:["Escrever muito rápido para não perder a ideia","Avaliar se o que vais partilhar é seguro, verdadeiro e apropriado","Publicar e depois pensar","Publicar sem qualquer cuidado"],a:1},
@@ -3803,9 +3995,22 @@ document.addEventListener("DOMContentLoaded", () => {
     usedIndices=usedIndices||[]; attempt=attempt||1;
     const quizList=QUIZ_DATA[currentThemeKey]||[];
     if(!quizList.length){ completeLevel(); return; }
-    const available=quizList.map((_,i)=>i).filter(i=>!usedIndices.includes(i));
-    const pool=available.length?available:quizList.map((_,i)=>i);
+    // Memória (por aparelho) das perguntas já saídas em cada tema: só voltam a sair
+    // quando o banco todo tiver passado — assim os níveis seguidos não repetem perguntas.
+    const SEEN_KEY="vb_prog_quiz_seen_v1";
+    let seenAll={}; try{ seenAll=JSON.parse(localStorage.getItem(SEEN_KEY)||"{}")||{}; }catch(e){ seenAll={}; }
+    let seen=Array.isArray(seenAll[currentThemeKey])?seenAll[currentThemeKey].filter(i=>i>=0&&i<quizList.length):[];
+    const all=quizList.map((_,i)=>i);
+    let available=all.filter(i=>!usedIndices.includes(i)&&!seen.includes(i));
+    if(!available.length){                         // banco esgotado: recomeça (sem repetir logo a última)
+      const last=seen.length?seen[seen.length-1]:-1;
+      seen=[];
+      available=all.filter(i=>!usedIndices.includes(i)&&i!==last);
+    }
+    const pool=available.length?available:all;
     const qIdx=pool[Math.floor(Math.random()*pool.length)];
+    seen.push(qIdx); seenAll[currentThemeKey]=seen;
+    try{ localStorage.setItem(SEEN_KEY,JSON.stringify(seenAll)); }catch(e){}
     const q=quizList[qIdx];
     const newUsed=[...usedIndices,qIdx];
     const attemptLabel=attempt===1?"1.ª tentativa":attempt===2?"2.ª tentativa ✨":attempt===3?"3.ª tentativa 💪":`${attempt}.ª tentativa 🔥`;
@@ -4065,7 +4270,9 @@ document.addEventListener("DOMContentLoaded", () => {
     updateThemeProgressUI(); updateSideProgress();
     const stars=currentMinMoves!==null?
       (moveCount<=currentMinMoves?3:moveCount<=currentMinMoves*1.5?2:1):1;
-    showPopup(stars, lvls[li]);
+    // espera a pirueta da vitória antes de cobrir o tabuleiro com o pop-up
+    const _lsDone=levelState;
+    setTimeout(()=>{ if(levelState===_lsDone) showPopup(stars, lvls[li]); },1350);
   }
 
   function showPopup(stars, levelBase){
@@ -4101,6 +4308,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const qs=$("popup-quiz-section"); if(qs) qs.style.display="none";
     const pnext=$("popup-next"); if(pnext) pnext.style.display="inline-flex";
     const certBtn=$("popup-cert-btn"); if(certBtn) certBtn.style.display="none";
+    const cycBtn0=$("popup-cert-cycle-btn"); if(cycBtn0) cycBtn0.style.display="none";
     pop.classList.remove("hidden");
     launchConfetti();
     vbDanceSequence($("popup-vb-robot"), 4);
@@ -4137,6 +4345,10 @@ document.addEventListener("DOMContentLoaded", () => {
     shouldDanceOnRender=true; renderGrid();
     if(window._vbReact) window._vbReact('vb-spin');
     if(window.heroShowBub) window.heroShowBub('Tema completo! Campeão! 🏆🥳');
+    const _lsAll=levelState;
+    setTimeout(()=>{ if(levelState===_lsAll) showAllCompletedPopup(); },1350);
+  }
+  function showAllCompletedPopup(){
     const pop=$("popup-complete"); if(!pop) return;
     const pt=$("popup-title"); if(pt) pt.textContent="Tema concluído! 🏆";
     // Personalizar mensagem com nome do jogador
@@ -4158,6 +4370,8 @@ document.addEventListener("DOMContentLoaded", () => {
       certBtn.dataset.cycle=currentCycleKey;
       certBtn.dataset.theme=currentThemeKey;
     }
+    const cycBtn=$("popup-cert-cycle-btn");
+    if(cycBtn){ cycBtn.style.display=cycleDone?"inline-flex":"none"; cycBtn.dataset.cycle=currentCycleKey; }
     pop.classList.remove("hidden");
     // 🎵 Fanfarra final de vitória
     if(typeof playFinalFanfare === 'function') playFinalFanfare();
@@ -4765,7 +4979,14 @@ document.addEventListener("DOMContentLoaded", () => {
     $("certificateOverlay")?.classList.add("hidden");
     updateOverlayOpenClass();
   });
-  $("btnCertPrint")?.addEventListener("click",()=>window.print());
+  $("btnCertPrint")?.addEventListener("click",()=>certPrint());
+  $("btnCertPng")?.addEventListener("click",()=>certSaveAs("png"));
+  $("btnCertPdf")?.addEventListener("click",()=>certSaveAs("pdf"));
+  $("popup-cert-cycle-btn")?.addEventListener("click",()=>{
+    const ck=$("popup-cert-cycle-btn").dataset.cycle||currentCycleKey;
+    $("popup-complete")?.classList.add("hidden");
+    showCertificate(ck,null);
+  });
 
   $("side-home")?.addEventListener("click",()=>showScreen(menuScreen));
   $("side-1c")?.addEventListener("click",()=>showScreen(themes1cScreen));
