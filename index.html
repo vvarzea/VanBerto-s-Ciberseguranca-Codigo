@@ -492,7 +492,7 @@
        a animar até 0. A propriedade "translate" soma-se ao transform existente (2D e 3D). */
     @property --gx{syntax:'<length>';inherits:true;initial-value:0px;}
     @property --gy{syntax:'<length>';inherits:true;initial-value:0px;}
-    .cell.robot-cell{transition:--gx .22s ease-out,--gy .22s ease-out,background .1s,border-color .1s,box-shadow .1s;}
+    .cell.robot-cell{transition:--gx .22s ease-out,--gy .22s ease-out,--rot .34s cubic-bezier(.25,.9,.3,1.18),background .1s,border-color .1s,box-shadow .1s;}
     .grid-wrapper:not(.mode3d) .robot-cell{z-index:4;}
     .grid-wrapper:not(.mode3d) .robot-cell .robot-icon{translate:var(--gx) var(--gy);}
     @media (prefers-reduced-motion:reduce){
@@ -914,6 +914,14 @@
       box-shadow:0 0 0 3px #ffd700,0 0 0 6px #ff6b35,0 0 0 8px #a0d0ff,8px 8px 0 rgba(0,0,0,.4),0 0 80px rgba(255,215,0,.3)!important;
       text-align:center;padding:24px 22px!important;
     }
+    /* Botões do certificado sempre à vista: o cartão rola por dentro e, no telemóvel, os botões
+       ficavam escondidos no fundo. A barra fica colada ao fundo do cartão, com fundo próprio. */
+    .certificate-card>.popup-btns{
+      position:sticky;bottom:-24px;z-index:3;margin:14px -22px -24px!important;padding:16px 22px 14px;
+      display:flex;flex-wrap:wrap;justify-content:center;gap:8px;
+      background:linear-gradient(to top,#1a0535 0,#1a0535 78%,rgba(26,5,53,0) 100%);
+    }
+    .certificate-card>.popup-btns .btn{margin:0;flex:1 1 calc(50% - 8px);min-width:0;white-space:nowrap;}
     .certificate-header{margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid rgba(255,215,0,.3);}
     .certificate-seal{font-size:48px;display:block;animation:certSealSpin 4s linear infinite;filter:drop-shadow(0 0 12px rgba(255,215,0,.6));}
     @keyframes certSealSpin{0%{filter:drop-shadow(0 0 8px rgba(255,215,0,.6));}50%{filter:drop-shadow(0 0 22px rgba(255,107,53,.8));}100%{filter:drop-shadow(0 0 8px rgba(255,215,0,.6));}}
@@ -938,6 +946,9 @@
     .certificate-robot{height:auto;flex-direction:column;}
     .certificate-brand{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;color:#ffd700;letter-spacing:.5px;margin-top:2px;}
     .theme-cert-btn,.cycle-cert-btn{font-size:.72rem!important;padding:6px 12px!important;margin-top:8px;}
+    /* medalha + estrelas no cartão do tema concluído */
+    .theme-medal{font-family:'Baloo 2',sans-serif;font-size:.8rem;font-weight:800;color:#ffd166;margin:2px 0 4px;line-height:1.3;}
+    .theme-medal small{display:block;font-weight:600;font-size:.68rem;color:rgba(255,255,255,.62);}
     .cycle-cert-btn[disabled]{opacity:.55;cursor:not-allowed;filter:grayscale(.4);}
     .back-row .cycle-cert-btn{margin:0 0 0 auto;}
     /* Horizontal (paisagem) em ecrãs largos: o VanBerto's fica à esquerda, como no jogo do e-mail */
@@ -949,7 +960,8 @@
       }
       .certificate-header{grid-area:header;} .certificate-robot{grid-area:robot;height:auto!important;flex-direction:column;align-self:stretch;justify-content:center;border-right:1px dashed rgba(255,215,0,.35);padding-right:16px;}
       .certificate-body{grid-area:body;} .certificate-stats{grid-area:stats;} .certificate-date{grid-area:date;}
-      .certificate-signature{grid-area:sig;} .certificate-card>.popup-btns{grid-area:btns;}
+      .certificate-signature{grid-area:sig;} .certificate-card>.popup-btns{grid-area:btns;position:static;margin:14px 0 0!important;padding:0;background:none;}
+      .certificate-card>.popup-btns .btn{flex:0 0 auto;}
       .certificate-card #cert-vb-robot{width:170px!important;height:170px!important;}
       .certificate-brand{font-size:20px;margin-top:6px;}
     }
@@ -1510,7 +1522,7 @@
       position:absolute;inset:0;pointer-events:none;
       transform-origin:50% 72%;
       transform:translateZ(3px) rotateZ(calc(-1 * var(--yaw))) rotateX(calc(-1 * var(--tilt))) scale(1.3);
-      filter:drop-shadow(0 7px 3px rgba(0,0,0,.45));
+      filter:drop-shadow(0 2px 2px rgba(0,0,0,.35));
     }
     .mode3d .cell.obstacle .bb{transform:translateZ(3px) rotateZ(calc(-1 * var(--yaw))) rotateX(calc(-1 * var(--tilt))) scale(1.3);}
     /* Robô: os PÉS ficam exatamente no ponto de rotação do "de pé" (78% da casa).
@@ -1541,6 +1553,34 @@
     /* grelhas grandes (casas pequenas): pastilha mais pequena e mais para fora,
        para não tapar o robô */
     .mode3d .grid.big .robot-dir,.mode3d .grid.huge .robot-dir{right:-16%;bottom:56%;font-size:.58rem;padding:0 1px;}
+    /* ── Robô a virar: o ângulo (--rot) passa a ser animável e o robô faz uma
+       pequena viragem de corpo (rotação em Y) quando recebe ESQ/DIR. ── */
+    @property --rot{syntax:'<angle>';inherits:true;initial-value:0deg;}
+    .robot-icon{transition:none;}  /* a rotação agora anima-se por --rot, não por transform */
+    @keyframes robotTurn{
+      0%{transform:perspective(520px) rotateY(var(--turn-from,70deg)) scale(.9,1.04);}
+      55%{transform:perspective(520px) rotateY(calc(var(--turn-from,70deg) * -.14)) scale(1.05,.97);}
+      100%{transform:perspective(520px) rotateY(0deg) scale(1,1);}
+    }
+    .mode3d .robot-turn .robot-icon-inner{animation:robotTurn .38s cubic-bezier(.3,.8,.35,1) both;transform-origin:50% 100%;}
+    /* ── Sombra de contacto no chão (só em 3D): elipse escura sob os pés ── */
+    .cshadow{display:none;}
+    .mode3d .cshadow{
+      display:block;position:absolute;left:50%;top:78%;width:58%;height:28%;
+      border-radius:50%;pointer-events:none;
+      background:radial-gradient(ellipse at center,rgba(0,0,0,.66) 0,rgba(0,0,0,.36) 46%,rgba(0,0,0,0) 74%);
+      transform:translate(-50%,-50%) translateZ(1px);
+    }
+    .mode3d .cell.item .cshadow{top:70%;width:46%;height:22%;}
+    .mode3d .cell.obstacle .cshadow{top:72%;width:68%;height:30%;}
+    .mode3d .robot-cell .cshadow{translate:var(--gx) var(--gy);}
+    .mode3d .robot-cell .bb{filter:none;}   /* o robô já tem sombra de contacto + brilho próprio */
+    @keyframes cshHop{0%,100%{transform:translate(-50%,-50%) translateZ(1px) scale(1);opacity:1;}
+      50%{transform:translate(-50%,-50%) translateZ(1px) scale(.55);opacity:.45;}}
+    .mode3d .robot-cell:has(.robot-pirouette) .cshadow{animation:cshHop 1.15s cubic-bezier(.3,.7,.4,1);}
+    @media (prefers-reduced-motion:reduce){
+      .mode3d .robot-turn .robot-icon-inner,.mode3d .robot-cell:has(.robot-pirouette) .cshadow{animation:none;}
+    }
     /* Botão 2D/3D */
     button.tag.tag-btn{cursor:pointer;font-family:'Fredoka One',cursive;}
     button.tag.tag-btn:hover{background:rgba(126,87,194,0.18);}
@@ -2389,6 +2429,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return {themesDone, themesTotal:themeKeys.length, starsEarned, starsTotal};
   }
 
+  // Medalha do certificado. Só se emite certificado a quem COMPLETOU tudo, por
+  // isso nunca diz "A Melhorar": com poucas estrelas mostra "Concluído".
+  // (Quem fez tudo com 1 estrela por nível fica nos ~33% — antes recebia
+  // "A Melhorar" num certificado de Guardião.)
+  function medalFor(pct){
+    return pct>=100?"🥇 Perfeito":pct>=80?"🥈 Excelente":pct>=60?"🥉 Bom":"✅ Concluído";
+  }
+
   // Estatísticas de UM ÚNICO tema (não do ciclo inteiro) — usadas pelo
   // certificado, que agora se emite por tema em vez de exigir o ciclo
   // completo. Mesma lógica de estrelas que cycleCertStats, mas só para
@@ -2435,7 +2483,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const lab=$("certStatLabel"); if(lab) lab.textContent=isCycle?"temas":"níveis";
     const cs=$("certStars"); if(cs) cs.textContent=`${starsEarned}/${starsTotal}`;
     const pct=starsTotal>0?Math.round(starsEarned/starsTotal*100):0;
-    const cm=$("certMedal"); if(cm) cm.textContent=pct===100?"🥇 Perfeito":pct>=80?"🥈 Excelente":pct>=60?"🥉 Bom":"📚 A Melhorar";
+    const cm=$("certMedal"); if(cm) cm.textContent=medalFor(pct);
     const cd=$("certDate"); if(cd){ const now=new Date(); cd.textContent=now.toLocaleDateString("pt-PT",{day:"numeric",month:"long",year:"numeric"}); }
     overlay.dataset.kind=isCycle?"ciclo":"tema";
     overlay.dataset.slug=(isCycle?"ciclo-"+ck:"tema-"+tk);
@@ -2567,6 +2615,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const allDone=done===total&&total>0;
       countEl.innerHTML=allDone?`✅ ${total} níveis — concluído!`:`📋 ${done} / ${total} níveis`;
       // 🎓 certificado do tema — sempre acessível quando o tema está completo
+      // medalha + estrelas do tema (só quando está completo): mostra ao aluno onde pode melhorar
+      let mEl=card.querySelector(".theme-medal");
+      if(allDone){
+        const ts=themeCertStats(ck,tk);
+        const mp=ts.starsTotal>0?Math.round(ts.starsEarned/ts.starsTotal*100):0;
+        if(!mEl){
+          mEl=document.createElement("div"); mEl.className="theme-medal";
+          countEl.insertAdjacentElement("afterend",mEl);
+        }
+        const hint=mp<100?"<small>Repete níveis para ganhar mais estrelas</small>":"";
+        const html=`⭐ ${ts.starsEarned}/${ts.starsTotal} · ${medalFor(mp)}${hint}`;
+        if(mEl.innerHTML!==html) mEl.innerHTML=html;
+      } else if(mEl){ mEl.remove(); }
       let tb=card.querySelector(".theme-cert-btn");
       if(allDone&&!tb){
         tb=document.createElement("button"); tb.type="button"; tb.className="btn small theme-cert-btn";
@@ -3035,6 +3096,28 @@ document.addEventListener("DOMContentLoaded", () => {
     if(idx>0) setTimeout(()=>showLevelBanner("🎯 Nível "+(idx+1)+" — "+currentTheme.name+" "+currentTheme.emoji),100);
     const g=$("grid"); if(g){ g.classList.remove("level-fade-in"); void g.offsetWidth; g.classList.add("level-fade-in"); }
     updateThemeProgressUI(); updateSideProgress();
+    scrollToBoard(idx===0);
+  }
+
+  // No telemóvel o tabuleiro fica a meio da página (depois do cabeçalho, botões e missão).
+  // Ao começar um nível rola-se (suavemente) até o tabuleiro ficar no topo do ecrã: assim o
+  // tabuleiro e o D-pad cabem juntos no ecrã. No 1.º nível do tema espera-se mais, para dar
+  // tempo de ler a missão; nos seguintes é quase imediato. Nunca "luta" com o aluno: se ele
+  // já rolou, se há um pop-up aberto ou se o tabuleiro já está à vista, não faz nada.
+  function scrollToBoard(first){
+    if(window.innerWidth>=1120) return;          // desktop: o jogo não rola a página
+    clearTimeout(scrollToBoard._t);
+    const y0=window.scrollY;
+    scrollToBoard._t=setTimeout(()=>{
+      const wrap=document.querySelector(".grid-wrapper");
+      if(!wrap||document.hidden||document.body.classList.contains("overlay-open")) return;
+      if(gameScreen&&gameScreen.classList.contains("hidden")) return;
+      if(Math.abs(window.scrollY-y0)>40) return;  // o aluno já está a rolar
+      const top=wrap.getBoundingClientRect().top;
+      if(top<150) return;                         // já está à vista
+      const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+      window.scrollTo({top:Math.max(0,window.scrollY+top-10),behavior:reduce?"auto":"smooth"});
+    }, first?2200:450);
   }
 
   renderGrid._uid=0;
@@ -3055,17 +3138,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const bb=document.createElement("div"); bb.className="bb";
       nodes.forEach(n=>bb.appendChild(n));
       cell.appendChild(bb);
+      // sombra de contacto no chão (só se vê em 3D) — fica FORA do "bb", deitada na casa
+      const sh=document.createElement("span"); sh.className="cshadow"; sh.setAttribute("aria-hidden","true");
+      cell.appendChild(sh);
     });
   }
 
   /* 3D: alternar 2D/3D, rodar, inclinar e seguir o robô (preferências guardadas) */
   (function board3dToggle(){
-    const KEY="ciber_board3d", KEYF="ciber_board3d_follow";
+    const KEY="ciber_board3d", KEYF="ciber_board3d_follow", KEYF2="ciber_board3d_follow_v2";
     const gw=document.querySelector(".grid-wrapper"), btn=document.getElementById("btn-3d");
     const g=document.getElementById("grid");
     if(!gw||!btn||!g) return;
-    let on=true, follow=false;
-    try{ on=localStorage.getItem(KEY)!=="0"; follow=localStorage.getItem(KEYF)==="1"; }catch(e){}
+    // follow: null = AUTOMÁTICO (no telemóvel, em grelhas 7×7 ou maiores a câmara aproxima-se
+    // e segue o robô sozinha); true/false = o aluno carregou em "Seguir" e a escolha dele manda.
+    let on=true, follow=null;
+    try{
+      on=localStorage.getItem(KEY)!=="0";
+      const v2=localStorage.getItem(KEYF2);
+      follow=v2==="1"?true:v2==="0"?false:(localStorage.getItem(KEYF)==="1"?true:null);
+    }catch(e){}
     const camL=document.getElementById("btn-cam-l"), camR=document.getElementById("btn-cam-r");
     const tiltB=document.getElementById("btn-tilt"), folB=document.getElementById("btn-follow");
     const rstB=document.getElementById("btn-cam-reset");
@@ -3073,6 +3165,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const DEF_TILT=window.matchMedia("(max-width:600px)").matches?40:50;
     let yaw=0, tilt=DEF_TILT, pos=null;
     const rad=d=>d*Math.PI/180;
+    const isPhone=()=>window.matchMedia("(max-width:600px)").matches;
+    const followOn=()=>follow===null?(isPhone()&&!!pos&&pos[2]>=7):follow;
+    // zoom da câmara: no telemóvel (7×7 ou maior) um zoom mais suave, para ainda se ver o caminho à frente
+    const zoomFor=n=>(isPhone()&&n>=7)?Math.min(1.7,Math.max(1.35,n/4.5)):Math.max(1.3,n/3.6);
+    let camShift=1;       // 1 = robô um pouco abaixo do centro (cabeça cabe); 0 = câmara encostada ao bordo do tabuleiro
     const D=1700;        // perspective do CSS
     const GAP=4;         // gap da grelha
     const PADV=14;       // folga vertical dentro da caixa (px)
@@ -3124,9 +3221,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const Hb=Math.round((b[3]-b[2])+2*PADV);
       // 3) com "Seguir": o robô vai para o centro (um pouco abaixo, para a cabeça caber)
       let T2=T;
-      if(follow&&pos){
-        const zf=Math.max(1.3,n/3.6), q=proj([0,cell*0.28,3],s*zf,0,0), k=D/(D-q[2]);
-        T2=(0.12*Hb)/k-q[1];
+      if(followOn()&&pos){
+        const zf=zoomFor(n), q=proj([0,cell*0.28,3],s*zf,0,0), k=D/(D-q[2]);
+        T2=(0.12*Hb*camShift)/k-q[1];
       }
       // posição da grelha no fluxo (a partir do topo da caixa) vs. onde queremos o centro
       const Cflow=gw.clientTop+g.offsetTop+Hg/2;
@@ -3148,11 +3245,23 @@ document.addEventListener("DOMContentLoaded", () => {
       layout();
     }
     function applyFollow(){
-      let fx=0,fy=0,z=1;
-      if(on&&follow&&pos){
+      let fx=0,fy=0,z=1; camShift=1;
+      const fo=on&&followOn()&&!!pos;
+      if(fo){
         const r=pos[0], c=pos[1], n=pos[2];
-        fx=-(c+0.5-n/2)/n*100; fy=-(r+0.5-n/2)/n*100; z=Math.max(1.3,n/3.6);
+        z=zoomFor(n);
+        // A câmara não passa dos bordos do tabuleiro (senão via-se só vazio). Só no lado do ecrã
+        // que fica "para cima" se deixa uma margem, porque é para lá que sai a cabeça do robô de pé.
+        const base=Math.max(0,0.5-1/(2*z)), m=0.9/n;
+        const gx=-Math.sin(rad(yaw)), gy=-Math.cos(rad(yaw));          // "para cima" no ecrã, no referencial da grelha
+        const lim=(o,gv)=>Math.max(-(base+m*Math.max(0,-gv)),Math.min(base+m*Math.max(0,gv),o));
+        const ox=(c+0.5)/n-0.5, oy=(r+0.5)/n-0.5;
+        const cx=lim(ox,gx), cy=lim(oy,gy);
+        fx=-cx*100; fy=-cy*100;
+        // perto de um bordo desliga o "robô um pouco abaixo do centro", para o bordo não fugir do ecrã
+        camShift=Math.max(0,Math.min(1,(base-Math.abs(cx*gx+cy*gy))/m));
       }
+      if(folB) folB.setAttribute("aria-pressed",fo?"true":"false");
       gw.style.setProperty("--fx",fx.toFixed(2)+"%");
       gw.style.setProperty("--fy",fy.toFixed(2)+"%");
       gw.style.setProperty("--zoom",z.toFixed(2));
@@ -3166,7 +3275,6 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.setAttribute("aria-pressed",on?"true":"false");
       btn.textContent=on?"🧊 3D":"🔲 2D";
       [camL,camR,tiltB,folB,rstB].forEach(b=>{ if(b) b.style.display=on?"":"none"; });
-      if(folB){ folB.setAttribute("aria-pressed",follow?"true":"false"); }
       applyFollow();
     }
     // Recentrar: rotação, inclinação e arrasto voltam ao padrão (o "Seguir" fica como estava)
@@ -3185,7 +3293,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(tiltB) tiltB.addEventListener("click",()=>{
       let i=PRESETS.findIndex(q=>Math.abs(q[0]-tilt)<8); i=(i+1)%PRESETS.length; setTilt(PRESETS[i][0]);
     });
-    if(folB) folB.addEventListener("click",()=>{ follow=!follow; try{ localStorage.setItem(KEYF,follow?"1":"0"); }catch(e){} apply(); });
+    if(folB) folB.addEventListener("click",()=>{ follow=!followOn(); try{ localStorage.setItem(KEYF2,follow?"1":"0"); }catch(e){} apply(); });
     if(rstB) rstB.addEventListener("click",recenter);
     gw.addEventListener("dblclick",()=>{ if(on) recenter(); });
 
@@ -3250,7 +3358,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let lastW=0;
     function refit(){
       const w=gw.clientWidth; if(!w||w===lastW) return;
-      lastW=w; gw.classList.add("notrans"); layout();
+      lastW=w; gw.classList.add("notrans"); applyFollow();
       requestAnimationFrame(()=>requestAnimationFrame(()=>gw.classList.remove("notrans")));
     }
     if(window.ResizeObserver) new ResizeObserver(refit).observe(gw);
@@ -3265,6 +3373,16 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCompass();
     const g=$("grid"); if(!g) return;
     const {robot,items,obstacles,deposit,size}=levelState;
+    // Ângulo acumulado do robô: vira pelo caminho mais curto (3→0 é +90°, não −270°)
+    // para a viragem poder ser ANIMADA em vez de saltar de um ângulo para o outro.
+    const _gp=renderGrid._prev;
+    let rotNow=dir*90, rotFrom=dir*90, turned=0;
+    if(_gp && _gp.ls===levelState && _gp.size===size && typeof _gp.acc==="number"){
+      turned=(((dir*90-_gp.acc)%360)+540)%360-180;      // −180…180 (0 = não virou)
+      rotFrom=_gp.acc; rotNow=_gp.acc+turned;
+      const k=Math.trunc(rotNow/360); rotNow-=k*360; rotFrom-=k*360;   // não deixa o ângulo crescer sem fim
+    }
+    const rotInit=turned?rotFrom:rotNow;
     const sizeClass=size>=9?"huge":size>=7?"big":"";
     g.className="grid"+(sizeClass?" "+sizeClass:"");
     g.style.gridTemplateColumns=`repeat(${size},1fr)`;
@@ -3348,7 +3466,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Portal as background, robot on top
             cell.classList.add("robot-cell");
             if(carriedItem) cell.classList.add("robot-carrying");
-            const angle=dir*90; cell.style.setProperty("--rot",angle+"deg");
+            cell.style.setProperty("--rot",rotInit+"deg");
             const carryBadge=carriedItem?`<span class="carry-badge" style="transform:rotate(calc(var(--rot) * -1));">${carriedItem}</span>`:"";
             cell.innerHTML=portalSvg+`<div class="robot-icon" style="transform:rotate(var(--rot));position:relative;z-index:2;"><span class="robot-icon-inner">${VB_ROBOT_CANVAS_HTML}</span>${carryBadge}</div><span class="robot-dir" style="position:relative;z-index:2;">${DIR_ARROWS[dir]}</span>`;
             const gcv=cell.querySelector(".grid-vb-robot"); if(gcv){ const gctx=gcv.getContext("2d"); if(gctx) drawVanBerto(gctx,false,-1,false); }
@@ -3372,7 +3490,7 @@ document.addEventListener("DOMContentLoaded", () => {
         else if(isRobot){
           cell.classList.add("robot-cell");
           if(carriedItem) cell.classList.add("robot-carrying");
-          const angle=dir*90; cell.style.setProperty("--rot",angle+"deg");
+          cell.style.setProperty("--rot",rotInit+"deg");
           const carryBadge=carriedItem?`<span class="carry-badge" style="transform:rotate(calc(var(--rot) * -1));">${carriedItem}</span>`:"";
           const itemBadge=(!carriedItem&&itemIdx>=0)?`<span class="item-under-robot">${itemEms[itemIdx%itemEms.length]}</span>`:"";
           cell.innerHTML=`<div class="robot-icon" style="transform:rotate(var(--rot));"><span class="robot-icon-inner">${VB_ROBOT_CANVAS_HTML}</span>${carryBadge}</div><span class="robot-dir">${DIR_ARROWS[dir]}</span>${itemBadge}`;
@@ -3412,7 +3530,22 @@ document.addEventListener("DOMContentLoaded", () => {
         rcell.style.setProperty("--gy","0px");
       }
     }
-    renderGrid._prev={ls:levelState,size,r:robot[0],c:robot[1]};
+    // Viragem animada: o ângulo vai do anterior para o novo (transição de --rot) e o robô
+    // faz um pequeno "swivel" em 3D. Corre depois do deslize para os dois se poderem combinar.
+    if(turned && g.offsetParent!==null){
+      const tc=g.children[robot[0]*size+robot[1]];
+      if(tc && tc.classList.contains("robot-cell")){
+        void tc.offsetWidth;                          // fixa o ângulo de partida
+        tc.style.setProperty("--rot",rotNow+"deg");
+        const ti=tc.querySelector(".robot-icon");
+        if(ti){
+          ti.style.setProperty("--turn-from",(-turned*0.85).toFixed(0)+"deg");
+          ti.classList.add("robot-turn");
+          ti.addEventListener("animationend",e=>{ if(e.animationName==="robotTurn") ti.classList.remove("robot-turn"); });
+        }
+      }
+    }
+    renderGrid._prev={ls:levelState,size,r:robot[0],c:robot[1],acc:rotNow};
     shouldDanceOnRender=false;
     const ht=$("hint-text");
     if(ht){
@@ -4260,6 +4393,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const lvls=levelsFor(currentCycleKey,currentTheme);
     const prog=loadProgress(currentCycleKey,currentThemeKey);
     if(!prog.levels) prog.levels={};
+    // O tema já estava completo ANTES deste nível? (se sim, é só uma repetição)
+    const themeWasDone=lvls.every((lv,i)=>getValidLevelData(prog,i,lv));
     const li=currentLevelIndex;
     if(!prog.levels[li]) prog.levels[li]={};
     prog.levels[li].completed=true;
@@ -4272,7 +4407,15 @@ document.addEventListener("DOMContentLoaded", () => {
       (moveCount<=currentMinMoves?3:moveCount<=currentMinMoves*1.5?2:1):1;
     // espera a pirueta da vitória antes de cobrir o tabuleiro com o pop-up
     const _lsDone=levelState;
-    setTimeout(()=>{ if(levelState===_lsDone) showPopup(stars, lvls[li]); },1350);
+    // Se este nível foi o que FECHOU o tema, mostra logo o pop-up "Tema concluído"
+    // com o botão do certificado (antes só aparecia o pop-up normal de nível e o
+    // certificado ficava escondido no cartão do tema).
+    const themeNowDone=lvls.every((lv,i)=>getValidLevelData(prog,i,lv));
+    const closesTheme=themeNowDone&&!themeWasDone;
+    setTimeout(()=>{
+      if(levelState!==_lsDone) return;
+      if(closesTheme) showAllCompletedPopup(); else showPopup(stars, lvls[li]);
+    },1350);
   }
 
   function showPopup(stars, levelBase){
@@ -4306,7 +4449,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if(facts.length){ pf.style.display="block"; pf.textContent="💡 "+facts[currentLevelIndex%facts.length]; }
     else pf.style.display="none";
     const qs=$("popup-quiz-section"); if(qs) qs.style.display="none";
-    const pnext=$("popup-next"); if(pnext) pnext.style.display="inline-flex";
+    const pnext=$("popup-next");
+    if(pnext){
+      pnext.style.display="inline-flex";
+      pnext.textContent=(currentLevelIndex+1<levelsFor(currentCycleKey,currentTheme).length)?"➡️ Próxima missão":"📋 Voltar aos temas";
+    }
     const certBtn=$("popup-cert-btn"); if(certBtn) certBtn.style.display="none";
     const cycBtn0=$("popup-cert-cycle-btn"); if(cycBtn0) cycBtn0.style.display="none";
     pop.classList.remove("hidden");
@@ -4362,7 +4509,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if(ptxt) ptxt.textContent=cycleDone
       ? (pName ? `Parabéns, ${pName}! Completaste "${themeName}" — e com ele, o ${GAME_DATA[currentCycleKey]?.name} inteiro! Tira o teu certificado! 🎓` : `Completaste "${themeName}" — e com ele, o ${GAME_DATA[currentCycleKey]?.name} inteiro! Tira o teu certificado! 🎓`)
       : (pName ? `Parabéns, ${pName}! Completaste "${themeName}"! Já podes tirar o teu certificado deste tema! 🎓` : `Completaste "${themeName}"! Já podes tirar o teu certificado deste tema! 🎓`);
-    [1,2,3].forEach(i=>{ const s=$("popup-star"+i); if(s){ s.classList.remove("lit"); setTimeout(()=>s.classList.add("lit"),i*200); } });
+    // Resultado real do tema (as mesmas estrelas e medalha que vão no certificado)
+    const ts=themeCertStats(currentCycleKey,currentThemeKey);
+    const tpct=ts.starsTotal>0?Math.round(ts.starsEarned/ts.starsTotal*100):0;
+    const tavg=ts.levelsTotal>0?Math.max(1,Math.min(3,Math.round(ts.starsEarned/ts.levelsTotal))):1;
+    if(ptxt) ptxt.textContent+=` ⭐ ${ts.starsEarned}/${ts.starsTotal} estrelas · ${medalFor(tpct)}`;
+    [1,2,3].forEach(i=>{ const s=$("popup-star"+i); if(s){ s.classList.remove("lit"); if(i<=tavg) setTimeout(()=>s.classList.add("lit"),i*200); } });
+    const pnx=$("popup-next"); if(pnx){ pnx.style.display="inline-flex"; pnx.textContent="📋 Voltar aos temas"; }
     const pf=$("popup-fact"); if(pf) pf.style.display="none";
     const certBtn=$("popup-cert-btn");
     if(certBtn){
@@ -6350,6 +6503,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
       return scaleRoot.appendChild(child);
     };
+  }
+
+  /* ── Pop-ups ancorados ao ecrã visível (só telemóvel) ──
+     Em modo telemóvel o #scale-root tem transform:scale(1), o que faz com que os
+     .popup "fixed" fiquem relativos à PÁGINA INTEIRA (mais alta que o ecrã) e não ao
+     ecrã. Quem tinha rolado até ao tabuleiro via o pop-up cortado em cima, e o botão do
+     certificado podia ficar fora do ecrã. Aqui cada pop-up aberto passa a ocupar
+     exatamente a janela visível, acompanhando o scroll. */
+  function pinPopups() {
+    if (!scaleRoot) return;
+    var mobile = window.innerWidth < DESIGN_W;
+    var off = Math.round(-scaleRoot.getBoundingClientRect().top);
+    var h = window.innerHeight + 'px';
+    document.querySelectorAll('.popup').forEach(function (p) {
+      if (p.classList.contains('hidden')) return;
+      var t = mobile ? off + 'px' : '';
+      var hh = mobile ? h : '';
+      if (p.style.top !== t) p.style.top = t;
+      if (p.style.height !== hh) p.style.height = hh;
+      var bt = mobile ? 'auto' : '';
+      if (p.style.bottom !== bt) p.style.bottom = bt;
+    });
+  }
+  window.addEventListener('scroll', pinPopups, { passive: true });
+  window.addEventListener('resize', pinPopups);
+  if (scaleRoot && window.MutationObserver) {
+    new MutationObserver(pinPopups).observe(scaleRoot, { subtree: true, attributes: true, attributeFilter: ['class'], childList: true });
   }
 
   /* ── Inicialização e listeners ───────────────────── */
