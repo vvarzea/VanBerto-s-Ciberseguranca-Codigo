@@ -966,6 +966,12 @@
       .certificate-brand{font-size:20px;margin-top:6px;}
     }
     @media print{
+      /* Imprimir só o certificado: o #scale-root tem largura fixa e um transform (translateX+scale)
+         definidos pelo JS para o ecrã, o que deixava o certificado deslocado em relação à folha.
+         Aqui anula-se isso e escondem-se (display:none, sem páginas em branco) os restantes ecrãs. */
+      html,body{height:auto!important;overflow:visible!important;background:#fff!important;}
+      #scale-root{transform:none!important;width:100%!important;height:auto!important;overflow:visible!important;}
+      #scale-root>*:not(#certificateOverlay){display:none!important;}
       body *{visibility:hidden!important;}
       #certificateOverlay,#certificateOverlay *{visibility:visible!important;}
       #certificateOverlay{position:absolute!important;inset:auto!important;top:0!important;left:0!important;width:100%!important;height:auto!important;display:block!important;padding:0!important;margin:0!important;background:#fff!important;animation:none!important;}
@@ -4162,7 +4168,7 @@ document.addEventListener("DOMContentLoaded", () => {
         _overlayObserver.observe(popup, { attributes: true, attributeFilter: ['class', 'style'] });
       }
     }
-    popup.style.display="flex"; popup.style.opacity="1"; popup.style.pointerEvents="auto"; updateOverlayOpenClass();
+    popup.style.display="flex"; popup.style.opacity="1"; popup.style.pointerEvents="auto"; updateOverlayOpenClass(); if(window._pinPopups) window._pinPopups();
     inner.innerHTML=`
       <div style="font-size:2.2rem;text-align:center;margin-bottom:8px;animation:popIn .3s cubic-bezier(.34,1.56,.64,1);">🌀✨</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -4313,7 +4319,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       popup.addEventListener("click",(e)=>{ if(e.target===popup) closeCodeSniff(); });
     }
-    popup.style.display="flex"; popup.style.opacity="1"; popup.style.pointerEvents="auto"; updateOverlayOpenClass();
+    popup.style.display="flex"; popup.style.opacity="1"; popup.style.pointerEvents="auto"; updateOverlayOpenClass(); if(window._pinPopups) window._pinPopups();
     popup.setAttribute("aria-label",isPseudo?"Desafio de Pseudocódigo":"Desafio de Código");
     if(!list.length){
       inner.innerHTML=`<div style="text-align:center;">
@@ -4547,7 +4553,7 @@ document.addEventListener("DOMContentLoaded", () => {
       overlay.style.cssText="position:fixed;inset:0;pointer-events:none;z-index:9998;overflow:hidden;";
       document.body.appendChild(overlay);
     }
-    overlay.innerHTML="";
+    overlay.innerHTML=""; if(window._pinPopups) window._pinPopups();
     const emojis=["⭐","🌟","✨","🎉","🎊","🏆","🎈","💛","🩷","🌈"];
     for(let i=0;i<50;i++){
       const el=document.createElement("div");
@@ -5182,13 +5188,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function resetQueue(){ runningQueue=false; queuedCommands=[]; renderQueue(); }
 
   function doConfirm(msg,cb){
-    const box=document.createElement("div");
+    const box=document.createElement("div"); box.id="vb-confirm-box";
     box.style.cssText="position:fixed;inset:0;background:rgba(45,27,105,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;";
     box.innerHTML=`<div style="background:linear-gradient(155deg,#fff,#FFF8E1);padding:20px 24px;border-radius:20px;text-align:center;max-width:320px;border:3px solid #FF8C00;box-shadow:0 10px 30px rgba(45,27,105,0.25);font-family:'Fredoka One',cursive;color:#2D1B69;">
       <p style="font-size:.9rem;margin-bottom:14px;">${msg}</p>
       <button id="conf-y" style="padding:6px 18px;border:none;background:linear-gradient(180deg,#FF6B9D,#E91E8C);border-radius:999px;cursor:pointer;margin-right:8px;font-weight:400;font-family:'Fredoka One',cursive;color:#fff;font-size:.85rem;">Sim!</button>
       <button id="conf-n" style="padding:6px 18px;border:2px solid #FF8C00;background:transparent;border-radius:999px;cursor:pointer;font-weight:400;font-family:'Fredoka One',cursive;color:#7A4500;font-size:.85rem;">Não</button></div>`;
-    document.body.appendChild(box);
+    document.body.appendChild(box); if(window._pinPopups) window._pinPopups();
     box.querySelector("#conf-n").onclick=()=>box.remove();
     box.querySelector("#conf-y").onclick=()=>{ box.remove(); if(typeof cb==="function")cb(); };
   }
@@ -5464,7 +5470,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function showLevelBanner(msg){
     let b=document.getElementById("level-banner");
     if(!b){ b=document.createElement("div"); b.id="level-banner"; b.className="level-banner"; document.body.appendChild(b); }
-    b.textContent=msg; b.style.display="block";
+    b.textContent=msg; b.style.display="block"; if(window._pinPopups) window._pinPopups();
     b.style.animation="none"; void b.offsetWidth; b.style.animation="bannerIn .3s ease";
     setTimeout(()=>{ b.style.animation="bannerOut .3s ease forwards"; setTimeout(()=>{b.style.display="none";},300); }, 2200);
   }
@@ -6514,16 +6520,28 @@ document.addEventListener("DOMContentLoaded", () => {
     var mobile = window.innerWidth < DESIGN_W;
     var off = Math.round(-scaleRoot.getBoundingClientRect().top);
     var h = window.innerHeight + 'px';
-    document.querySelectorAll('.popup').forEach(function (p) {
-      if (p.classList.contains('hidden')) return;
-      var t = mobile ? off + 'px' : '';
-      var hh = mobile ? h : '';
-      if (p.style.top !== t) p.style.top = t;
-      if (p.style.height !== hh) p.style.height = hh;
-      var bt = mobile ? 'auto' : '';
-      if (p.style.bottom !== bt) p.style.bottom = bt;
+    document.querySelectorAll('.popup,#tutorial-overlay,#teacher-pause-overlay,#popup-door-quiz,#popup-codesniff,#name-overlay,#big-celebrate-overlay,#vb-confirm-box').forEach(function (p) {
+      if (p.classList.contains('hidden') || p.style.display === 'none') return;
+      if (mobile) {
+        // guarda os valores inline originais (os overlays criados em JS têm "inset:0" escrito inline)
+        if (p.getAttribute('data-pin') === null) {
+          p.setAttribute('data-pin', [p.style.top, p.style.height, p.style.bottom].join('|'));
+        }
+        if (p.style.top !== off + 'px') p.style.top = off + 'px';
+        if (p.style.height !== h) p.style.height = h;
+        if (p.style.bottom !== 'auto') p.style.bottom = 'auto';
+      } else if (p.getAttribute('data-pin') !== null) {
+        // saiu do modo telemóvel: repõe exatamente o que lá estava antes
+        var o = p.getAttribute('data-pin').split('|');
+        p.style.top = o[0]; p.style.height = o[1]; p.style.bottom = o[2];
+        p.removeAttribute('data-pin');
+      }
     });
+    // aviso de nível (fixed, topo): acompanha o topo do ecrã visível em vez do topo da página
+    var bn = document.getElementById('level-banner');
+    if (bn) { var bt2 = mobile ? off + 'px' : ''; if (bn.style.top !== bt2) bn.style.top = bt2; }
   }
+  window._pinPopups = pinPopups;
   window.addEventListener('scroll', pinPopups, { passive: true });
   window.addEventListener('resize', pinPopups);
   if (scaleRoot && window.MutationObserver) {
