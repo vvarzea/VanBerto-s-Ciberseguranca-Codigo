@@ -3170,7 +3170,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let yaw=0, tilt=DEF_TILT, pos=null;
     const rad=d=>d*Math.PI/180;
     const isPhone=()=>window.matchMedia("(max-width:600px)").matches;
-    const followOn=()=>follow===null?(isPhone()&&!!pos&&pos[2]>=7):follow;
+    // O zoom que segue o robô é SÓ por escolha do aluno (botão "Seguir"): por defeito o tabuleiro
+    // inteiro ajusta-se ao espaço do ecrã, sem ficar cortado.
+    const followOn=()=>follow===true;
     // zoom da câmara: no telemóvel (7×7 ou maior) um zoom mais suave, para ainda se ver o caminho à frente
     const zoomFor=n=>(isPhone()&&n>=7)?Math.min(1.7,Math.max(1.35,n/4.5)):Math.max(1.3,n/3.6);
     let camShift=1;       // 1 = robô um pouco abaixo do centro (cabeça cabe); 0 = câmara encostada ao bordo do tabuleiro
