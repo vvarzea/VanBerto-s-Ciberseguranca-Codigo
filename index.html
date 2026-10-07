@@ -941,7 +941,7 @@
     .certificate-date{font-size:11px;color:#ff9060;font-style:italic;margin:8px 0 2px;font-family:'Baloo 2',sans-serif;}
     .certificate-signature{margin:14px auto 4px;max-width:260px;text-align:center;}
     .cert-sig-line{height:2px;background:linear-gradient(90deg,transparent,#ffd700,transparent);margin-bottom:6px;}
-    .cert-sig-name{font-family:'Baloo 2',sans-serif;font-size:13px;font-weight:800;color:#ffd700;margin:0 0 2px;font-style:italic;}
+    .cert-sig-name{font-family:'Baloo 2',sans-serif;font-size:15px;font-weight:800;color:#ffd700;margin:0 0 2px;font-style:italic;}
     .cert-sig-role{font-size:10px;color:#ff9060;text-transform:uppercase;letter-spacing:.5px;margin:0;}
     .certificate-robot{height:auto;flex-direction:column;}
     .certificate-brand{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;color:#ffd700;letter-spacing:.5px;margin-top:2px;}
@@ -2017,8 +2017,7 @@
     <p class="certificate-date" id="certDate"></p>
     <div class="certificate-signature">
       <div class="cert-sig-line"></div>
-      <p class="cert-sig-name">Professora Vanda Várzea</p>
-      <p class="cert-sig-role">Professora de Tecnologias de Informação e Comunicação</p>
+      <p class="cert-sig-name">Prof.ª Vanda Várzea</p>
     </div>
     <div class="popup-btns" style="margin-top:14px;">
       <button class="btn secondary small" id="btnCertBack">← Voltar</button>
@@ -2532,8 +2531,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     g.fillStyle="#888"; g.font=`italic 600 26px ${F}`; g.fillText(txt("certDate"),cx,860);
     g.strokeStyle=GOLD; g.lineWidth=3; g.beginPath(); g.moveTo(cx-190,945); g.lineTo(cx+190,945); g.stroke();
-    g.fillStyle=GOLD; g.font=`italic 800 30px ${F}`; g.fillText("Professora Vanda Várzea",cx,985);
-    g.fillStyle="#777"; fit("Professora de Tecnologias de Informação e Comunicação",mw,20,"600",FB); g.fillText("Professora de Tecnologias de Informação e Comunicação",cx,1018);
+    g.fillStyle=GOLD; g.font=`italic 800 34px ${F}`; g.fillText("Prof.ª Vanda Várzea",cx,992);
     return cv;
   }
   function certSafeName(){
