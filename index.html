@@ -2,7 +2,8 @@
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8"/>
-  <title>Cibersegurança — Programação!</title>
+  <meta name="theme-color" content="#fff8e7"/>
+  <title>VanBerto's — Cibersegurança · Programação!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     /* Tipos de letra embutidos (funciona offline; subconjunto latino). Fredoka One → Fredoka 600 */
@@ -1591,7 +1592,344 @@
     button.tag.tag-btn{cursor:pointer;font-family:'Fredoka One',cursive;}
     button.tag.tag-btn:hover{background:rgba(126,87,194,0.18);}
     button.tag.tag-btn[aria-pressed="true"]{background:rgba(236,30,121,.14);border-color:rgba(236,30,121,.55);}
-  </style>
+  
+/* ═══════════════════════════════════════════════════════════════════
+   TEMA "Hora do Código" — igual ao da Central de Missões
+   creme com pontinhos, contornos escuros e sombras de botão
+   (bloco final: sobrepõe-se ao estilo escuro anterior;
+    os tipos de letra continuam os que já vêm dentro do ficheiro)
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#1e1b4b;--sun:#ffd23f;--coral:#ff6b6b;--mint:#2ee6a6;--sky:#4cc9f0;--grape:#7c3aed;--cream:#fff8e7;--soft:#4a4872;
+  --ok:#0f7a4f;--ok-bg:#d9fbec;--ok-border:#12a36f;
+  --err:#b42318;--err-bg:#ffe3e3;--err-border:#e0443e;
+  --warn:#7a5200;--warn-bg:#fff3b0;--warn-border:#c28a00;
+  --bg-dark:#fff8e7;--bg-dark2:#fff8e7;
+}
+body,body.dark{
+  --ink:#1e1b4b;--ink2:#4a4872;
+  --surface:#fff8e7;--surface2:#ffffff;--surface-border:#1e1b4b;
+  --surface-text:#1e1b4b;--surface-text2:#4a4872;
+  --card-bg:#ffffff;--card-border:#1e1b4b;--card-shadow:#1e1b4b;
+  --sidebar-bg:#ffffff;--sidebar-text:#1e1b4b;--sidebar-btn:#ffffff;--sidebar-btn-border:#1e1b4b;
+  --grid-bg:#fff8e7;--grid-border:#1e1b4b;
+  --cell-bg:#ffffff;--cell-border:rgba(30,27,75,.35);
+  --cmd-bg:#ffffff;--cmd-border:#1e1b4b;--cmd-text:#1e1b4b;--cmd-shadow:#1e1b4b;
+  --queue-bg:#fff8e7;--queue-border:#1e1b4b;--queue-cmd-bg:#ffffff;--queue-cmd-text:#1e1b4b;
+  --feedback-info-bg:#ffffff;--feedback-info-border:#1e1b4b;--feedback-info-text:#1e1b4b;
+  --popup-overlay:rgba(255,248,231,.92);--popup-bg:#ffffff;--popup-text:#1e1b4b;--popup-subtext:#4a4872;
+  --popup-fact-bg:#fff8e7;--popup-fact-border:#1e1b4b;
+  --muted:#4a4872;
+  background-color:var(--cream)!important;
+  background-image:radial-gradient(rgba(255,150,60,.30) 1.4px,transparent 1.6px)!important;
+  background-size:22px 22px!important;background-attachment:fixed;
+  color:var(--ink);animation:none!important;
+}
+html{background:var(--cream);}
+body::before{display:none;}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+
+/* ── cabeçalho ── */
+header{background:#fff;border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);}
+header::before,header::after{display:none;}
+header h1{background:none;-webkit-background-clip:border-box;background-clip:border-box;-webkit-text-fill-color:var(--ink);color:var(--ink);animation:none;filter:none;}
+header p{color:var(--soft);}
+.header-player{color:var(--grape);text-shadow:none;}
+
+/* ── botões ── */
+.btn{background:var(--sun);color:var(--ink);border:3px solid var(--ink);border-radius:12px;box-shadow:0 4px 0 var(--ink);text-shadow:none;transition:transform .08s,box-shadow .08s,background .12s;}
+.btn:hover{background:#ffdc66;color:var(--ink);transform:translateY(-2px);box-shadow:0 6px 0 var(--ink);border-color:var(--ink);}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink);}
+.btn.secondary{background:#fff;color:var(--ink);border-color:var(--ink);box-shadow:0 4px 0 var(--ink);}
+.btn.secondary:hover{background:#fffbea;color:var(--ink);border-color:var(--ink);box-shadow:0 6px 0 var(--ink);}
+.btn.primary{background:var(--mint);color:var(--ink);border-color:var(--ink);}
+.btn:focus-visible,.cycle-card:focus-visible,.theme-card:focus-visible,.dpad-btn:focus-visible,.tag-btn:focus-visible{outline:3px solid var(--grape);outline-offset:3px;}
+#btn-teacher-pause{background:var(--sky)!important;border-color:var(--ink)!important;color:var(--ink)!important;box-shadow:0 4px 0 var(--ink)!important;}
+button#btn-teacher-pause.paused{background:var(--mint)!important;border-color:var(--ink)!important;box-shadow:0 4px 0 var(--ink)!important;}
+
+/* ── ecrãs e menu ── */
+.screen{background:#fff;border:3px solid var(--ink);outline:none;box-shadow:0 6px 0 var(--ink);}
+.hero{background:var(--cream);border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);}
+.hero-text h2{color:var(--ink);text-shadow:none;}
+.hero-text p,.hero-desc{color:var(--soft);}
+.hero-desc{border-top:2px dotted rgba(30,27,75,.3);}
+.hero-vb-bubble{background:#fff;border:3px solid var(--ink);outline:none;box-shadow:0 3px 0 var(--ink);color:var(--ink);}
+.hero-vb-bubble::after{border-top-color:var(--ink);}
+.hero-vb-bubble::before{border-top-color:#fff;}
+.hero-name-row,.hero-welcome{background:var(--cream)!important;border:3px solid var(--ink)!important;box-shadow:0 4px 0 var(--ink);}
+.hero-name-label,.hero-welcome-text{color:var(--ink);text-shadow:none;}
+.hero-welcome-text strong{color:var(--grape);}
+.hero-name-input{background:#fff;border:3px solid var(--ink);color:var(--ink);box-shadow:0 3px 0 var(--ink);}
+.hero-name-input:focus{border-color:var(--ink);outline:3px solid var(--grape);outline-offset:2px;box-shadow:0 3px 0 var(--ink);}
+.hero-name-input::placeholder{color:var(--soft);opacity:.6;}
+.hero-name-btn{background:var(--sun);color:var(--ink);border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);}
+.hero-change-btn{background:#fff;border:2.5px solid var(--ink);color:var(--ink);}
+.hero-change-btn:hover{background:#fffbea;}
+.menu-header h2{color:var(--ink);}
+.menu-header p{color:var(--soft);}
+.pill{background:#fff;border:2px solid var(--ink);color:var(--ink);}
+.breadcrumbs,.small-text{color:var(--soft);font-style:normal;font-weight:700;}
+#app-footer{color:var(--ink);border-top:none;opacity:1;}
+#app-footer{font-weight:700;}
+
+/* ── ciclos e temas ── */
+.cycle-card{box-shadow:0 5px 0 var(--ink)!important;border:3px solid var(--ink)!important;}
+.cycle-card.cycle-card--1c{background:#d9fbec;}
+.cycle-card.cycle-card--2c{background:#d9f3fd;}
+.cycle-card.cycle-card--3c{background:#ffe9c9;}
+.cycle-card.cycle-card--4c{background:#ffe3e3;}
+.cycle-card::after{display:none;}
+.cycle-card:hover{transform:translateY(-4px)!important;box-shadow:0 9px 0 var(--ink)!important;}
+.cycle-card .cycle-title{color:var(--ink)!important;text-shadow:none!important;}
+.cycle-card .cycle-sub{color:var(--soft)!important;font-style:normal;font-weight:700;}
+.cycle-card .chip{background:#fff!important;border:2px solid var(--ink)!important;color:var(--ink)!important;box-shadow:0 2px 0 var(--ink);}
+.cycle-card .side-prog{color:var(--soft)!important;font-weight:700;}
+.theme-card{background:#fff;border:3px solid var(--ink)!important;box-shadow:0 5px 0 var(--ink)!important;}
+.theme-card--1c{background:#d9fbec;}
+.theme-card--2c{background:#d9f3fd;}
+.theme-card--3c{background:#ffe9c9;}
+.theme-card--4c{background:#ffe3e3;}
+.theme-card:hover{box-shadow:0 8px 0 var(--ink)!important;}
+.theme-title{color:var(--ink);}
+.theme-sub{color:var(--soft);font-style:normal;font-weight:700;}
+.theme-progress{background:#fff;border:2px solid var(--ink);height:11px;border-radius:999px;}
+.theme-progress-bar{background:linear-gradient(90deg,var(--mint),var(--sky));animation:none;border-radius:999px;}
+
+/* ── nível e tabuleiro ── */
+.level-info{background:#fff;border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);}
+.level-title{color:var(--ink);}
+.level-desc{color:var(--soft);}
+.tag{background:#fff;border:2px solid var(--ink);color:var(--ink);box-shadow:0 2px 0 var(--ink);}
+button.tag.tag-btn:hover{background:#fffbea;}
+button.tag.tag-btn[aria-pressed="true"]{background:var(--sun);border-color:var(--ink);}
+.grid-wrapper{background:var(--cream);border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);}
+.grid .cell{background:#fff;border:2px solid rgba(30,27,75,.35);}
+.grid .cell.obstacle{background:repeating-linear-gradient(45deg,#ffb3b3,#ffb3b3 5px,#ffd9d9 5px,#ffd9d9 10px)!important;border-color:var(--ink)!important;box-shadow:none!important;}
+.grid .cell.deposit{background:#b8f5d9!important;border-color:var(--ink)!important;box-shadow:none!important;}
+.grid .cell.item{background:#fff3b0!important;border-color:var(--ink)!important;box-shadow:none!important;}
+.grid .cell.robot-cell{background:#d9f3fd;border-color:var(--ink);}
+.grid .cell.robot-carrying{background:linear-gradient(135deg,#b8f5d9,#fff3b0)!important;border-color:var(--ink)!important;box-shadow:none!important;}
+.grid .cell.door-cell{background:#d9f3fd!important;border-color:var(--ink)!important;box-shadow:none!important;}
+.grid .cell.door-cell.door-locked{background:#ffe3e3!important;border-color:var(--ink)!important;}
+.grid .cell.door-cell.door-open{background:#d9fbec!important;border-color:var(--ink)!important;}
+.grid .cell.collect-flash{border-color:var(--ink)!important;}
+.grid .cell.hint-highlight{border-color:var(--grape)!important;box-shadow:0 0 0 3px var(--grape)!important;}
+.grid .cell.robot-cell.hint-highlight{border-color:var(--grape)!important;box-shadow:0 0 0 3px var(--grape)!important;}
+.robot-icon{filter:drop-shadow(0 3px 0 rgba(30,27,75,.35));}
+.robot-dir{background:#fff;border:2px solid var(--ink);color:var(--ink);filter:none;}
+.carry-badge{background:#fff;border:2px solid var(--ink);filter:none;}
+.item-fly{filter:drop-shadow(0 3px 0 rgba(30,27,75,.35));}
+.mode3d .grid::before{background:linear-gradient(160deg,#8f84e8,#4a3fb0);border:3px solid var(--ink);box-shadow:0 22px 28px rgba(30,27,75,.30);}
+.mode3d .cell::before{background:#8f84e8;box-shadow:0 0 0 1px rgba(30,27,75,.35);}
+.mode3d .cell.item::before{background:#d9a300;}
+.mode3d .cell.deposit::before,.mode3d .cell.door-cell::before{background:#12a36f;}
+.mode3d .cell.obstacle::before{background:#c43a3a;}
+.mode3d .cshadow{background:radial-gradient(ellipse at center,rgba(30,27,75,.45) 0,rgba(30,27,75,.22) 46%,rgba(30,27,75,0) 74%);}
+
+/* ── comandos ── */
+.dpad-wrap{background:var(--cream);border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);}
+.dpad-wrap::before{color:var(--ink)!important;}
+.dpad-btn{background:#fff!important;border:3px solid var(--ink)!important;box-shadow:0 5px 0 var(--ink)!important;color:var(--ink);}
+.dpad-btn:hover{filter:none;background:#fff3b0!important;box-shadow:0 7px 0 var(--ink)!important;}
+.dpad-btn:active,.dpad-btn.cmd-btn-active{box-shadow:0 1px 0 var(--ink)!important;filter:none;}
+.dpad-arrow{filter:none;color:var(--ink);}
+.dpad-label{color:var(--ink);text-shadow:none;}
+.dpad-action-btn,.action-btn{background:var(--mint)!important;border:3px solid var(--ink)!important;box-shadow:0 5px 0 var(--ink)!important;color:var(--ink);}
+.dpad-action-btn:hover,.action-btn:hover{box-shadow:0 7px 0 var(--ink)!important;}
+.dpad-action-btn:active,.dpad-action-btn.cmd-btn-active,.action-btn:active{box-shadow:0 1px 0 var(--ink)!important;filter:none;}
+.dpad-action-btn .btn-label,.action-btn .btn-label{color:var(--ink);text-shadow:none;}
+.dpad-compass{background:#fff;border:3px solid var(--ink);box-shadow:0 2px 0 var(--ink);}
+.dpad-compass::before{border-color:rgba(30,27,75,.3);}
+.compass-needle{fill:var(--coral);}
+.compass-needle polygon{fill:var(--coral);stroke:var(--ink);stroke-width:1;}
+.compass-needle polygon.tail{fill:#fff;}
+.queue-box{background:var(--cream);border:3px solid var(--ink);box-shadow:0 3px 0 var(--ink);}
+.queue-label,.queue-blocks-hint{color:var(--ink);}
+.queue-cmd{background:#fff;border:2px solid var(--ink);color:var(--ink);box-shadow:0 2px 0 var(--ink);}
+.queue-repeat{background:#d9f3fd!important;border-color:var(--ink)!important;color:var(--ink)!important;}
+.queue-blocks-toolbar{border-top:2px dashed rgba(30,27,75,.3);}
+.queue-group-active{background:#d9f3fd;border:2px dashed var(--ink);}
+#queue-box.demo-playing{border-color:var(--ink);box-shadow:0 0 0 3px var(--sun),0 3px 0 var(--ink);}
+#queue-box.demo-playing .queue-label{color:var(--grape);}
+.queue-cmd.demo-active{box-shadow:0 0 0 3px var(--sun),0 2px 0 var(--ink);}
+.write-help summary{color:var(--ink);font-weight:700;}
+.write-help div{color:var(--soft);}
+.write-help code{background:#d9f3fd;color:var(--ink);}
+.write-msg.err{color:var(--err);}
+.write-msg.ok{color:var(--ok);}
+.kbd-hint{background:var(--cream);border:2px dashed rgba(30,27,75,.3);color:var(--soft);font-style:normal;font-weight:700;}
+.swipe-hint{color:var(--soft);}
+#hint-text{color:var(--soft)!important;font-weight:700;}
+.feedback-box{border-width:3px;font-weight:700;box-shadow:0 3px 0 var(--ink);border-color:var(--ink);}
+.feedback-ok{border-color:var(--ink);}
+.feedback-err{border-color:var(--ink);}
+.feedback-warn{border-color:var(--ink);}
+
+/* ── barra lateral ── */
+.sidebar{background:#fff;border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);}
+.side-title{color:var(--ink);border-bottom:2px dotted rgba(30,27,75,.3);}
+.side-btn{background:#fff;border:2px solid var(--ink);color:var(--ink);box-shadow:0 2px 0 var(--ink);}
+.side-btn:hover,.side-btn.active{background:#fff3b0;border-color:var(--ink);color:var(--ink);}
+.side-prog{color:var(--soft);}
+.side-player{border-bottom:2px dotted rgba(30,27,75,.3);}
+.side-player-name{color:var(--ink);text-shadow:none;}
+.side-player-label{color:var(--soft);}
+
+/* ── janelas ── */
+.popup{backdrop-filter:none;}
+.popup-inner{background:#fff;border:4px solid var(--ink);box-shadow:0 7px 0 var(--ink);color:var(--ink);}
+.popup-inner h3{color:var(--ink);}
+.popup-inner p{font-style:normal;font-weight:700;}
+.popup-fact{background:var(--cream);border:2px dashed rgba(30,27,75,.45);color:var(--ink);font-style:normal;font-weight:700;}
+.level-banner{background:var(--sun);animation:bannerIn .3s ease;color:var(--ink);border-bottom:4px solid var(--ink);box-shadow:0 5px 0 var(--ink);}
+.quiz-q{color:var(--ink);}
+.quiz-opt{background:#fff;border:3px solid var(--ink);color:var(--ink);box-shadow:0 3px 0 var(--ink);}
+.quiz-opt:hover:not(:disabled){background:#fff3b0;border-color:var(--ink);}
+.quiz-opt-correct{background:#b8f5d9!important;border-color:var(--ink)!important;color:var(--ink)!important;}
+.quiz-opt-wrong{background:#ffb3b3!important;border-color:var(--ink)!important;color:var(--ink)!important;}
+.quiz-ok{color:var(--ok);}
+.quiz-err{color:var(--err);}
+#name-overlay{background:rgba(255,248,231,.92);}
+.name-card{background:#fff;border:4px solid var(--ink);outline:none;box-shadow:0 7px 0 var(--ink);}
+.name-card h2{color:var(--ink);}
+.name-card p{color:var(--soft);font-style:normal;font-weight:700;}
+.name-input{background:#fff;border:3px solid var(--ink);color:var(--ink);box-shadow:0 3px 0 var(--ink);}
+.name-input::placeholder{color:var(--soft);opacity:.6;}
+.name-input:focus{border-color:var(--ink);box-shadow:0 3px 0 var(--ink);outline:3px solid var(--grape);}
+.name-btn{background:var(--sun);color:var(--ink);border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);}
+#landscape-warning{background:var(--cream);color:var(--ink);}
+#landscape-warning p{color:var(--soft);}
+#teacher-pause-overlay{background:rgba(255,248,231,.94)!important;backdrop-filter:none!important;}
+#teacher-pause-overlay .tp-box{background:#fff!important;border:4px solid var(--ink)!important;box-shadow:0 7px 0 var(--ink)!important;color:var(--ink)!important;}
+#teacher-pause-overlay p{color:var(--soft)!important;font-weight:700;}
+
+/* ── tutorial ── */
+#tutorial-overlay{background:rgba(255,248,231,.94);backdrop-filter:none;}
+.tutorial-card{background:#fff;border:4px solid var(--ink);outline:none;box-shadow:0 7px 0 var(--ink);}
+.tutorial-title{color:var(--ink);text-shadow:none;}
+.tutorial-bubble{background:var(--cream);border:2.5px solid var(--ink);color:var(--ink);font-weight:700;}
+.tutorial-visual{background:var(--cream);border:2.5px solid var(--ink);}
+.tutorial-dot{background:#fff;border:2px solid var(--ink);}
+.tutorial-dot.active{background:var(--sun);}
+.demo-cell{background:#fff;border:2px solid var(--ink);}
+.tut-btn{background:#fff;border:3px solid var(--ink);color:var(--ink);box-shadow:0 4px 0 var(--ink);}
+.tut-btn.tut-action{background:var(--mint);}
+.tut-btn.tut-neutral{background:#fff3b0;}
+.tut-next{background:var(--sun)!important;border:3px solid var(--ink)!important;color:var(--ink)!important;box-shadow:0 4px 0 var(--ink)!important;}
+.tut-next:hover{box-shadow:0 6px 0 var(--ink)!important;}
+.tut-next:active{box-shadow:0 1px 0 var(--ink)!important;}
+.tut-skip{color:var(--soft);font-weight:700;}
+.tutorial-step div[style*="color:#ec1e79"]{color:var(--grape)!important;}
+
+/* ── certificado no ecrã ── */
+.certificate-card{background:var(--cream)!important;border:4px solid var(--ink)!important;box-shadow:0 7px 0 var(--ink)!important;}
+.certificate-card>.popup-btns{background:linear-gradient(to top,#fff8e7 0,#fff8e7 78%,rgba(255,248,231,0) 100%);}
+.certificate-header{border-bottom:3px dotted rgba(30,27,75,.3);}
+.certificate-seal{filter:none;}
+.certificate-title{color:var(--ink)!important;text-shadow:none!important;}
+.certificate-subtitle{color:var(--grape);}
+.certificate-robot{filter:drop-shadow(0 4px 0 rgba(30,27,75,.3));border-right-color:rgba(30,27,75,.3);}
+.certificate-body{background:#fff;border:2px solid var(--ink);}
+.certificate-text{color:var(--soft);}
+.certificate-name{color:var(--ink);text-shadow:none;}
+.certificate-highlight{color:var(--grape);}
+.cert-stat{background:#fff;border:2px solid var(--ink);box-shadow:0 2px 0 var(--ink);}
+.cert-stat strong{color:var(--ink);}
+.cert-stat span{color:var(--soft);}
+.certificate-date{color:var(--soft);}
+.cert-sig-line{background:var(--ink);}
+.cert-sig-name{color:var(--ink);}
+.cert-sig-role{color:var(--soft);}
+.certificate-brand{color:var(--ink);}
+
+/* ── festa ao apanhar / entregar / acertar ── */
+.spark{position:fixed;font-size:18px;line-height:1;pointer-events:none;z-index:9950;animation:sparkFly .9s ease-out forwards;}
+@keyframes sparkFly{
+  0%{transform:translate(-50%,-50%) scale(.4);opacity:1;}
+  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.3) rotate(var(--rot));opacity:0;}
+}
+#wordPop{
+  position:fixed;left:50%;top:22%;z-index:9960;pointer-events:none;
+  transform:translate(-50%,-50%) scale(.3) rotate(-6deg);opacity:0;
+  background:#fff;border:4px solid var(--ink);border-radius:22px;box-shadow:0 7px 0 var(--ink);
+  padding:.3em .9em .35em;text-align:center;white-space:nowrap;
+  font-family:'Fredoka One',cursive;color:var(--ink);
+  font-size:clamp(1.2rem,5.5vw,2.2rem);line-height:1.1;
+}
+#wordPop small{display:block;font-size:.42em;color:var(--grape);margin-bottom:.15em;}
+#wordPop b{display:inline-block;padding:0 .3em;border-radius:12px;background:var(--sun);border:3px solid var(--ink);font-weight:400;}
+#wordPop.show{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-2deg);animation:wordPopIn 1.5s ease both;}
+@keyframes wordPopIn{
+  0%{transform:translate(-50%,-50%) scale(.3) rotate(-8deg);opacity:0;}
+  18%{transform:translate(-50%,-50%) scale(1.15) rotate(2deg);opacity:1;}
+  30%{transform:translate(-50%,-50%) scale(1) rotate(-2deg);}
+  78%{transform:translate(-50%,-50%) scale(1) rotate(-2deg);opacity:1;}
+  100%{transform:translate(-50%,-62%) scale(.9) rotate(-2deg);opacity:0;}
+}
+
+/* ── textos claros escritos dentro do JavaScript: escurecer para ler no creme ── */
+:not(pre)[style*="color:#38bdf8"]{color:#1d6fa5!important;opacity:1!important;font-weight:700;}
+:not(pre)[style*="color:#7dd3fc"]{color:#1d6fa5!important;}
+:not(pre)[style*="color:#FFB3D1"]{color:var(--soft)!important;}
+:not(pre)[style*="color:#ffb890"]{color:var(--soft)!important;}
+:not(pre)[style*="color:#ffa733"]{color:var(--ink)!important;}
+.header-player span{color:var(--ink);}
+.level-desc{font-weight:700;}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BOTÕES COMO NA "HORA DO CÓDIGO"
+   cores por tipo de comando (todos os ecrãs) e, no smartphone,
+   uma barra fixa em baixo com os 6 comandos numa só linha
+   ═══════════════════════════════════════════════════════════════════ */
+#btn-cmd-move,#btn-cmd-back{background:var(--grape)!important;color:#fff!important;}
+#btn-cmd-move .dpad-label,#btn-cmd-back .dpad-label,
+#btn-cmd-move .dpad-arrow,#btn-cmd-back .dpad-arrow{color:#fff;}
+#btn-cmd-left,#btn-cmd-right{background:var(--sky)!important;color:var(--ink)!important;}
+#btn-cmd-collect{background:var(--sun)!important;color:var(--ink)!important;}
+#btn-cmd-drop{background:var(--mint)!important;color:var(--ink)!important;}
+#btn-cmd-move:hover,#btn-cmd-back:hover{background:#8b5cf6!important;}
+#btn-cmd-left:hover,#btn-cmd-right:hover{background:#7ad9f7!important;}
+#btn-cmd-collect:hover{background:#ffdc66!important;}
+#btn-cmd-drop:hover{background:#5ff0bd!important;}
+.dpad-btn .dpad-label{font-weight:900;}
+
+@media (max-width:750px){
+  #game-screen{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px));animation:none!important;transform:none!important;}
+  body:has(#game-screen:not(.hidden)) #app-footer{margin-bottom:calc(84px + env(safe-area-inset-bottom,0px));}
+  #game-screen .dpad-wrap{
+    position:fixed;left:0;right:0;bottom:0;z-index:9200;
+    display:flex;flex-wrap:nowrap;align-items:stretch;justify-content:center;gap:5px;
+    width:100%;max-width:none;margin:0;box-sizing:border-box;
+    padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));
+    background:rgba(255,255,255,.97);
+    border:0;border-top:2px solid #c7d2fe;border-radius:0;
+    box-shadow:0 -8px 24px rgba(15,23,42,.18);
+  }
+  #game-screen .dpad-wrap::before{display:none;}
+  #game-screen .dpad-wrap .dpad-row,
+  #game-screen .dpad-wrap .dpad-actions{display:contents;}
+  #game-screen .dpad-wrap .dpad-cell-empty,
+  #game-screen .dpad-wrap .dpad-center{display:none!important;}
+  #game-screen .dpad-wrap .dpad-btn{
+    position:static;flex:1 1 0;min-width:0;width:auto!important;height:56px!important;
+    margin:0;padding:2px 0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+    border:3px solid var(--ink)!important;border-radius:18px;
+    box-shadow:0 5px 0 var(--ink)!important;
+    transform:none;overflow:hidden;
+  }
+  #game-screen .dpad-wrap .dpad-btn:active,
+  #game-screen .dpad-wrap .dpad-btn.cmd-btn-active{transform:translateY(5px);box-shadow:0 0 0 var(--ink)!important;}
+  #game-screen .dpad-wrap .dpad-btn .dpad-arrow{position:static;font-size:1.25rem;line-height:1;}
+  #game-screen .dpad-wrap .dpad-btn .dpad-label{font-size:.62rem;max-width:100%;overflow:hidden;text-overflow:clip;white-space:nowrap;}
+  #game-screen .dpad-wrap .dpad-btn .btn-label{font-size:.62rem;}
+}
+@media (max-width:360px){
+  #game-screen .dpad-wrap{gap:4px;padding-left:5px;padding-right:5px;}
+  #game-screen .dpad-wrap .dpad-btn{height:54px!important;border-radius:14px;}
+  #game-screen .dpad-wrap .dpad-btn .dpad-label{font-size:.56rem;}
+}
+</style>
 </head>
 <body class="dark">
 <div id="scale-root">
@@ -3807,6 +4145,32 @@ document.addEventListener("DOMContentLoaded", () => {
     renderGrid(); checkStuck(); checkDoor(nr,nc);
   }
 
+
+  /* ── FESTA: faíscas e selo "Boa!" ao apanhar, entregar e acertar ── */
+  function celebrateSticker(top,txt){
+    let wp=document.getElementById("wordPop");
+    if(!wp){ wp=document.createElement("div"); wp.id="wordPop"; wp.setAttribute("role","status"); wp.setAttribute("aria-live","polite"); document.body.appendChild(wp); }
+    wp.innerHTML="<small>"+top+"</small><b>"+txt+"</b>";
+    wp.classList.remove("show"); void wp.offsetWidth; wp.classList.add("show");
+    clearTimeout(wp._t); wp._t=setTimeout(()=>wp.classList.remove("show"),1500);
+  }
+  function celebrateAt(rect,top,txt){
+    if(!rect) return;
+    const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+    for(let n=0;n<10;n++){
+      const sp=document.createElement("span");
+      sp.className="spark"; sp.textContent=["⭐","✨","🌟"][n%3];
+      sp.style.left=cx+"px"; sp.style.top=cy+"px";
+      const ang=(n/10)*Math.PI*2+Math.random()*.5, dist=40+Math.random()*50;
+      sp.style.setProperty("--dx",Math.cos(ang)*dist+"px");
+      sp.style.setProperty("--dy",Math.sin(ang)*dist+"px");
+      sp.style.setProperty("--rot",(Math.random()*180-90)+"deg");
+      document.body.appendChild(sp);
+      setTimeout(()=>sp.remove(),1100);
+    }
+    celebrateSticker(top,txt);
+  }
+
   function collectEffect(emoji){
     // Flash dourado na célula do robô + emoji a voar para cima
     const g=$("grid"); if(!g) return;
@@ -3827,6 +4191,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fly.style.top=(rect.top+rect.height/2-14)+"px";
       document.body.appendChild(fly);
       setTimeout(()=>fly.remove(),520);
+      celebrateAt(rect,"Boa!","Apanhaste! ⭐");
     }
     // Robô faz pop
     if(cell){
@@ -3852,6 +4217,7 @@ document.addEventListener("DOMContentLoaded", () => {
       void cell.offsetWidth;
       cell.classList.add("deposit-flash");
       setTimeout(()=>cell.classList.remove("deposit-flash"),550);
+      celebrateAt(cell.getBoundingClientRect(),"Entregue!","Muito bem! 🎉");
       const icon=cell.querySelector(".robot-icon");
       if(icon) vbFlashPose(icon.querySelector(".grid-vb-robot"),'happy',-1,true,450);
     }
@@ -4160,10 +4526,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if(!popup){
       popup=document.createElement("div");
       popup.id="popup-door-quiz";
-      popup.style.cssText="position:fixed;inset:0;background:rgba(8,3,20,0.85);display:flex;align-items:center;justify-content:center;z-index:9500;backdrop-filter:blur(4px);";
+      popup.style.cssText="position:fixed;inset:0;background:rgba(255,248,231,0.92);display:flex;align-items:center;justify-content:center;z-index:9500;backdrop-filter:blur(4px);";
       inner=document.createElement("div");
       inner.id="popup-door-quiz-inner";
-      inner.style.cssText="background:linear-gradient(155deg,#2d0e52,#1a0835);border:3px solid #ec1e79;outline:2px solid #ffa733;outline-offset:-5px;border-radius:20px;padding:22px 24px;max-width:440px;width:92%;text-align:left;box-shadow:0 0 0 2px rgba(255,167,51,0.3),8px 8px 0 #0a0520,0 0 60px rgba(236,30,121,.3);font-family:'Fredoka One',cursive;color:#ffa733;position:relative;";
+      inner.style.cssText="background:#ffffff;border:4px solid #1e1b4b;border-radius:20px;padding:22px 24px;max-width:440px;width:92%;text-align:left;box-shadow:0 7px 0 #1e1b4b;font-family:'Fredoka One',cursive;color:#1e1b4b;position:relative;";
       popup.appendChild(inner);
       document.body.appendChild(popup);
       if (typeof _overlayObserver !== 'undefined') {
@@ -4174,24 +4540,24 @@ document.addEventListener("DOMContentLoaded", () => {
     inner.innerHTML=`
       <div style="font-size:2.2rem;text-align:center;margin-bottom:8px;animation:popIn .3s cubic-bezier(.34,1.56,.64,1);">🌀✨</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-size:.75rem;color:#ec1e79;text-transform:uppercase;letter-spacing:.07em;font-weight:400;font-family:'Fredoka One',cursive;">🌀 Portal</div>
-        <div id="dq-attempt-badge" style="font-size:.72rem;font-family:'Fredoka One',cursive;padding:3px 12px;border-radius:999px;background:rgba(236,30,121,0.15);border:1px solid rgba(236,30,121,0.5);color:#ffb890;">${attemptLabel}</div>
+        <div style="font-size:.75rem;color:#7c3aed;text-transform:uppercase;letter-spacing:.07em;font-weight:400;font-family:'Fredoka One',cursive;">🌀 Portal</div>
+        <div id="dq-attempt-badge" style="font-size:.72rem;font-family:'Fredoka One',cursive;padding:3px 12px;border-radius:999px;background:#fff3b0;border:2px solid #1e1b4b;color:#4a4872;">${attemptLabel}</div>
       </div>
-      <div style="font-size:.92rem;color:#ffa733;font-weight:400;line-height:1.6;margin-bottom:16px;font-family:'Fredoka One',cursive;">${q.q}</div>
+      <div style="font-size:.92rem;color:#1e1b4b;font-weight:400;line-height:1.6;margin-bottom:16px;font-family:'Fredoka One',cursive;">${q.q}</div>
       <div id="dq-opts" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        ${opts.map(opt=>`<button data-correct="${opt.correct}" style="padding:10px 12px;border-radius:12px;border:2px solid rgba(236,30,121,0.4);background:rgba(236,30,121,0.1);color:#ffa733;font-size:.78rem;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;text-align:center;line-height:1.4;transition:all .12s;-webkit-tap-highlight-color:transparent;">${opt.text}</button>`).join("")}
+        ${opts.map(opt=>`<button data-correct="${opt.correct}" style="padding:10px 12px;border-radius:12px;border:3px solid #1e1b4b;background:#ffffff;box-shadow:0 3px 0 #1e1b4b;color:#1e1b4b;font-size:.78rem;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;text-align:center;line-height:1.4;transition:all .12s;-webkit-tap-highlight-color:transparent;">${opt.text}</button>`).join("")}
       </div>
-      <div id="dq-feedback" style="font-size:.82rem;font-weight:700;min-height:22px;margin-top:12px;color:#ffa733;font-family:'Fredoka One',cursive;text-align:center;"></div>`;
+      <div id="dq-feedback" style="font-size:.82rem;font-weight:700;min-height:22px;margin-top:12px;color:#1e1b4b;font-family:'Fredoka One',cursive;text-align:center;"></div>`;
     inner.querySelectorAll("#dq-opts button").forEach(btn=>{
       btn.addEventListener("click",()=>{
         const ok=btn.getAttribute("data-correct")==="true";
         const fb=inner.querySelector("#dq-feedback");
         if(ok){
-          btn.style.background="rgba(67,160,71,0.25)"; btn.style.borderColor="#66BB6A"; btn.style.color="#A5D6A7"; btn.style.fontWeight="900";
+          btn.style.background="#b8f5d9"; btn.style.borderColor="#1e1b4b"; btn.style.color="#1e1b4b"; btn.style.fontWeight="900";
           inner.querySelectorAll("#dq-opts button").forEach(b=>{b.disabled=true;});
           const praise = window._getRandomPraise ? window._getRandomPraise() : "✅ Muito bem!";
-          if(fb){fb.style.color="#81C784";fb.textContent=`${praise} A porta mágica abre-se! 🎉`;}
-          playTone("quizOk");
+          if(fb){fb.style.color="#0f7a4f";fb.textContent=`${praise} A porta mágica abre-se! 🎉`;}
+          playTone("quizOk"); celebrateSticker("Boa!","Porta aberta! 🚪");
           // Starmelody na resposta correta!
           setTimeout(()=>{ if(typeof playStarMelody === 'function') playStarMelody(); }, 200);
           setTimeout(()=>{ popup.style.display="none"; doorQuizOpen=false; updateOverlayOpenClass(); completeLevel(); },1100);
@@ -4199,13 +4565,13 @@ document.addEventListener("DOMContentLoaded", () => {
           inner.querySelectorAll("#dq-opts button").forEach(b=>{
             b.disabled=true; b.style.pointerEvents="none";
             if(b.getAttribute("data-correct")==="true"){
-              b.style.background="rgba(67,160,71,0.25)"; b.style.borderColor="#66BB6A"; b.style.color="#A5D6A7"; b.style.fontWeight="900";
+              b.style.background="#b8f5d9"; b.style.borderColor="#1e1b4b"; b.style.color="#1e1b4b"; b.style.fontWeight="900";
             }
           });
-          btn.style.background="rgba(229,57,53,0.25)"; btn.style.borderColor="#EF5350"; btn.style.color="#EF9A9A";
+          btn.style.background="#ffb3b3"; btn.style.borderColor="#1e1b4b"; btn.style.color="#1e1b4b";
           const correctBtn=inner.querySelector("#dq-opts button[data-correct='true']");
           const correctText=correctBtn?correctBtn.textContent:"";
-          if(fb){fb.style.color="#EF9A9A";fb.innerHTML=`❌ Era: <span style="color:#A5D6A7;font-weight:900;">${correctText}</span> — Vem aí outra...`;}
+          if(fb){fb.style.color="#b42318";fb.innerHTML=`❌ Era: <span style="color:#0f7a4f;font-weight:900;">${correctText}</span> — Vem aí outra...`;}
           playTone("quizErr");
           setTimeout(()=>openKidQuiz(newUsed, attempt+1), 1800);
         }
@@ -4310,10 +4676,10 @@ document.addEventListener("DOMContentLoaded", () => {
       popup.setAttribute("role","dialog");
       popup.setAttribute("aria-modal","true");
       popup.setAttribute("aria-label","Desafio de Código");
-      popup.style.cssText="position:fixed;inset:0;background:rgba(8,3,20,0.85);display:flex;align-items:center;justify-content:center;z-index:9500;backdrop-filter:blur(4px);";
+      popup.style.cssText="position:fixed;inset:0;background:rgba(255,248,231,0.92);display:flex;align-items:center;justify-content:center;z-index:9500;backdrop-filter:blur(4px);";
       inner=document.createElement("div");
       inner.id="popup-codesniff-inner";
-      inner.style.cssText="background:linear-gradient(155deg,#2d0e52,#1a0835);border:3px solid #38bdf8;outline:2px solid #ffa733;outline-offset:-5px;border-radius:20px;padding:22px 24px;max-width:520px;width:92%;max-height:88vh;overflow-y:auto;text-align:left;box-shadow:0 0 0 2px rgba(56,189,248,0.3),8px 8px 0 #0a0520,0 0 60px rgba(56,189,248,.3);font-family:'Fredoka One',cursive;color:#ffa733;position:relative;";
+      inner.style.cssText="background:#ffffff;border:4px solid #1e1b4b;border-radius:20px;padding:22px 24px;max-width:520px;width:92%;max-height:88vh;overflow-y:auto;text-align:left;box-shadow:0 7px 0 #1e1b4b;font-family:'Fredoka One',cursive;color:#1e1b4b;position:relative;";
       popup.appendChild(inner);
       document.body.appendChild(popup);
       if (typeof _overlayObserver !== 'undefined') {
@@ -4325,7 +4691,7 @@ document.addEventListener("DOMContentLoaded", () => {
     popup.setAttribute("aria-label",isPseudo?"Desafio de Pseudocódigo":"Desafio de Código");
     if(!list.length){
       inner.innerHTML=`<div style="text-align:center;">
-        <div style="font-size:.92rem;color:#ffa733;line-height:1.6;margin-bottom:16px;">Ainda não há desafios de ${isPseudo?"pseudocódigo":"código"} para este tema.</div>
+        <div style="font-size:.92rem;color:#1e1b4b;line-height:1.6;margin-bottom:16px;">Ainda não há desafios de ${isPseudo?"pseudocódigo":"código"} para este tema.</div>
         <button id="cs-close-empty" class="btn secondary small">← Voltar</button>
       </div>`;
       inner.querySelector("#cs-close-empty").addEventListener("click",closeCodeSniff);
@@ -4334,7 +4700,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(idx>=list.length){
       inner.innerHTML=`<div style="text-align:center;">
         <div style="font-size:2.2rem;margin-bottom:8px;">🕵️‍♀️✅</div>
-        <div style="font-size:.95rem;color:#ffa733;font-weight:400;line-height:1.6;margin-bottom:16px;">${isPseudo?"Completaste todos os desafios de pseudocódigo deste tema! Já sabes ler um algoritmo linha a linha e prever o que ele faz.":"Completaste todos os desafios de código deste tema! Já sabes olhar para o código de uma página web à procura de sinais de perigo."}</div>
+        <div style="font-size:.95rem;color:#1e1b4b;font-weight:400;line-height:1.6;margin-bottom:16px;">${isPseudo?"Completaste todos os desafios de pseudocódigo deste tema! Já sabes ler um algoritmo linha a linha e prever o que ele faz.":"Completaste todos os desafios de código deste tema! Já sabes olhar para o código de uma página web à procura de sinais de perigo."}</div>
         <button id="cs-close-done" class="btn small">← Voltar</button>
       </div>`;
       inner.querySelector("#cs-close-done").addEventListener("click",closeCodeSniff);
@@ -4346,14 +4712,14 @@ document.addEventListener("DOMContentLoaded", () => {
     inner.innerHTML=`
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <div style="font-size:.75rem;color:#38bdf8;text-transform:uppercase;letter-spacing:.07em;font-weight:400;">${isPseudo?"🧠 Desafio de Pseudocódigo":"🔍 Desafio de Código"}</div>
-        <div style="font-size:.72rem;padding:3px 12px;border-radius:999px;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.5);color:#ffb890;">${idx+1} / ${list.length}</div>
+        <div style="font-size:.72rem;padding:3px 12px;border-radius:999px;background:#fff3b0;border:2px solid #1e1b4b;color:#4a4872;">${idx+1} / ${list.length}</div>
       </div>
       <pre style="background:#0a0520;border:1px solid rgba(56,189,248,0.35);border-radius:10px;padding:12px 14px;overflow-x:auto;font-family:'Consolas','Courier New',monospace;font-size:.72rem;line-height:1.5;color:${isPseudo?"#e0f2fe":"#7dd3fc"};white-space:pre;margin:0 0 14px;"><code>${isPseudo?highlightPseudo(ch.code):escapeHtml(ch.code)}</code></pre>
-      <div style="font-size:.88rem;color:#ffa733;font-weight:400;line-height:1.6;margin-bottom:14px;">${ch.q}</div>
+      <div style="font-size:.88rem;color:#1e1b4b;font-weight:400;line-height:1.6;margin-bottom:14px;">${ch.q}</div>
       <div id="cs-opts" style="display:flex;flex-direction:column;gap:8px;">
-        ${opts.map(opt=>`<button data-correct="${opt.correct}" style="padding:10px 12px;border-radius:12px;border:2px solid rgba(56,189,248,0.4);background:rgba(56,189,248,0.08);color:#ffa733;font-size:.78rem;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;text-align:left;line-height:1.4;transition:all .12s;-webkit-tap-highlight-color:transparent;">${escapeHtml(opt.text)}</button>`).join("")}
+        ${opts.map(opt=>`<button data-correct="${opt.correct}" style="padding:10px 12px;border-radius:12px;border:3px solid #1e1b4b;background:#ffffff;box-shadow:0 3px 0 #1e1b4b;color:#1e1b4b;font-size:.78rem;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;text-align:left;line-height:1.4;transition:all .12s;-webkit-tap-highlight-color:transparent;">${escapeHtml(opt.text)}</button>`).join("")}
       </div>
-      <div id="cs-feedback" style="font-size:.82rem;font-weight:700;min-height:22px;margin-top:12px;color:#ffa733;text-align:center;"></div>
+      <div id="cs-feedback" style="font-size:.82rem;font-weight:700;min-height:22px;margin-top:12px;color:#1e1b4b;text-align:center;"></div>
       <div id="cs-expl" style="display:none;font-size:.78rem;line-height:1.55;color:#bae6fd;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.3);border-radius:10px;padding:9px 12px;margin-top:8px;font-family:'Nunito',sans-serif;font-weight:700;text-align:left;"></div>
       <div style="text-align:center;margin-top:8px;"><button id="cs-next" class="btn small" style="display:none;margin-right:6px;">${idx+1>=list.length?"Terminar ✓":"Seguinte →"}</button><button id="cs-close" class="btn secondary small">← Voltar</button></div>`;
     inner.querySelector("#cs-close").addEventListener("click",closeCodeSniff);
@@ -4363,15 +4729,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const fb=inner.querySelector("#cs-feedback");
         inner.querySelectorAll("#cs-opts button").forEach(b=>{ b.disabled=true; b.style.pointerEvents="none"; });
         if(ok){
-          btn.style.background="rgba(67,160,71,0.25)"; btn.style.borderColor="#66BB6A"; btn.style.color="#A5D6A7"; btn.style.fontWeight="900";
-          if(fb){fb.style.color="#81C784";fb.textContent=isPseudo?"✅ Certo! Seguiste o programa passo a passo.":"✅ Certo! Boa deteção.";}
-          playTone("quizOk");
+          btn.style.background="#b8f5d9"; btn.style.borderColor="#1e1b4b"; btn.style.color="#1e1b4b"; btn.style.fontWeight="900";
+          if(fb){fb.style.color="#0f7a4f";fb.textContent=isPseudo?"✅ Certo! Seguiste o programa passo a passo.":"✅ Certo! Boa deteção.";}
+          playTone("quizOk"); celebrateSticker("Boa!","Certo! ⭐");
         } else {
           inner.querySelectorAll("#cs-opts button").forEach(b=>{
-            if(b.getAttribute("data-correct")==="true"){ b.style.background="rgba(67,160,71,0.25)"; b.style.borderColor="#66BB6A"; b.style.color="#A5D6A7"; b.style.fontWeight="900"; }
+            if(b.getAttribute("data-correct")==="true"){ b.style.background="#b8f5d9"; b.style.borderColor="#1e1b4b"; b.style.color="#1e1b4b"; b.style.fontWeight="900"; }
           });
-          btn.style.background="rgba(229,57,53,0.25)"; btn.style.borderColor="#EF5350"; btn.style.color="#EF9A9A";
-          if(fb){fb.style.color="#EF9A9A";fb.textContent=isPseudo?"❌ Não era essa — vê a opção a verde e a explicação.":"❌ Não era essa — repara na parte marcada a verde.";}
+          btn.style.background="#ffb3b3"; btn.style.borderColor="#1e1b4b"; btn.style.color="#1e1b4b";
+          if(fb){fb.style.color="#b42318";fb.textContent=isPseudo?"❌ Não era essa — vê a opção a verde e a explicação.":"❌ Não era essa — repara na parte marcada a verde.";}
           playTone("quizErr");
         }
         if(ch.e){
@@ -6539,6 +6905,18 @@ document.addEventListener("DOMContentLoaded", () => {
         p.removeAttribute('data-pin');
       }
     });
+    // barra de comandos (fixed, fundo): com o transform:scale(1) do #scale-root ficava presa
+    // ao fundo da PÁGINA; aqui é ancorada ao fundo do ecrã visível (só em telemóvel, ≤750px)
+    var cbar = document.querySelector('#game-screen .dpad-wrap');
+    if (cbar) {
+      if (window.innerWidth <= 750) {
+        var bt = Math.round(off + window.innerHeight - cbar.offsetHeight) + 'px';
+        if (cbar.style.top !== bt) cbar.style.top = bt;
+        if (cbar.style.bottom !== 'auto') cbar.style.bottom = 'auto';
+      } else if (cbar.style.top || cbar.style.bottom) {
+        cbar.style.top = ''; cbar.style.bottom = '';
+      }
+    }
     // aviso de nível (fixed, topo): acompanha o topo do ecrã visível em vez do topo da página
     var bn = document.getElementById('level-banner');
     if (bn) { var bt2 = mobile ? off + 'px' : ''; if (bn.style.top !== bt2) bn.style.top = bt2; }
