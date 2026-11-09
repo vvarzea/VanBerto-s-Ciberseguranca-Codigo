@@ -1898,8 +1898,8 @@ button.tag.tag-btn[aria-pressed="true"]{background:var(--sun);border-color:var(-
   body:has(#game-screen:not(.hidden)) #app-footer{margin-bottom:calc(84px + env(safe-area-inset-bottom,0px));}
   #game-screen .dpad-wrap{
     position:fixed;left:0;right:0;bottom:0;z-index:9200;
-    display:flex;flex-wrap:nowrap;align-items:stretch;justify-content:center;gap:5px;
-    width:100%;max-width:none;margin:0;box-sizing:border-box;
+    display:flex;flex-direction:row!important;flex-wrap:nowrap;align-items:stretch;justify-content:center;gap:5px;
+    width:100%;max-width:none;overflow:hidden;margin:0;box-sizing:border-box;
     padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));
     background:rgba(255,255,255,.97);
     border:0;border-top:2px solid #c7d2fe;border-radius:0;
