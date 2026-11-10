@@ -1929,6 +1929,35 @@ button.tag.tag-btn[aria-pressed="true"]{background:var(--sun);border-color:var(-
   #game-screen .dpad-wrap .dpad-btn{height:54px!important;border-radius:14px;}
   #game-screen .dpad-wrap .dpad-btn .dpad-label{font-size:.56rem;}
 }
+/* ===== "O que fiz" + aviso de regresso ===== */
+#vb-trail{display:flex;align-items:center;gap:8px;box-sizing:border-box;min-height:52px;margin:8px 0;padding:8px 12px;background:#fff;border:3px solid #1e1b4b;border-radius:16px;box-shadow:0 4px 0 #1e1b4b;}
+#vb-trail.hidden{display:none!important;}
+#vb-trail .vb-trail-lbl{font:800 .9rem 'Fredoka','Nunito',sans-serif;color:#1e1b4b;white-space:nowrap;}
+#vb-trail .vb-trail-list{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;flex:1;min-width:0;padding:2px;scrollbar-width:thin;}
+#vb-trail .vb-step{flex:0 0 auto;width:38px;height:38px;display:grid;place-items:center;font-size:1.3rem;background:#fff3d6;border:2.5px solid #1e1b4b;border-radius:11px;}
+#vb-trail .vb-step.last{background:#2ee6a6;}
+#vb-trail .vb-trail-empty{color:#64748b;font:700 .85rem 'Nunito',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:750px){
+  #vb-trail{height:46px;min-height:0;margin:4px 0;padding:3px 8px;gap:6px;border-width:2.5px;box-shadow:0 3px 0 #1e1b4b;}
+  #vb-trail .vb-trail-lbl{font-size:0;}
+  #vb-trail .vb-trail-lbl::before{content:'📝';font-size:1.2rem;}
+  #vb-trail .vb-step{width:32px;height:32px;font-size:1.1rem;border-radius:9px;}
+  #vb-trail .vb-trail-empty{font-size:.78rem;}
+}
+#vb-tab-return-banner{position:fixed;bottom:0;left:0;right:0;z-index:9970;box-sizing:border-box;background:linear-gradient(90deg,#6366f1,#0891b2);color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:.88rem;padding:8px 20px calc(8px + env(safe-area-inset-bottom,0px));text-align:center;pointer-events:none;transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+#vb-tab-return-banner.show{transform:translateY(0);}
+@media(prefers-reduced-motion:reduce){#vb-tab-return-banner{transition:none;}}
+/* ===== Botões iguais aos do VanBerto's (PC) ===== */
+@media (min-width:751px){
+  #game-screen .dpad-wrap{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;gap:7px;width:100%;max-width:320px;margin:0 auto 10px;}
+  #game-screen .dpad-wrap::before{content:'🎮 Comandos do robô';display:inline-block;align-self:flex-start;margin:0 0 4px;padding:4px 12px;border-radius:999px;background:#eef2ff;border:1px solid #c7d2fe;color:#4338ca!important;font:700 .8rem 'Nunito',sans-serif;letter-spacing:0;text-transform:none;}
+  #game-screen .dpad-wrap .dpad-row{gap:7px;}
+  #game-screen .dpad-wrap .dpad-btn{border-radius:18px;}
+  #game-screen .dpad-wrap .dpad-actions{width:100%;gap:7px;margin:3px 0 0!important;}
+  #game-screen .dpad-wrap .dpad-action-btn{width:auto;height:auto;min-height:46px;flex-direction:row;gap:8px;padding:8px 10px;border-radius:14px;}
+  #game-screen .dpad-wrap .dpad-action-btn .dpad-arrow{font-size:1.5rem;}
+  #game-screen .dpad-wrap .dpad-action-btn .dpad-label{font-size:.86rem;}
+}
 </style>
 </head>
 <body class="dark">
@@ -2175,6 +2204,7 @@ button.tag.tag-btn[aria-pressed="true"]{background:var(--sun);border-color:var(-
             <button type="button" class="tag tag-btn" id="btn-cam-reset" title="Recentrar a vista (também: duplo clique no tabuleiro)" aria-label="Recentrar a vista">🎯 Recentrar</button>
           </div>
         </div>
+        <div id="vb-trail" class="hidden" role="list" aria-label="O que fiz"><span class="vb-trail-lbl">📝 O que fiz:</span><div class="vb-trail-list"></div></div>
         <div class="grid-wrapper">
           <div class="grid" id="grid"></div>
         </div>
@@ -2196,7 +2226,7 @@ button.tag.tag-btn[aria-pressed="true"]{background:var(--sun);border-color:var(-
           <!-- linha 2: Esquerda | VanBerto | Direita -->
           <div class="dpad-row">
             <button class="dpad-btn cmd-btn" data-cmd="LEFT" id="btn-cmd-left" title="Virar esq." aria-label="Virar à esquerda">
-              <span class="dpad-arrow">↩️</span><span class="dpad-label">Esquerda</span>
+              <span class="dpad-arrow">↩️</span><span class="dpad-label">Esq.</span>
             </button>
             <div class="dpad-center">
               <div class="dpad-compass" id="dpad-compass" role="img" aria-label="O robô está virado para cima" title="Direção do robô">
@@ -2207,7 +2237,7 @@ button.tag.tag-btn[aria-pressed="true"]{background:var(--sun);border-color:var(-
               </div>
             </div>
             <button class="dpad-btn cmd-btn" data-cmd="RIGHT" id="btn-cmd-right" title="Virar dir." aria-label="Virar à direita">
-              <span class="dpad-arrow">↪️</span><span class="dpad-label">Direita</span>
+              <span class="dpad-arrow">↪️</span><span class="dpad-label">Dir.</span>
             </button>
           </div>
           <!-- linha 3: vazio | Recuar | vazio -->
@@ -3363,7 +3393,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cr=$("crumb-level"); if(cr) cr.textContent="Nível "+(idx+1)+" de "+lvls.length;
     const ct=$("crumb-theme"); if(ct) ct.textContent=currentTheme.name+" "+currentTheme.emoji;
     dir=0; carriedItem=null; moveCount=0; allDeposited=false; doorQuizOpen=false;
-    moveHistory=[]; runningQueue=false; queuedCommands=[]; groupStack=[]; pseudoLastRun=null;
+    moveHistory=[]; runningQueue=false; queuedCommands=[]; groupStack=[]; pseudoLastRun=null; trailCmds=[];
     levelState={
       robot:[...base.robot],
       items:base.items.map(([r,c])=>({r,c,collected:false})),
@@ -3417,6 +3447,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // crianças mais velhas, que não precisam de alvos de toque tão grandes
     // como o 1.º Ciclo. O 1.º Ciclo mantém-se sempre no tamanho grande.
     document.body.classList.toggle("queue-mode-dpad", isQueueMode());
+    trailDraw();
     const qbt=$("queue-blocks-toolbar");
     if(qbt) qbt.classList.toggle("hidden", !cycleHasRepeat(currentCycleKey));
     renderQueueGroupBar();
@@ -4097,13 +4128,36 @@ document.addEventListener("DOMContentLoaded", () => {
     if(type) playTone(type);
   }
 
+  /* "O que fiz": caminho percorrido no modo de comandos diretos */
+  const TRAIL_ICON={MOVE:"⬆️",BACK:"⬇️",LEFT:"↩️",RIGHT:"↪️",COLLECT:"✋",DROP:"📥"};
+  const TRAIL_NAME={MOVE:"Avançar",BACK:"Recuar",LEFT:"Esquerda",RIGHT:"Direita",COLLECT:"Apanhar",DROP:"Depositar"};
+  let trailCmds=[];
+  function trailDraw(){
+    const box=document.getElementById("vb-trail"); if(!box) return;
+    const on=!!(currentCycle&&!isQueueMode()&&levelState);
+    box.classList.toggle("hidden",!on); if(!on) return;
+    const lbl=box.querySelector(".vb-trail-lbl"), list=box.querySelector(".vb-trail-list");
+    lbl.textContent="📝 O que fiz"+(trailCmds.length?" ("+trailCmds.length+"):":":");
+    list.innerHTML=trailCmds.length?trailCmds.map((c,i)=>'<span class="vb-step'+(i===trailCmds.length-1?" last":"")+'" role="listitem" title="'+(TRAIL_NAME[c]||c)+'" aria-label="'+(TRAIL_NAME[c]||c)+'">'+(TRAIL_ICON[c]||"•")+'</span>').join(""):'<span class="vb-trail-empty">Carrega nos botões e fica aqui o teu caminho.</span>';
+    list.scrollLeft=list.scrollWidth;
+  }
+  function trailPush(c){ trailCmds.push(c); trailDraw(); }
+  function trailPop(){ trailCmds.pop(); trailDraw(); }
+  function trailReset(){ trailCmds=[]; trailDraw(); }
+  /* aviso ao voltar ao separador */
+  function showWelcomeBack(){
+    let b=document.getElementById("vb-tab-return-banner");
+    if(!b){ b=document.createElement("div"); b.id="vb-tab-return-banner"; b.setAttribute("role","status"); b.setAttribute("aria-live","polite"); document.body.appendChild(b); }
+    b.textContent="🎮 Bem-vindo de volta!"; void b.offsetWidth; b.classList.add("show");
+    clearTimeout(showWelcomeBack._t); showWelcomeBack._t=setTimeout(()=>b.classList.remove("show"),2500);
+  }
   function saveStateSnapshot(){
     moveHistory.push({robot:[...levelState.robot],dir,carriedItem,moveCount,items:levelState.items.map(it=>({...it})),allDeposited});
     if(moveHistory.length>50) moveHistory.shift();
   }
   function undoLastMove(){
     if(!levelState||isQueueMode()||moveHistory.length===0) return;
-    const s=moveHistory.pop();
+    const s=moveHistory.pop(); trailPop();
     levelState.robot=[...s.robot]; dir=s.dir; carriedItem=s.carriedItem; moveCount=s.moveCount;
     levelState.items=s.items.map(it=>({...it})); allDeposited=s.allDeposited;
     // Se regressámos a um estado antes de depositar tudo, fechar o quiz e resetar flag
@@ -4114,7 +4168,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function runSingleCommand(cmd){
     if(!levelState||runningQueue) return;
     if(doorQuizOpen) return;
-    if(!isQueueMode()) saveStateSnapshot();
+    if(!isQueueMode()){ saveStateSnapshot(); trailPush(cmd); }
     if(cmd==="MOVE") moveForward();
     else if(cmd==="BACK") moveBackward();
     else if(cmd==="LEFT"){ dir=(dir+3)%4; playSound("soundMove"); setFeedback("↩️ Virou à esquerda.","info"); moveCount++; updateMoves(); renderGrid(); if(window._vbReact) window._vbReact('vb-bump'); }
@@ -6368,7 +6422,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         if (!anyOpen) {
           // Dar feedback de que o jogo retomou
-          if (levelState) setFeedback('🎮 Jogo retomado! Bem-vindo de volta!', 'info');
+          if (levelState){ setFeedback('🎮 Jogo retomado! Bem-vindo de volta!', 'info'); showWelcomeBack(); }
         }
       }
     }
