@@ -1930,15 +1930,19 @@ button.tag.tag-btn[aria-pressed="true"]{background:var(--sun);border-color:var(-
   #game-screen .dpad-wrap .dpad-btn .dpad-label{font-size:.56rem;}
 }
 /* ===== "O que fiz" + aviso de regresso ===== */
-#vb-trail{display:flex;align-items:center;gap:8px;box-sizing:border-box;min-height:52px;margin:8px 0;padding:8px 12px;background:#fff;border:3px solid #1e1b4b;border-radius:16px;box-shadow:0 4px 0 #1e1b4b;}
+#vb-trail{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;align-items:center;column-gap:8px;row-gap:4px;box-sizing:border-box;margin:8px 0;padding:8px 12px;background:#fff;border:3px solid #1e1b4b;border-radius:16px;box-shadow:0 4px 0 #1e1b4b;}
 #vb-trail.hidden{display:none!important;}
-#vb-trail .vb-trail-lbl{font:800 .9rem 'Fredoka','Nunito',sans-serif;color:#1e1b4b;white-space:nowrap;}
-#vb-trail .vb-trail-list{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;flex:1;min-width:0;padding:2px;scrollbar-width:thin;}
+#vb-trail .vb-trail-lbl{grid-column:1;grid-row:1 / span 2;align-self:center;font:800 .9rem 'Fredoka','Nunito',sans-serif;color:#1e1b4b;white-space:nowrap;}
+#vb-trail .vb-trail-list{grid-column:2;grid-row:1;display:flex;flex-wrap:nowrap;align-items:center;gap:6px;overflow-x:auto;overflow-y:hidden;min-width:0;padding:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+#vb-trail .vb-trail-list::-webkit-scrollbar{display:none;}
+#vb-trail .vb-trail-track{grid-column:2;grid-row:2;position:relative;height:10px;background:#e0e7ff;border-radius:999px;touch-action:none;cursor:pointer;}
+#vb-trail .vb-trail-thumb{position:absolute;top:0;left:0;height:100%;min-width:24px;background:#6366f1;border-radius:999px;cursor:grab;}
 #vb-trail .vb-step{flex:0 0 auto;width:38px;height:38px;display:grid;place-items:center;font-size:1.3rem;background:#fff3d6;border:2.5px solid #1e1b4b;border-radius:11px;}
 #vb-trail .vb-step.last{background:#2ee6a6;}
 #vb-trail .vb-trail-empty{color:#64748b;font:700 .85rem 'Nunito',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 @media(max-width:750px){
-  #vb-trail{height:46px;min-height:0;margin:4px 0;padding:3px 8px;gap:6px;border-width:2.5px;box-shadow:0 3px 0 #1e1b4b;}
+  #vb-trail{margin:4px 0;padding:3px 8px;column-gap:6px;row-gap:3px;border-width:2.5px;box-shadow:0 3px 0 #1e1b4b;}
+  #vb-trail .vb-trail-track{height:8px;}
   #vb-trail .vb-trail-lbl{font-size:0;}
   #vb-trail .vb-trail-lbl::before{content:'📝';font-size:1.2rem;}
   #vb-trail .vb-step{width:32px;height:32px;font-size:1.1rem;border-radius:9px;}
@@ -2212,7 +2216,7 @@ button.tag.tag-btn[aria-pressed="true"]{background:var(--sun);border-color:var(-
             <button type="button" class="tag tag-btn" id="btn-cam-reset" title="Recentrar a vista (também: duplo clique no tabuleiro)" aria-label="Recentrar a vista">🎯 Recentrar</button>
           </div>
         </div>
-        <div id="vb-trail" class="hidden" role="list" aria-label="O que fiz"><span class="vb-trail-lbl">📝 O que fiz:</span><div class="vb-trail-list"></div></div>
+        <div id="vb-trail" class="hidden" role="list" aria-label="O que fiz"><span class="vb-trail-lbl">📝 O que fiz:</span><div class="vb-trail-list"></div><div class="vb-trail-track" aria-hidden="true"><div class="vb-trail-thumb"></div></div></div>
         <div class="grid-wrapper">
           <div class="grid" id="grid"></div>
         </div>
@@ -4148,7 +4152,35 @@ document.addEventListener("DOMContentLoaded", () => {
     lbl.textContent="📝 O que fiz"+(trailCmds.length?" ("+trailCmds.length+"):":":");
     list.innerHTML=trailCmds.length?trailCmds.map((c,i)=>'<span class="vb-step'+(i===trailCmds.length-1?" last":"")+'" role="listitem" title="'+(TRAIL_NAME[c]||c)+'" aria-label="'+(TRAIL_NAME[c]||c)+'">'+(TRAIL_ICON[c]||"•")+'</span>').join(""):'<span class="vb-trail-empty">Carrega nos botões e fica aqui o teu caminho.</span>';
     list.scrollLeft=list.scrollWidth;
+    trailSync();
   }
+  function trailSync(){
+    const box=document.getElementById("vb-trail"); if(!box) return;
+    const list=box.querySelector(".vb-trail-list"), track=box.querySelector(".vb-trail-track"), th=box.querySelector(".vb-trail-thumb");
+    if(!list||!track||!th) return;
+    const sw=list.scrollWidth, cw=list.clientWidth, tw=track.clientWidth;
+    if(!sw||!tw) return;
+    const w=Math.max(24,tw*Math.min(1,cw/sw));
+    th.style.width=w+"px";
+    const max=sw-cw;
+    th.style.left=(max>0?(list.scrollLeft/max)*(tw-w):0)+"px";
+  }
+  (function trailInitBar(){
+    const box=document.getElementById("vb-trail"); if(!box) return;
+    const list=box.querySelector(".vb-trail-list"), track=box.querySelector(".vb-trail-track"), th=box.querySelector(".vb-trail-thumb");
+    if(!list||!track||!th) return;
+    list.addEventListener("scroll",trailSync,{passive:true});
+    window.addEventListener("resize",trailSync);
+    function toScroll(x){ /* x = posição do centro da barra dentro da pista */
+      const tw=track.clientWidth, w=th.offsetWidth, max=list.scrollWidth-list.clientWidth;
+      if(tw>w) list.scrollLeft=Math.min(1,Math.max(0,(x-w/2)/(tw-w)))*max;
+    }
+    let drag=false;
+    track.addEventListener("pointerdown",e=>{ drag=true; try{track.setPointerCapture(e.pointerId);}catch(_){} toScroll(e.clientX-track.getBoundingClientRect().left); e.preventDefault(); });
+    track.addEventListener("pointermove",e=>{ if(drag) toScroll(e.clientX-track.getBoundingClientRect().left); });
+    const end=()=>{ drag=false; };
+    track.addEventListener("pointerup",end); track.addEventListener("pointercancel",end);
+  })();
   function trailPush(c){ trailCmds.push(c); trailDraw(); }
   function trailPop(){ trailCmds.pop(); trailDraw(); }
   function trailReset(){ trailCmds=[]; trailDraw(); }
