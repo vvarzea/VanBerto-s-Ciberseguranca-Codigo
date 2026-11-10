@@ -1958,6 +1958,14 @@ button.tag.tag-btn[aria-pressed="true"]{background:var(--sun);border-color:var(-
   #game-screen .dpad-wrap .dpad-action-btn .dpad-arrow{font-size:1.5rem;}
   #game-screen .dpad-wrap .dpad-action-btn .dpad-label{font-size:.86rem;}
 }
+/* ===== Comandos no fundo do painel (PC) + emblema do objeto fora da cara do robô (telemóvel) ===== */
+@media (min-width:751px){
+  #game-screen .academy-side{display:flex;flex-direction:column;}
+  #game-screen .academy-side .dpad-wrap{order:99;margin:12px auto 0;}
+}
+@media (max-width:750px){
+  #game-screen .carry-badge{top:-8px!important;bottom:auto!important;left:auto!important;right:-10px!important;font-size:.46em!important;padding:0 3px!important;border-width:1.5px!important;z-index:9;}
+}
 </style>
 </head>
 <body class="dark">
